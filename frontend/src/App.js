@@ -4,7 +4,7 @@ function App() {
   const [message, setMessage] = useState("Connecting...");
 
   useEffect(() => {
-    fetch("http://localhost:8080/test")
+    fetch(process.env.REACT_APP_API_URL + "/test")
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
