@@ -1,0 +1,28 @@
+# ========================
+# IntelliJ / Java
+# ========================
+.idea/
+*.iml
+
+# Maven build (Spring Boot)
+backend/target/
+
+# Logs
+*.log
+
+# ========================
+# Node / React
+# ========================
+frontend/node_modules/
+frontend/build/
+
+# ========================
+# Environment files
+# ========================
+.env
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
