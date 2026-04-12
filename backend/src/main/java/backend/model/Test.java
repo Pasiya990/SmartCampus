@@ -1,13 +1,14 @@
 package backend.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import jakarta.persistence.*;
 
-@Document(collection = "test")
+@Entity
+@Table(name = "test")
 public class Test {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
 
@@ -17,9 +18,9 @@ public class Test {
         this.name = name;
     }
 
-    public String getId() { return id; }
+    public Long getId() { return id; }
     public String getName() { return name; }
 
-    public void setId(String id) { this.id = id; }
+    public void setId(Long id) { this.id = id; }
     public void setName(String name) { this.name = name; }
 }
