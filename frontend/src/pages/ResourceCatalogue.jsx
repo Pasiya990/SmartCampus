@@ -1,0 +1,267 @@
+import { useState, useEffect, useCallback } from 'react';
+import { resourceService } from '../services/resourceService';
+import ResourceModal from '../components/ResourceModal';
+import toast from 'react-hot-toast';
+import './ResourceCatalogue.css';
+
+const TYPE_ICONS = {
+  LECTURE_HALL: '🏛️',
+  LAB: '🔬',
+  MEETING_ROOM: '🗓️',
+  EQUIPMENT: '🎥',
+};
+
+export default function ResourceCatalogue() {
+  const [resources, setResources] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState({
+    type: '',
+    location: '',
+    minCapacity: '',
+  });
+  const [modal, setModal] = useState({
+    open: false,
+    resource: null,
+  });
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = Object.fromEntries(
+        Object.entries(search).filter(([, v]) => v !== '')
+      );
+
+      const res = Object.keys(params).length
+        ? await resourceService.search(params)
+        : await resourceService.getAll();
+
+      setResources(res.data);
+    } catch (err) {
+      toast.error('Failed to load resources');
+    } finally {
+      setLoading(false);
+    }
+  }, [search]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    const loadTypes = async () => {
+      try {
+        const res = await resourceService.getTypes();
+        setTypes(res.data);
+      } catch (err) {
+        toast.error('Failed to load resource types');
+      }
+    };
+
+    loadTypes();
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this resource?')) return;
+
+    try {
+      await resourceService.delete(id);
+      toast.success('Resource deleted');
+      load();
+    } catch (err) {
+      const msg = err.response?.data?.message || err.response?.data?.error || 'Delete failed';
+      toast.error(msg);
+    }
+  };
+
+  const handleStatusToggle = async (resource) => {
+    const nextStatus =
+      resource.status === 'ACTIVE' ? 'OUT_OF_SERVICE' : 'ACTIVE';
+
+    try {
+      await resourceService.updateStatus(resource.id, nextStatus);
+      toast.success(`Status updated to ${nextStatus}`);
+      load();
+    } catch (err) {
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Status update failed';
+      toast.error(msg);
+    }
+  };
+
+  return (
+    <div className="catalogue-page">
+      <div className="page-backdrop" />
+
+      <div className="catalogue-inner">
+        <div className="page-header">
+          <div>
+            <h1 className="page-title">Facilities &amp; Assets</h1>
+            <p className="page-sub">Smart Campus Operations Hub — Module A</p>
+          </div>
+
+          <button
+            className="btn-primary"
+            onClick={() => setModal({ open: true, resource: null })}
+          >
+            + Add Resource
+          </button>
+        </div>
+
+        <div className="glass-card filter-bar">
+          <input
+            className="glass-input"
+            placeholder="Search by location..."
+            value={search.location}
+            onChange={(e) =>
+              setSearch((s) => ({ ...s, location: e.target.value }))
+            }
+          />
+
+          <select
+            className="glass-select"
+            value={search.type}
+            onChange={(e) =>
+              setSearch((s) => ({ ...s, type: e.target.value }))
+            }
+          >
+            <option value="">All types</option>
+            {types.map((t) => (
+              <option key={t} value={t}>
+                {t.replaceAll('_', ' ')}
+              </option>
+            ))}
+          </select>
+
+          <input
+            className="glass-input"
+            type="number"
+            placeholder="Min capacity"
+            value={search.minCapacity}
+            onChange={(e) =>
+              setSearch((s) => ({ ...s, minCapacity: e.target.value }))
+            }
+          />
+
+          <button
+            className="btn-ghost"
+            onClick={() =>
+              setSearch({ type: '', location: '', minCapacity: '' })
+            }
+          >
+            Clear
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="loading-grid">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="skeleton-card" />
+            ))}
+          </div>
+        ) : resources.length === 0 ? (
+          <div className="empty-state">
+            <span>📭</span>
+            <p>No resources found. Try adjusting your filters.</p>
+          </div>
+        ) : (
+          <div className="resource-grid">
+            {resources.map((r) => (
+              <div key={r.id} className="glass-card resource-card">
+                {r.imageUrl && (
+                  <img
+                    src={r.imageUrl}
+                    alt={r.name}
+                    className="resource-image"
+                  />
+                )}
+
+                <div className="resource-icon">
+                  {TYPE_ICONS[r.type] || '🏢'}
+                </div>
+
+                <div className="resource-header">
+                  <div>
+                    <h3 className="resource-name">{r.name}</h3>
+                    <p className="resource-type">
+                      {r.type?.replaceAll('_', ' ')}
+                    </p>
+                  </div>
+
+                  <span
+                    className={`status-badge ${
+                      r.status === 'ACTIVE' ? 'active' : 'inactive'
+                    }`}
+                  >
+                    {r.status === 'ACTIVE' ? 'Active' : 'Out of Service'}
+                  </span>
+                </div>
+
+                <div className="resource-meta">
+                  {r.location && (
+                    <span>
+                      📍 {r.location}
+                      {r.building ? `, ${r.building}` : ''}
+                    </span>
+                  )}
+
+                  {r.capacity && <span>👥 Capacity: {r.capacity}</span>}
+
+                  {r.availabilityStart && (
+                    <span>
+                      🕐 {r.availabilityStart} – {r.availabilityEnd}
+                    </span>
+                  )}
+                </div>
+
+                {r.description && (
+                  <p className="resource-desc">{r.description}</p>
+                )}
+
+                <div className="resource-actions">
+                  <button
+                    className="btn-icon"
+                    onClick={() => setModal({ open: true, resource: r })}
+                    title="Edit"
+                  >
+                    ✏️
+                  </button>
+
+                  <button
+                    className="btn-icon"
+                    onClick={() => handleStatusToggle(r)}
+                    title="Toggle status"
+                  >
+                    {r.status === 'ACTIVE' ? '🔴' : '🟢'}
+                  </button>
+
+                  <button
+                    className="btn-icon danger"
+                    onClick={() => handleDelete(r.id)}
+                    title="Delete"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {modal.open && (
+        <ResourceModal
+          resource={modal.resource}
+          types={types}
+          onClose={() => setModal({ open: false, resource: null })}
+          onSaved={() => {
+            setModal({ open: false, resource: null });
+            load();
+          }}
+        />
+      )}
+    </div>
+  );
+}
