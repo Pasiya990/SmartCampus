@@ -22,7 +22,6 @@ public class IncidentTicketController {
     @PostMapping
     public ResponseEntity<IncidentTicketResponse> createTicket(
             @Valid @RequestBody CreateIncidentTicketRequest request) {
-
         IncidentTicketResponse response = incidentTicketService.createTicket(request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
