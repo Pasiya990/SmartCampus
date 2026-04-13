@@ -2,11 +2,14 @@ package backend.service.impl;
 
 import backend.dto.CreateIncidentTicketRequest;
 import backend.dto.IncidentTicketResponse;
+import backend.exception.ResourceNotFoundException;
 import backend.model.IncidentTicket;
 import backend.repository.IncidentTicketRepository;
 import backend.service.IncidentTicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,22 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         IncidentTicket savedTicket = incidentTicketRepository.save(ticket);
 
         return mapToResponse(savedTicket);
+    }
+
+    @Override
+    public List<IncidentTicketResponse> getAllTickets() {
+        return incidentTicketRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public IncidentTicketResponse getTicketById(Long id) {
+        IncidentTicket ticket = incidentTicketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + id));
+
+        return mapToResponse(ticket);
     }
 
     private String generateTicketCode() {
