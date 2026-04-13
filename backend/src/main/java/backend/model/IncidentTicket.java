@@ -6,7 +6,11 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "incident_tickets")
+@Table(name = "incident_tickets",
+        indexes = {
+                @Index(name = "idx_status", columnList = "status"),
+                @Index(name = "idx_priority", columnList = "priority")
+        })
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +22,7 @@ public class IncidentTicket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "ticket_code", unique = true, nullable = false)
+    @Column(name = "ticket_code", unique = true)
     private String ticketCode;
 
     @Column(nullable = false, length = 150)
@@ -39,7 +43,7 @@ public class IncidentTicket {
     @Column(nullable = false)
     private TicketStatus status;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String location;
 
     @Column(name = "resource_name")
@@ -72,7 +76,9 @@ public class IncidentTicket {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        this.status = TicketStatus.OPEN;
+        if (this.status == null) {
+            this.status = TicketStatus.OPEN;
+        }
     }
 
     @PreUpdate
