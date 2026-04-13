@@ -10,8 +10,7 @@ function App() {
         console.log(data);
 
         if (data.length >= 0) {
-          setMessage("MongoDB Connected Successfully ✅");
-        }
+          setMessage("PostgreSQL Connected Successfully ✅");        }
       })
       .catch((err) => {
         console.error(err);
