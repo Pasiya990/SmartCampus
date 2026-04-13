@@ -26,24 +26,14 @@ public class ResourceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Resource>> getAll() {
-        return ResponseEntity.ok(service.getAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Resource> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
-    }
-
     @GetMapping("/search")
     public ResponseEntity<List<Resource>> search(
             @RequestParam(required = false) Resource.ResourceType type,
-            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Integer minCapacity,
             @RequestParam(required = false) Resource.ResourceStatus status
     ) {
-        return ResponseEntity.ok(service.search(type, location, minCapacity, status));
+        return ResponseEntity.ok(service.search(type, keyword, minCapacity, status));
     }
 
     @GetMapping("/types")
@@ -54,6 +44,16 @@ public class ResourceController {
     @GetMapping("/available")
     public ResponseEntity<List<Resource>> getAvailable() {
         return ResponseEntity.ok(service.getAvailable());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Resource>> getAll() {
+        return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Resource> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

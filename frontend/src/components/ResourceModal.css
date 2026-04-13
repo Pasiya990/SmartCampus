@@ -18,11 +18,12 @@
   border-radius: 22px;
   width: 100%;
   max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 12px 35px rgba(15, 23, 42, 0.10);
   animation: slideUp 0.22s ease;
-  overflow: hidden;
 }
 
 @keyframes slideUp {

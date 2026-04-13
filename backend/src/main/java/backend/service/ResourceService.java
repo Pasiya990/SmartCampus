@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -80,9 +81,24 @@ public class ResourceService {
         repository.deleteById(id);
     }
 
-    public List<Resource> search(Resource.ResourceType type, String location,
+    public List<Resource> search(Resource.ResourceType type, String keyword,
                                  Integer minCapacity, Resource.ResourceStatus status) {
-        return repository.search(type, location, minCapacity, status);
+
+        String normalizedKeyword = keyword == null ? "" : keyword.trim().toLowerCase(Locale.ROOT);
+
+        return repository.findAll().stream()
+                .filter(r -> type == null || r.getType() == type)
+                .filter(r -> status == null || r.getStatus() == status)
+                .filter(r -> minCapacity == null || (r.getCapacity() != null && r.getCapacity() >= minCapacity))
+                .filter(r -> {
+                    if (normalizedKeyword.isBlank()) return true;
+
+                    String location = r.getLocation() == null ? "" : r.getLocation().toLowerCase(Locale.ROOT);
+                    String building = r.getBuilding() == null ? "" : r.getBuilding().toLowerCase(Locale.ROOT);
+
+                    return location.contains(normalizedKeyword) || building.contains(normalizedKeyword);
+                })
+                .toList();
     }
 
     public List<String> getTypes() {

@@ -9,6 +9,12 @@ const TYPE_ICONS = {
   LAB: '🔬',
   MEETING_ROOM: '🗓️',
   EQUIPMENT: '🎥',
+  SMART_RESOURCE: '💡',
+  OUTDOOR_EVENT_SPACE: '🌿',
+  AUDITORIUM_STAGE: '🎤',
+  LIBRARY_STUDY_AREA: '📚',
+  PODCAST_RECORDING_ROOM: '🎙️',
+  MEDIA_PRODUCTION_STUDIO: '🎬',
 };
 
 export default function ResourceCatalogue() {
@@ -18,7 +24,7 @@ export default function ResourceCatalogue() {
 
   const [search, setSearch] = useState({
     type: '',
-    location: '',
+    keyword: '',
     minCapacity: '',
   });
 
@@ -39,13 +45,27 @@ export default function ResourceCatalogue() {
     }
   }, []);
 
+  const loadTypes = useCallback(async () => {
+    try {
+      const res = await resourceService.getTypes();
+      setTypes(res.data);
+    } catch (err) {
+      toast.error('Failed to load resource types');
+    }
+  }, []);
+
+  useEffect(() => {
+    loadAllResources();
+    loadTypes();
+  }, [loadAllResources, loadTypes]);
+
   const handleSearch = async () => {
     setLoading(true);
     try {
       const params = {};
 
-      if (search.type.trim()) params.type = search.type.trim();
-      if (search.location.trim()) params.location = search.location.trim();
+      if (search.type) params.type = search.type;
+      if (search.keyword.trim()) params.keyword = search.keyword.trim();
       if (search.minCapacity !== '') params.minCapacity = Number(search.minCapacity);
 
       const res =
@@ -68,28 +88,11 @@ export default function ResourceCatalogue() {
   const handleClear = async () => {
     setSearch({
       type: '',
-      location: '',
+      keyword: '',
       minCapacity: '',
     });
     await loadAllResources();
   };
-
-  useEffect(() => {
-    loadAllResources();
-  }, [loadAllResources]);
-
-  useEffect(() => {
-    const loadTypes = async () => {
-      try {
-        const res = await resourceService.getTypes();
-        setTypes(res.data);
-      } catch (err) {
-        toast.error('Failed to load resource types');
-      }
-    };
-
-    loadTypes();
-  }, []);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this resource?')) return;
@@ -99,7 +102,10 @@ export default function ResourceCatalogue() {
       toast.success('Resource deleted');
       loadAllResources();
     } catch (err) {
-      const msg = err.response?.data?.message || err.response?.data?.error || 'Delete failed';
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Delete failed';
       toast.error(msg);
     }
   };
@@ -143,10 +149,10 @@ export default function ResourceCatalogue() {
         <div className="glass-card filter-bar">
           <input
             className="glass-input"
-            placeholder="Search by location..."
-            value={search.location}
+            placeholder="Search by location or building..."
+            value={search.keyword}
             onChange={(e) =>
-              setSearch((s) => ({ ...s, location: e.target.value }))
+              setSearch((s) => ({ ...s, keyword: e.target.value }))
             }
           />
 
