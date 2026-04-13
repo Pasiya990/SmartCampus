@@ -15,38 +15,68 @@ export default function ResourceCatalogue() {
   const [resources, setResources] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState({
     type: '',
     location: '',
     minCapacity: '',
   });
+
   const [modal, setModal] = useState({
     open: false,
     resource: null,
   });
 
-  const load = useCallback(async () => {
+  const loadAllResources = useCallback(async () => {
     setLoading(true);
     try {
-      const params = Object.fromEntries(
-        Object.entries(search).filter(([, v]) => v !== '')
-      );
-
-      const res = Object.keys(params).length
-        ? await resourceService.search(params)
-        : await resourceService.getAll();
-
+      const res = await resourceService.getAll();
       setResources(res.data);
     } catch (err) {
       toast.error('Failed to load resources');
     } finally {
       setLoading(false);
     }
-  }, [search]);
+  }, []);
+
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      const params = {};
+
+      if (search.type.trim()) params.type = search.type.trim();
+      if (search.location.trim()) params.location = search.location.trim();
+      if (search.minCapacity !== '') params.minCapacity = Number(search.minCapacity);
+
+      const res =
+        Object.keys(params).length > 0
+          ? await resourceService.search(params)
+          : await resourceService.getAll();
+
+      setResources(res.data);
+    } catch (err) {
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Search failed';
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClear = async () => {
+    setSearch({
+      type: '',
+      location: '',
+      minCapacity: '',
+    });
+    await loadAllResources();
+  };
 
   useEffect(() => {
-    load();
-  }, [load]);
+    loadAllResources();
+  }, [loadAllResources]);
 
   useEffect(() => {
     const loadTypes = async () => {
@@ -67,7 +97,7 @@ export default function ResourceCatalogue() {
     try {
       await resourceService.delete(id);
       toast.success('Resource deleted');
-      load();
+      loadAllResources();
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.error || 'Delete failed';
       toast.error(msg);
@@ -81,7 +111,7 @@ export default function ResourceCatalogue() {
     try {
       await resourceService.updateStatus(resource.id, nextStatus);
       toast.success(`Status updated to ${nextStatus}`);
-      load();
+      loadAllResources();
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -145,12 +175,11 @@ export default function ResourceCatalogue() {
             }
           />
 
-          <button
-            className="btn-ghost"
-            onClick={() =>
-              setSearch({ type: '', location: '', minCapacity: '' })
-            }
-          >
+          <button className="btn-primary" onClick={handleSearch}>
+            Search
+          </button>
+
+          <button className="btn-ghost" onClick={handleClear}>
             Clear
           </button>
         </div>
@@ -258,7 +287,7 @@ export default function ResourceCatalogue() {
           onClose={() => setModal({ open: false, resource: null })}
           onSaved={() => {
             setModal({ open: false, resource: null });
-            load();
+            loadAllResources();
           }}
         />
       )}
