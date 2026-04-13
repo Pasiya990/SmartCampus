@@ -135,7 +135,7 @@ export default function ResourceCatalogue() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Facilities &amp; Assets</h1>
-            <p className="page-sub">Smart Campus Operations Hub — Module A</p>
+            <p className="page-sub">Smart Campus Operations Hub</p>
           </div>
 
           <button

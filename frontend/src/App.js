@@ -30,9 +30,15 @@
 // export default App;
 
 import ResourceCatalogue from "./pages/ResourceCatalogue";
+import { Toaster } from 'react-hot-toast';
 
 function App() {
-  return <ResourceCatalogue />;
+  return (
+    <>
+      <Toaster position="top-right" reverseOrder={false} />
+      <ResourceCatalogue />
+    </>
+  );
 }
 
 export default App;
