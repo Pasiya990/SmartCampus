@@ -31,6 +31,7 @@ public class ResourceService {
                 .imageUrl(imageUrl)
                 .availabilityStart(dto.getAvailabilityStart())
                 .availabilityEnd(dto.getAvailabilityEnd())
+                .status(Resource.ResourceStatus.ACTIVE)
                 .build();
 
         return repository.save(resource);
@@ -42,27 +43,40 @@ public class ResourceService {
 
     public Resource getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with id: " + id));
     }
 
     public Resource update(Long id, ResourceFormDTO dto) {
-        Resource r = getById(id);
+        Resource existing = getById(id);
 
-        r.setName(dto.getName());
-        r.setType(dto.getType());
-        r.setCapacity(dto.getCapacity());
-        r.setLocation(dto.getLocation());
-        r.setBuilding(dto.getBuilding());
-        r.setFloor(dto.getFloor());
-        r.setDescription(dto.getDescription());
+        existing.setName(dto.getName());
+        existing.setType(dto.getType());
+        existing.setCapacity(dto.getCapacity());
+        existing.setLocation(dto.getLocation());
+        existing.setBuilding(dto.getBuilding());
+        existing.setFloor(dto.getFloor());
+        existing.setDescription(dto.getDescription());
+        existing.setAvailabilityStart(dto.getAvailabilityStart());
+        existing.setAvailabilityEnd(dto.getAvailabilityEnd());
 
         String imageUrl = cloudinaryService.uploadImage(dto.getImage());
-        if (imageUrl != null) r.setImageUrl(imageUrl);
+        if (imageUrl != null) {
+            existing.setImageUrl(imageUrl);
+        }
 
-        return repository.save(r);
+        return repository.save(existing);
+    }
+
+    public Resource updateStatus(Long id, Resource.ResourceStatus status) {
+        Resource resource = getById(id);
+        resource.setStatus(status);
+        return repository.save(resource);
     }
 
     public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Resource not found with id: " + id);
+        }
         repository.deleteById(id);
     }
 
@@ -73,7 +87,8 @@ public class ResourceService {
 
     public List<String> getTypes() {
         return Arrays.stream(Resource.ResourceType.values())
-                .map(Enum::name).toList();
+                .map(Enum::name)
+                .toList();
     }
 
     public List<Resource> getAvailable() {
