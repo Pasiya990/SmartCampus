@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { resourceService } from '../services/resourceService';
 import ResourceModal from '../components/ResourceModal';
 import toast from 'react-hot-toast';
@@ -18,6 +19,8 @@ const TYPE_ICONS = {
 };
 
 export default function ResourceCatalogue() {
+  const navigate = useNavigate();
+
   const [resources, setResources] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -64,9 +67,17 @@ export default function ResourceCatalogue() {
     try {
       const params = {};
 
-      if (search.type) params.type = search.type;
-      if (search.keyword.trim()) params.keyword = search.keyword.trim();
-      if (search.minCapacity !== '') params.minCapacity = Number(search.minCapacity);
+      if (search.type) {
+        params.type = search.type;
+      }
+
+      if (search.keyword.trim()) {
+        params.keyword = search.keyword.trim();
+      }
+
+      if (search.minCapacity !== '') {
+        params.minCapacity = Number(search.minCapacity);
+      }
 
       const res =
         Object.keys(params).length > 0
@@ -99,7 +110,7 @@ export default function ResourceCatalogue() {
 
     try {
       await resourceService.delete(id);
-      toast.success('Resource deleted');
+      toast.success('Resource deleted successfully');
       loadAllResources();
     } catch (err) {
       const msg =
@@ -125,6 +136,15 @@ export default function ResourceCatalogue() {
         'Status update failed';
       toast.error(msg);
     }
+  };
+
+  const handleBook = (resource) => {
+    if (resource.status !== 'ACTIVE') {
+      toast.error('This resource is currently out of service');
+      return;
+    }
+
+    navigate(`/booking/${resource.id}`);
   };
 
   return (
@@ -262,6 +282,14 @@ export default function ResourceCatalogue() {
                     title="Edit"
                   >
                     ✏️
+                  </button>
+
+                  <button
+                    className="btn-icon"
+                    onClick={() => handleBook(r)}
+                    title="Book"
+                  >
+                    📅
                   </button>
 
                   <button

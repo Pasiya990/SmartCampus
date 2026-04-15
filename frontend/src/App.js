@@ -29,15 +29,21 @@
 
 // export default App;
 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+
 import ResourceCatalogue from "./pages/ResourceCatalogue";
-import { Toaster } from 'react-hot-toast';
+import BookingPage from "./pages/BookingPage";
 
 function App() {
   return (
-    <>
+    <Router>
       <Toaster position="top-right" reverseOrder={false} />
-      <ResourceCatalogue />
-    </>
+      <Routes>
+        <Route path="/" element={<ResourceCatalogue />} />
+        <Route path="/booking/:id" element={<BookingPage />} />
+      </Routes>
+    </Router>
   );
 }
 
