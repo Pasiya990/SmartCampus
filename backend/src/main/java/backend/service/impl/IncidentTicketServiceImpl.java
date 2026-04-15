@@ -12,6 +12,8 @@ import backend.service.IncidentTicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import backend.model.TicketComment;
+import backend.repository.TicketCommentRepository;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -25,6 +27,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     private final IncidentTicketRepository incidentTicketRepository;
     private final TicketAttachmentRepository ticketAttachmentRepository;
     private final CloudinaryService cloudinaryService;
+    private final TicketCommentRepository ticketCommentRepository;
 
     @Override
     public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
@@ -137,6 +140,36 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .toList();
     }
 
+    @Override
+public TicketCommentResponse addComment(Long ticketId, AddTicketCommentRequest request) {
+    IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+
+    TicketComment comment = TicketComment.builder()
+            .authorName(request.getAuthorName())
+            .authorRole(request.getAuthorRole())
+            .message(request.getMessage())
+            .ticket(ticket)
+            .build();
+
+    TicketComment savedComment = ticketCommentRepository.save(comment);
+
+    ticket.getComments().add(savedComment);
+
+    return mapToCommentResponse(savedComment);
+}
+
+@Override
+public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
+    incidentTicketRepository.findById(ticketId)
+            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+
+    return ticketCommentRepository.findByTicketIdOrderByCreatedAtAsc(ticketId)
+            .stream()
+            .map(this::mapToCommentResponse)
+            .toList();
+}
+
     private void validateAttachments(MultipartFile[] files) {
         if (files == null) {
             return;
@@ -158,6 +191,16 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
             throw new IllegalArgumentException("A ticket can include up to 3 image attachments");
         }
     }
+
+    private TicketCommentResponse mapToCommentResponse(TicketComment comment) {
+    return TicketCommentResponse.builder()
+            .id(comment.getId())
+            .authorName(comment.getAuthorName())
+            .authorRole(comment.getAuthorRole())
+            .message(comment.getMessage())
+            .createdAt(comment.getCreatedAt())
+            .build();
+}
 
     private void saveAttachment(IncidentTicket ticket, MultipartFile file) {
     try {
