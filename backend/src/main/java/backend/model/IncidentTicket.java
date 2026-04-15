@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "incident_tickets",
@@ -85,4 +87,8 @@ public class IncidentTicket {
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+   @Builder.Default
+   @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+   private List<TicketAttachment> attachments = new ArrayList<>();
 }
