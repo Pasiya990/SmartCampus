@@ -80,4 +80,21 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .updatedAt(ticket.getUpdatedAt())
                 .build();
     }
+
+    @Override
+public IncidentTicketResponse assignTechnician(Long ticketId, String technicianName) {
+
+    IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+
+    ticket.setAssignedTechnician(technicianName);
+
+    if (ticket.getStatus() == null || ticket.getStatus().name().equals("OPEN")) {
+        ticket.setStatus(backend.model.TicketStatus.IN_PROGRESS);
+    }
+
+    IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+    return mapToResponse(updated);
+}
 }

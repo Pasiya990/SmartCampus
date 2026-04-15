@@ -1,5 +1,6 @@
 package backend.controller;
 
+import backend.dto.AssignTechnicianRequest;
 import backend.dto.CreateIncidentTicketRequest;
 import backend.dto.IncidentTicketResponse;
 import backend.service.IncidentTicketService;
@@ -35,4 +36,14 @@ public class IncidentTicketController {
     public ResponseEntity<IncidentTicketResponse> getTicketById(@PathVariable Long id) {
         return ResponseEntity.ok(incidentTicketService.getTicketById(id));
     }
+
+    @PatchMapping("/{id}/assign-technician")
+     public ResponseEntity<IncidentTicketResponse> assignTechnician(
+        @PathVariable Long id,
+        @Valid @RequestBody AssignTechnicianRequest request) {
+
+    return ResponseEntity.ok(
+            incidentTicketService.assignTechnician(id, request.getTechnicianName())
+    );
+}
 }
