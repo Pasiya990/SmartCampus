@@ -12,6 +12,8 @@ import backend.service.IncidentTicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import backend.model.TicketComment;
+import backend.repository.TicketCommentRepository;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -25,6 +27,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     private final IncidentTicketRepository incidentTicketRepository;
     private final TicketAttachmentRepository ticketAttachmentRepository;
     private final CloudinaryService cloudinaryService;
+    private final TicketCommentRepository ticketCommentRepository;
 
     @Override
     public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
@@ -137,6 +140,75 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .toList();
     }
 
+    @Override
+public TicketCommentResponse addComment(Long ticketId, AddTicketCommentRequest request) {
+    IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+
+    TicketComment comment = TicketComment.builder()
+            .authorName(request.getAuthorName())
+            .authorRole(request.getAuthorRole())
+            .message(request.getMessage())
+            .ticket(ticket)
+            .build();
+
+    TicketComment savedComment = ticketCommentRepository.save(comment);
+
+    ticket.getComments().add(savedComment);
+
+    return mapToCommentResponse(savedComment);
+}
+
+@Override
+public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
+    incidentTicketRepository.findById(ticketId)
+            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+
+    return ticketCommentRepository.findByTicketIdOrderByCreatedAtAsc(ticketId)
+            .stream()
+            .map(this::mapToCommentResponse)
+            .toList();
+}
+
+@Override
+public TicketCommentResponse updateComment(Long commentId, UpdateTicketCommentRequest request) {
+
+    TicketComment comment = ticketCommentRepository.findById(commentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
+
+    boolean isOwner =
+            comment.getAuthorName().equalsIgnoreCase(request.getEditorName()) &&
+            comment.getAuthorRole().equalsIgnoreCase(request.getEditorRole());
+
+    if (!isOwner) {
+        throw new IllegalArgumentException("Only the comment owner can edit this comment");
+    }
+
+    comment.setMessage(request.getMessage());
+
+    TicketComment updated = ticketCommentRepository.save(comment);
+
+    return mapToCommentResponse(updated);
+}
+
+@Override
+public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
+
+    TicketComment comment = ticketCommentRepository.findById(commentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
+
+    boolean isOwner =
+            comment.getAuthorName().equalsIgnoreCase(request.getActorName()) &&
+            comment.getAuthorRole().equalsIgnoreCase(request.getActorRole());
+
+    boolean isAdmin = "ADMIN".equalsIgnoreCase(request.getActorRole());
+
+    if (!isOwner && !isAdmin) {
+        throw new IllegalArgumentException("Only the comment owner or admin can delete this comment");
+    }
+
+    ticketCommentRepository.delete(comment);
+}
     private void validateAttachments(MultipartFile[] files) {
         if (files == null) {
             return;
@@ -158,6 +230,16 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
             throw new IllegalArgumentException("A ticket can include up to 3 image attachments");
         }
     }
+
+    private TicketCommentResponse mapToCommentResponse(TicketComment comment) {
+    return TicketCommentResponse.builder()
+            .id(comment.getId())
+            .authorName(comment.getAuthorName())
+            .authorRole(comment.getAuthorRole())
+            .message(comment.getMessage())
+            .createdAt(comment.getCreatedAt())
+            .build();
+}
 
     private void saveAttachment(IncidentTicket ticket, MultipartFile file) {
     try {
@@ -217,9 +299,18 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     }
 
     private String generateTicketCode() {
-        long count = incidentTicketRepository.count() + 1;
-        return String.format("TKT-%04d", count);
+    int nextNumber = 1;
+
+    var lastTicket = incidentTicketRepository.findTopByOrderByIdDesc();
+
+    if (lastTicket.isPresent() && lastTicket.get().getTicketCode() != null) {
+        String lastCode = lastTicket.get().getTicketCode(); // example: TKT-0008
+        int lastNumber = Integer.parseInt(lastCode.substring(4));
+        nextNumber = lastNumber + 1;
     }
+
+    return String.format("TKT-%04d", nextNumber);
+}
 
     private IncidentTicketResponse mapToResponse(IncidentTicket ticket) {
         List<TicketAttachmentResponse> attachmentResponses =

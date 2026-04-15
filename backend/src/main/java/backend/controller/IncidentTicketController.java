@@ -14,6 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import backend.dto.AddTicketCommentRequest;
+import backend.dto.TicketCommentResponse;
+import backend.dto.DeleteTicketCommentRequest;
+import backend.dto.UpdateTicketCommentRequest;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,4 +91,39 @@ public ResponseEntity<IncidentTicketResponse> createTicket(
                 incidentTicketService.filterTickets(status, priority)
         );
     }
+
+    @PostMapping("/{id}/comments")
+        public ResponseEntity<TicketCommentResponse> addComment(
+        @PathVariable Long id,
+        @Valid @RequestBody AddTicketCommentRequest request) {
+
+        return new ResponseEntity<>(
+            incidentTicketService.addComment(id, request),
+            HttpStatus.CREATED
+    );
+}
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<TicketCommentResponse>> getCommentsByTicketId(@PathVariable Long id) {
+    return ResponseEntity.ok(incidentTicketService.getCommentsByTicketId(id));
+}
+
+@PutMapping("/comments/{commentId}")
+public ResponseEntity<TicketCommentResponse> updateComment(
+        @PathVariable Long commentId,
+        @Valid @RequestBody UpdateTicketCommentRequest request) {
+
+    return ResponseEntity.ok(
+            incidentTicketService.updateComment(commentId, request)
+    );
+}
+
+@DeleteMapping("/comments/{commentId}")
+public ResponseEntity<String> deleteComment(
+        @PathVariable Long commentId,
+        @Valid @RequestBody DeleteTicketCommentRequest request) {
+
+    incidentTicketService.deleteComment(commentId, request);
+    return ResponseEntity.ok("Comment deleted successfully");
+}
 }
