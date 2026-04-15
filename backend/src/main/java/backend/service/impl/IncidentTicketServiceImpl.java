@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import backend.model.TicketComment;
 import backend.repository.TicketCommentRepository;
-import backend.dto.DeleteTicketCommentRequest;
-import backend.dto.UpdateTicketCommentRequest;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -301,9 +299,18 @@ public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
     }
 
     private String generateTicketCode() {
-        long count = incidentTicketRepository.count() + 1;
-        return String.format("TKT-%04d", count);
+    int nextNumber = 1;
+
+    var lastTicket = incidentTicketRepository.findTopByOrderByIdDesc();
+
+    if (lastTicket.isPresent() && lastTicket.get().getTicketCode() != null) {
+        String lastCode = lastTicket.get().getTicketCode(); // example: TKT-0008
+        int lastNumber = Integer.parseInt(lastCode.substring(4));
+        nextNumber = lastNumber + 1;
     }
+
+    return String.format("TKT-%04d", nextNumber);
+}
 
     private IncidentTicketResponse mapToResponse(IncidentTicket ticket) {
         List<TicketAttachmentResponse> attachmentResponses =
