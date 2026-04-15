@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/user")
 @CrossOrigin(origins = "http://localhost:3000")
-public class TestController {
+public class UserController {
 
     @Autowired
     private TestRepository repo;

@@ -1,28 +1,21 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import AdminDashboard from "./pages/AdminDashboard";
+import TechnicianView from "./pages/TechnicianView";
+import OAuthSuccess from "./pages/OAuthSuccess";
+import UserDashboard from "./pages/UserDashboard";
 
 function App() {
-  const [message, setMessage] = useState("Connecting...");
-
-  useEffect(() => {
-    fetch(process.env.REACT_APP_API_URL + "/test")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-
-        if (data.length >= 0) {
-          setMessage("PostgreSQL Connected Successfully ✅");        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setMessage("Connection Failed ❌");
-      });
-  }, []);
-
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>SmartCampus</h1>
-      <h2>{message}</h2>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/oauth-success" element={<OAuthSuccess />} />
+        <Route path="/user" element={<UserDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/technician" element={<TechnicianView />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

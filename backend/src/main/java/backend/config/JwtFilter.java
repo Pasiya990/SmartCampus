@@ -23,31 +23,37 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
+    
         String authHeader = request.getHeader("Authorization");
-
+    
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-
+    
             String token = authHeader.substring(7);
-
+    
             try {
                 String email = jwtUtil.extractEmail(token);
                 String role = jwtUtil.extractRole(token);
-
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                        );
-
-                SecurityContextHolder.getContext().setAuthentication(auth);
-
+    
+                // 🔥 ONLY set auth if not already set
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+    
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    email,
+                                    null,
+                                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                            );
+    
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+    
             } catch (Exception e) {
-                System.out.println("Invalid JWT");
+                // 🔥 CLEAR CONTEXT (IMPORTANT)
+                SecurityContextHolder.clearContext();
+                System.out.println("Invalid JWT: " + e.getMessage());
             }
         }
-
+    
         filterChain.doFilter(request, response);
     }
 }

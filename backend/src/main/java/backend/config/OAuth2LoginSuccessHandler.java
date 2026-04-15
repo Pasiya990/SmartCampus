@@ -36,6 +36,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String token = jwtUtil.generateToken(email, user.getRole().name());
 
         // TEMP: show token in browser
-        response.getWriter().write("JWT TOKEN:\n" + token);
+        //response.getWriter().write("JWT TOKEN:\n" + token);
+
+        response.sendRedirect("http://localhost:3000/oauth-success?token=" + token);
+
     }
 }
