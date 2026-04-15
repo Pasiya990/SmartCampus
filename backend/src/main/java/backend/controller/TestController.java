@@ -5,7 +5,6 @@ import backend.repository.TestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/test")
@@ -22,9 +21,9 @@ public class TestController {
         return repo.save(t);
     }
 
-    // ✅ Get all data
-    @GetMapping
-    public List<Test> getAll() {
-        return repo.findAll();
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello USER";
     }
+
 }
