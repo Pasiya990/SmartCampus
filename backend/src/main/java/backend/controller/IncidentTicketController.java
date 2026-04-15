@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import backend.dto.AddTicketCommentRequest;
 import backend.dto.TicketCommentResponse;
+import backend.dto.DeleteTicketCommentRequest;
+import backend.dto.UpdateTicketCommentRequest;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -109,7 +111,7 @@ public ResponseEntity<IncidentTicketResponse> createTicket(
 @PutMapping("/comments/{commentId}")
 public ResponseEntity<TicketCommentResponse> updateComment(
         @PathVariable Long commentId,
-        @Valid @RequestBody AddTicketCommentRequest request) {
+        @Valid @RequestBody UpdateTicketCommentRequest request) {
 
     return ResponseEntity.ok(
             incidentTicketService.updateComment(commentId, request)
@@ -117,9 +119,11 @@ public ResponseEntity<TicketCommentResponse> updateComment(
 }
 
 @DeleteMapping("/comments/{commentId}")
-public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
+public ResponseEntity<String> deleteComment(
+        @PathVariable Long commentId,
+        @Valid @RequestBody DeleteTicketCommentRequest request) {
 
-    incidentTicketService.deleteComment(commentId);
+    incidentTicketService.deleteComment(commentId, request);
     return ResponseEntity.ok("Comment deleted successfully");
 }
 }

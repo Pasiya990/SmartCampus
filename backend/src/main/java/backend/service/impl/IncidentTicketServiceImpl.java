@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import backend.model.TicketComment;
 import backend.repository.TicketCommentRepository;
+import backend.dto.DeleteTicketCommentRequest;
+import backend.dto.UpdateTicketCommentRequest;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -171,13 +173,19 @@ public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
 }
 
 @Override
-public TicketCommentResponse updateComment(Long commentId, AddTicketCommentRequest request) {
+public TicketCommentResponse updateComment(Long commentId, UpdateTicketCommentRequest request) {
 
     TicketComment comment = ticketCommentRepository.findById(commentId)
             .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
 
-    comment.setAuthorName(request.getAuthorName());
-    comment.setAuthorRole(request.getAuthorRole());
+    boolean isOwner =
+            comment.getAuthorName().equalsIgnoreCase(request.getEditorName()) &&
+            comment.getAuthorRole().equalsIgnoreCase(request.getEditorRole());
+
+    if (!isOwner) {
+        throw new IllegalArgumentException("Only the comment owner can edit this comment");
+    }
+
     comment.setMessage(request.getMessage());
 
     TicketComment updated = ticketCommentRepository.save(comment);
@@ -186,14 +194,23 @@ public TicketCommentResponse updateComment(Long commentId, AddTicketCommentReque
 }
 
 @Override
-public void deleteComment(Long commentId) {
+public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
 
     TicketComment comment = ticketCommentRepository.findById(commentId)
             .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
 
+    boolean isOwner =
+            comment.getAuthorName().equalsIgnoreCase(request.getActorName()) &&
+            comment.getAuthorRole().equalsIgnoreCase(request.getActorRole());
+
+    boolean isAdmin = "ADMIN".equalsIgnoreCase(request.getActorRole());
+
+    if (!isOwner && !isAdmin) {
+        throw new IllegalArgumentException("Only the comment owner or admin can delete this comment");
+    }
+
     ticketCommentRepository.delete(comment);
 }
-
     private void validateAttachments(MultipartFile[] files) {
         if (files == null) {
             return;
