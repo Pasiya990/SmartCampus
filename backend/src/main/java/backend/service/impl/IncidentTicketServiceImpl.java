@@ -170,6 +170,30 @@ public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
             .toList();
 }
 
+@Override
+public TicketCommentResponse updateComment(Long commentId, AddTicketCommentRequest request) {
+
+    TicketComment comment = ticketCommentRepository.findById(commentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
+
+    comment.setAuthorName(request.getAuthorName());
+    comment.setAuthorRole(request.getAuthorRole());
+    comment.setMessage(request.getMessage());
+
+    TicketComment updated = ticketCommentRepository.save(comment);
+
+    return mapToCommentResponse(updated);
+}
+
+@Override
+public void deleteComment(Long commentId) {
+
+    TicketComment comment = ticketCommentRepository.findById(commentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
+
+    ticketCommentRepository.delete(comment);
+}
+
     private void validateAttachments(MultipartFile[] files) {
         if (files == null) {
             return;

@@ -105,4 +105,21 @@ public ResponseEntity<IncidentTicketResponse> createTicket(
     public ResponseEntity<List<TicketCommentResponse>> getCommentsByTicketId(@PathVariable Long id) {
     return ResponseEntity.ok(incidentTicketService.getCommentsByTicketId(id));
 }
+
+@PutMapping("/comments/{commentId}")
+public ResponseEntity<TicketCommentResponse> updateComment(
+        @PathVariable Long commentId,
+        @Valid @RequestBody AddTicketCommentRequest request) {
+
+    return ResponseEntity.ok(
+            incidentTicketService.updateComment(commentId, request)
+    );
+}
+
+@DeleteMapping("/comments/{commentId}")
+public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
+
+    incidentTicketService.deleteComment(commentId);
+    return ResponseEntity.ok("Comment deleted successfully");
+}
 }

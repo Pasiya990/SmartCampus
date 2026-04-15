@@ -20,5 +20,7 @@ public interface IncidentTicketService {
     List<IncidentTicketResponse> filterTickets(TicketStatus status, PriorityLevel priority);
     TicketCommentResponse addComment(Long ticketId, AddTicketCommentRequest request);
     List<TicketCommentResponse> getCommentsByTicketId(Long ticketId);
+    TicketCommentResponse updateComment(Long commentId, AddTicketCommentRequest request);
+    void deleteComment(Long commentId);
 
 }
