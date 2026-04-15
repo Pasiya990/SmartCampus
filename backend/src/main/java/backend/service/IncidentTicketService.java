@@ -11,4 +11,6 @@ public interface IncidentTicketService {
     List<IncidentTicketResponse> getAllTickets();
     IncidentTicketResponse getTicketById(Long id);
     IncidentTicketResponse assignTechnician(Long ticketId, String technicianName);
+    IncidentTicketResponse updateTicketStatus(Long ticketId, backend.dto.UpdateTicketStatusRequest request);
+
 }

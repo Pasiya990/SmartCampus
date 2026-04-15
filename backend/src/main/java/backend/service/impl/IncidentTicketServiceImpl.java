@@ -2,8 +2,10 @@ package backend.service.impl;
 
 import backend.dto.CreateIncidentTicketRequest;
 import backend.dto.IncidentTicketResponse;
+import backend.dto.UpdateTicketStatusRequest;
 import backend.exception.ResourceNotFoundException;
 import backend.model.IncidentTicket;
+import backend.model.TicketStatus;
 import backend.repository.IncidentTicketRepository;
 import backend.service.IncidentTicketService;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +56,82 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         return mapToResponse(ticket);
     }
 
+    @Override
+    public IncidentTicketResponse assignTechnician(Long ticketId, String technicianName) {
+
+        IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+
+        ticket.setAssignedTechnician(technicianName);
+
+        if (ticket.getStatus() == null || ticket.getStatus() == TicketStatus.OPEN) {
+            ticket.setStatus(TicketStatus.IN_PROGRESS);
+        }
+
+        IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+        return mapToResponse(updated);
+    }
+
+    @Override
+    public IncidentTicketResponse updateTicketStatus(Long ticketId, UpdateTicketStatusRequest request) {
+
+        IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+
+        TicketStatus currentStatus = ticket.getStatus();
+        TicketStatus newStatus = request.getStatus();
+
+        validateStatusTransition(currentStatus, newStatus, request);
+
+        ticket.setStatus(newStatus);
+
+        if (newStatus == TicketStatus.RESOLVED) {
+            ticket.setResolutionNotes(request.getResolutionNotes());
+            ticket.setRejectionReason(null);
+        } else if (newStatus == TicketStatus.REJECTED) {
+            ticket.setRejectionReason(request.getRejectionReason());
+            ticket.setResolutionNotes(null);
+        }
+
+        IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+        return mapToResponse(updated);
+    }
+
+    private void validateStatusTransition(TicketStatus currentStatus, TicketStatus newStatus, UpdateTicketStatusRequest request) {
+
+        if (currentStatus == TicketStatus.OPEN && !(newStatus == TicketStatus.IN_PROGRESS || newStatus == TicketStatus.REJECTED)) {
+            throw new IllegalArgumentException("OPEN tickets can only move to IN_PROGRESS or REJECTED");
+        }
+
+        if (currentStatus == TicketStatus.IN_PROGRESS && newStatus != TicketStatus.RESOLVED) {
+            throw new IllegalArgumentException("IN_PROGRESS tickets can only move to RESOLVED");
+        }
+
+        if (currentStatus == TicketStatus.RESOLVED && newStatus != TicketStatus.CLOSED) {
+            throw new IllegalArgumentException("RESOLVED tickets can only move to CLOSED");
+        }
+
+        if (currentStatus == TicketStatus.CLOSED) {
+            throw new IllegalArgumentException("CLOSED tickets cannot be updated");
+        }
+
+        if (currentStatus == TicketStatus.REJECTED) {
+            throw new IllegalArgumentException("REJECTED tickets cannot be updated");
+        }
+
+        if (newStatus == TicketStatus.REJECTED &&
+                (request.getRejectionReason() == null || request.getRejectionReason().trim().isEmpty())) {
+            throw new IllegalArgumentException("Rejection reason is required when rejecting a ticket");
+        }
+
+        if (newStatus == TicketStatus.RESOLVED &&
+                (request.getResolutionNotes() == null || request.getResolutionNotes().trim().isEmpty())) {
+            throw new IllegalArgumentException("Resolution notes are required when resolving a ticket");
+        }
+    }
+
     private String generateTicketCode() {
         long count = incidentTicketRepository.count() + 1;
         return String.format("TKT-%04d", count);
@@ -80,21 +158,4 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .updatedAt(ticket.getUpdatedAt())
                 .build();
     }
-
-    @Override
-public IncidentTicketResponse assignTechnician(Long ticketId, String technicianName) {
-
-    IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
-            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
-
-    ticket.setAssignedTechnician(technicianName);
-
-    if (ticket.getStatus() == null || ticket.getStatus().name().equals("OPEN")) {
-        ticket.setStatus(backend.model.TicketStatus.IN_PROGRESS);
-    }
-
-    IncidentTicket updated = incidentTicketRepository.save(ticket);
-
-    return mapToResponse(updated);
-}
 }

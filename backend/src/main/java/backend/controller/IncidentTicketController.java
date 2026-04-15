@@ -3,6 +3,7 @@ package backend.controller;
 import backend.dto.AssignTechnicianRequest;
 import backend.dto.CreateIncidentTicketRequest;
 import backend.dto.IncidentTicketResponse;
+import backend.dto.UpdateTicketStatusRequest;
 import backend.service.IncidentTicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,12 +39,22 @@ public class IncidentTicketController {
     }
 
     @PatchMapping("/{id}/assign-technician")
-     public ResponseEntity<IncidentTicketResponse> assignTechnician(
-        @PathVariable Long id,
-        @Valid @RequestBody AssignTechnicianRequest request) {
+    public ResponseEntity<IncidentTicketResponse> assignTechnician(
+            @PathVariable Long id,
+            @Valid @RequestBody AssignTechnicianRequest request) {
 
-    return ResponseEntity.ok(
-            incidentTicketService.assignTechnician(id, request.getTechnicianName())
-    );
-}
+        return ResponseEntity.ok(
+                incidentTicketService.assignTechnician(id, request.getTechnicianName())
+        );
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<IncidentTicketResponse> updateTicketStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateTicketStatusRequest request) {
+
+        return ResponseEntity.ok(
+                incidentTicketService.updateTicketStatus(id, request)
+        );
+    }
 }
