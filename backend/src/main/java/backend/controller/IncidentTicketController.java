@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import backend.dto.AddTicketCommentRequest;
+import backend.dto.TicketCommentResponse;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,4 +89,20 @@ public ResponseEntity<IncidentTicketResponse> createTicket(
                 incidentTicketService.filterTickets(status, priority)
         );
     }
+
+    @PostMapping("/{id}/comments")
+        public ResponseEntity<TicketCommentResponse> addComment(
+        @PathVariable Long id,
+        @Valid @RequestBody AddTicketCommentRequest request) {
+
+        return new ResponseEntity<>(
+            incidentTicketService.addComment(id, request),
+            HttpStatus.CREATED
+    );
+}
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<TicketCommentResponse>> getCommentsByTicketId(@PathVariable Long id) {
+    return ResponseEntity.ok(incidentTicketService.getCommentsByTicketId(id));
+}
 }
