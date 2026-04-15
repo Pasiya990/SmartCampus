@@ -19,4 +19,6 @@ public interface IncidentTicketRepository extends JpaRepository<IncidentTicket, 
     Optional<IncidentTicket> findByTicketCode(String ticketCode);
 
     boolean existsByTicketCode(String ticketCode);
+
+    
 }

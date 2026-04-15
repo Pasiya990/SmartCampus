@@ -6,6 +6,8 @@ import backend.model.TicketStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -31,4 +33,6 @@ public class IncidentTicketResponse {
     private String resolutionNotes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<TicketAttachmentResponse> attachments;
+
 }

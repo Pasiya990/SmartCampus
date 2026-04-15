@@ -10,8 +10,13 @@ import backend.service.IncidentTicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -23,12 +28,25 @@ public class IncidentTicketController {
 
     private final IncidentTicketService incidentTicketService;
 
-    @PostMapping
-    public ResponseEntity<IncidentTicketResponse> createTicket(
-            @Valid @RequestBody CreateIncidentTicketRequest request) {
-        IncidentTicketResponse response = incidentTicketService.createTicket(request);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<IncidentTicketResponse> createTicket(
+        @RequestPart("ticket") String ticketJson,
+        @RequestPart(value = "files", required = false) MultipartFile[] files) {
+
+    try {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CreateIncidentTicketRequest request =
+                objectMapper.readValue(ticketJson, CreateIncidentTicketRequest.class);
+
+        IncidentTicketResponse response =
+                incidentTicketService.createTicket(request, files);
+
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+    } catch (Exception e) {
+        throw new RuntimeException("Invalid ticket JSON", e);
     }
+}
 
     @GetMapping
     public ResponseEntity<List<IncidentTicketResponse>> getAllTickets() {
@@ -62,11 +80,11 @@ public class IncidentTicketController {
 
     @GetMapping("/filter")
     public ResponseEntity<List<IncidentTicketResponse>> filterTickets(
-        @RequestParam(required = false) TicketStatus status,
-        @RequestParam(required = false) PriorityLevel priority) {
+            @RequestParam(required = false) TicketStatus status,
+            @RequestParam(required = false) PriorityLevel priority) {
 
-    return ResponseEntity.ok(
-            incidentTicketService.filterTickets(status, priority)
-    );
-}
+        return ResponseEntity.ok(
+                incidentTicketService.filterTickets(status, priority)
+        );
+    }
 }

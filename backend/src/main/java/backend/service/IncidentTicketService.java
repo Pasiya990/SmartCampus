@@ -4,12 +4,13 @@ import backend.dto.CreateIncidentTicketRequest;
 import backend.dto.IncidentTicketResponse;
 import backend.model.PriorityLevel;
 import backend.model.TicketStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 
 public interface IncidentTicketService {
-    IncidentTicketResponse createTicket(CreateIncidentTicketRequest request);
+    IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files);
     List<IncidentTicketResponse> getAllTickets();
     IncidentTicketResponse getTicketById(Long id);
     IncidentTicketResponse assignTechnician(Long ticketId, String technicianName);

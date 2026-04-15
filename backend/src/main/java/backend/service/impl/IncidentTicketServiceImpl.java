@@ -1,27 +1,35 @@
 package backend.service.impl;
 
-import backend.dto.CreateIncidentTicketRequest;
-import backend.dto.IncidentTicketResponse;
-import backend.dto.UpdateTicketStatusRequest;
+import backend.dto.*;
 import backend.exception.ResourceNotFoundException;
 import backend.model.IncidentTicket;
-import backend.model.PriorityLevel;
+import backend.model.TicketAttachment;
 import backend.model.TicketStatus;
 import backend.repository.IncidentTicketRepository;
+import backend.repository.TicketAttachmentRepository;
+import backend.service.CloudinaryService;
 import backend.service.IncidentTicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class IncidentTicketServiceImpl implements IncidentTicketService {
 
     private final IncidentTicketRepository incidentTicketRepository;
+    private final TicketAttachmentRepository ticketAttachmentRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Override
-    public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request) {
+    public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
+
+        validateAttachments(files);
 
         IncidentTicket ticket = IncidentTicket.builder()
                 .ticketCode(generateTicketCode())
@@ -38,7 +46,21 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
 
         IncidentTicket savedTicket = incidentTicketRepository.save(ticket);
 
-        return mapToResponse(savedTicket);
+        if (files != null) {
+            for (MultipartFile file : files) {
+                if (file != null && !file.isEmpty()) {
+                    saveAttachment(savedTicket, file);
+                }
+                else {
+            System.out.println("Empty file skipped");
+        }
+            }
+        }
+
+        IncidentTicket finalTicket = incidentTicketRepository.findById(savedTicket.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + savedTicket.getId()));
+
+        return mapToResponse(finalTicket);
     }
 
     @Override
@@ -59,7 +81,6 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
 
     @Override
     public IncidentTicketResponse assignTechnician(Long ticketId, String technicianName) {
-
         IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
@@ -70,13 +91,11 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         }
 
         IncidentTicket updated = incidentTicketRepository.save(ticket);
-
         return mapToResponse(updated);
     }
 
     @Override
     public IncidentTicketResponse updateTicketStatus(Long ticketId, UpdateTicketStatusRequest request) {
-
         IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
@@ -96,12 +115,76 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         }
 
         IncidentTicket updated = incidentTicketRepository.save(ticket);
-
         return mapToResponse(updated);
     }
 
-    private void validateStatusTransition(TicketStatus currentStatus, TicketStatus newStatus, UpdateTicketStatusRequest request) {
+    @Override
+    public List<IncidentTicketResponse> filterTickets(TicketStatus status, backend.model.PriorityLevel priority) {
+        List<IncidentTicket> tickets;
 
+        if (status != null && priority != null) {
+            tickets = incidentTicketRepository.findByStatusAndPriority(status, priority);
+        } else if (status != null) {
+            tickets = incidentTicketRepository.findByStatus(status);
+        } else if (priority != null) {
+            tickets = incidentTicketRepository.findByPriority(priority);
+        } else {
+            tickets = incidentTicketRepository.findAll();
+        }
+
+        return tickets.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    private void validateAttachments(MultipartFile[] files) {
+        if (files == null) {
+            return;
+        }
+
+        int nonEmptyCount = 0;
+        for (MultipartFile file : files) {
+            if (file != null && !file.isEmpty()) {
+                nonEmptyCount++;
+
+                String contentType = file.getContentType();
+                if (contentType == null || !contentType.startsWith("image/")) {
+                    throw new IllegalArgumentException("Only image files are allowed");
+                }
+            }
+        }
+
+        if (nonEmptyCount > 3) {
+            throw new IllegalArgumentException("A ticket can include up to 3 image attachments");
+        }
+    }
+
+    private void saveAttachment(IncidentTicket ticket, MultipartFile file) {
+    try {
+        System.out.println("Uploading to Cloudinary: " + file.getOriginalFilename());
+
+        Map uploadResult = cloudinaryService.uploadFile(file);
+
+        System.out.println("Upload success: " + uploadResult.get("secure_url"));
+
+        TicketAttachment attachment = TicketAttachment.builder()
+                .fileName(file.getOriginalFilename())
+                .fileUrl((String) uploadResult.get("secure_url"))
+                .publicId((String) uploadResult.get("public_id"))
+                .ticket(ticket)
+                .build();
+
+        TicketAttachment savedAttachment = ticketAttachmentRepository.save(attachment);
+        ticket.getAttachments().add(savedAttachment);
+        System.out.println("Saved attachment to DB");
+
+    } catch (IOException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Failed to upload attachment", e);
+    }
+}
+
+    private void validateStatusTransition(TicketStatus currentStatus, TicketStatus newStatus, UpdateTicketStatusRequest request) {
         if (currentStatus == TicketStatus.OPEN && !(newStatus == TicketStatus.IN_PROGRESS || newStatus == TicketStatus.REJECTED)) {
             throw new IllegalArgumentException("OPEN tickets can only move to IN_PROGRESS or REJECTED");
         }
@@ -139,6 +222,17 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     }
 
     private IncidentTicketResponse mapToResponse(IncidentTicket ticket) {
+        List<TicketAttachmentResponse> attachmentResponses =
+                ticket.getAttachments() == null ? Collections.emptyList() :
+                        ticket.getAttachments().stream()
+                                .map(attachment -> TicketAttachmentResponse.builder()
+                                        .id(attachment.getId())
+                                        .fileName(attachment.getFileName())
+                                        .fileUrl(attachment.getFileUrl())
+                                        .publicId(attachment.getPublicId())
+                                        .build())
+                                .toList();
+
         return IncidentTicketResponse.builder()
                 .id(ticket.getId())
                 .ticketCode(ticket.getTicketCode())
@@ -157,26 +251,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .resolutionNotes(ticket.getResolutionNotes())
                 .createdAt(ticket.getCreatedAt())
                 .updatedAt(ticket.getUpdatedAt())
+                .attachments(attachmentResponses)
                 .build();
     }
-
-    @Override
-public List<IncidentTicketResponse> filterTickets(TicketStatus status, PriorityLevel priority) {
-
-    List<IncidentTicket> tickets;
-
-    if (status != null && priority != null) {
-        tickets = incidentTicketRepository.findByStatusAndPriority(status, priority);
-    } else if (status != null) {
-        tickets = incidentTicketRepository.findByStatus(status);
-    } else if (priority != null) {
-        tickets = incidentTicketRepository.findByPriority(priority);
-    } else {
-        tickets = incidentTicketRepository.findAll();
-    }
-
-    return tickets.stream()
-            .map(this::mapToResponse)
-            .toList();
-}
 }
