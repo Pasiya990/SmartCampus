@@ -4,6 +4,8 @@ import backend.dto.AssignTechnicianRequest;
 import backend.dto.CreateIncidentTicketRequest;
 import backend.dto.IncidentTicketResponse;
 import backend.dto.UpdateTicketStatusRequest;
+import backend.model.PriorityLevel;
+import backend.model.TicketStatus;
 import backend.service.IncidentTicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,4 +59,14 @@ public class IncidentTicketController {
                 incidentTicketService.updateTicketStatus(id, request)
         );
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<IncidentTicketResponse>> filterTickets(
+        @RequestParam(required = false) TicketStatus status,
+        @RequestParam(required = false) PriorityLevel priority) {
+
+    return ResponseEntity.ok(
+            incidentTicketService.filterTickets(status, priority)
+    );
+}
 }

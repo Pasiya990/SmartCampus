@@ -5,6 +5,7 @@ import backend.dto.IncidentTicketResponse;
 import backend.dto.UpdateTicketStatusRequest;
 import backend.exception.ResourceNotFoundException;
 import backend.model.IncidentTicket;
+import backend.model.PriorityLevel;
 import backend.model.TicketStatus;
 import backend.repository.IncidentTicketRepository;
 import backend.service.IncidentTicketService;
@@ -158,4 +159,24 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .updatedAt(ticket.getUpdatedAt())
                 .build();
     }
+
+    @Override
+public List<IncidentTicketResponse> filterTickets(TicketStatus status, PriorityLevel priority) {
+
+    List<IncidentTicket> tickets;
+
+    if (status != null && priority != null) {
+        tickets = incidentTicketRepository.findByStatusAndPriority(status, priority);
+    } else if (status != null) {
+        tickets = incidentTicketRepository.findByStatus(status);
+    } else if (priority != null) {
+        tickets = incidentTicketRepository.findByPriority(priority);
+    } else {
+        tickets = incidentTicketRepository.findAll();
+    }
+
+    return tickets.stream()
+            .map(this::mapToResponse)
+            .toList();
+}
 }
