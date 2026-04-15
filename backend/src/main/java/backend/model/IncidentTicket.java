@@ -91,4 +91,8 @@ public class IncidentTicket {
    @Builder.Default
    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
    private List<TicketAttachment> attachments = new ArrayList<>();
+
+   @Builder.Default
+   @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+   private List<TicketComment> comments = new ArrayList<>();
 }
