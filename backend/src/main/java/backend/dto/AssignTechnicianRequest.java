@@ -15,5 +15,5 @@ import lombok.Setter;
 public class AssignTechnicianRequest {
 
     @NotBlank(message = "Technician name is required")
-    private String technicianName;
+    private String technicianEmail;;
 }

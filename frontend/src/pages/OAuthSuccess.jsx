@@ -13,6 +13,16 @@ export default function OAuthSuccess() {
       const role = payload.role;
       
 
+      const email = payload.email;
+
+      if (email) {
+        localStorage.setItem("email", email);
+        localStorage.setItem("role", role);
+        localStorage.setItem("user", JSON.stringify({ email, role }));
+      }
+
+      
+
       if (role === "ADMIN") {
         window.location.href = "/admin";
       } else if (role === "TECHNICIAN") {

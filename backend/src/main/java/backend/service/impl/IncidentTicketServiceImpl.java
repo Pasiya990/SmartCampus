@@ -83,11 +83,11 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     }
 
     @Override
-    public IncidentTicketResponse assignTechnician(Long ticketId, String technicianName) {
+    public IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail) {
         IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
-        ticket.setAssignedTechnician(technicianName);
+        ticket.setAssignedTechnician(technicianEmail);
 
         if (ticket.getStatus() == null || ticket.getStatus() == TicketStatus.OPEN) {
             ticket.setStatus(TicketStatus.IN_PROGRESS);

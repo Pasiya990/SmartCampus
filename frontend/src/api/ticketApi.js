@@ -49,10 +49,11 @@ export const deleteComment = async (commentId, deleteData) => {
   return response.data;
 };
 
-export const assignTechnician = async (ticketId, technicianName) => {
+export const assignTechnician = async (ticketId, technicianEmail) => {
   const response = await API.patch(`/api/tickets/${ticketId}/assign-technician`, {
-    technicianName,
+    technicianEmail,
   });
+
   return response.data;
 };
 
