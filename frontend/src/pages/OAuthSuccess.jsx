@@ -11,6 +11,7 @@ export default function OAuthSuccess() {
 
       const payload = JSON.parse(atob(token.split(".")[1]));
       const role = payload.role;
+      
 
       if (role === "ADMIN") {
         window.location.href = "/admin";

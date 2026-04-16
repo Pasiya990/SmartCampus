@@ -66,11 +66,11 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         return mapToResponse(finalTicket);
     }
 
-    @Override
+        @Override
     public List<IncidentTicketResponse> getAllTickets() {
         return incidentTicketRepository.findAll()
                 .stream()
-                .map(this::mapToResponse)
+                .map(this::mapToListResponse)
                 .toList();
     }
 
@@ -167,6 +167,14 @@ public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
     return ticketCommentRepository.findByTicketIdOrderByCreatedAtAsc(ticketId)
             .stream()
             .map(this::mapToCommentResponse)
+            .toList();
+}
+
+@Override
+public List<IncidentTicketResponse> getTicketsByAssignedTechnician(String assignedTechnician) {
+    return incidentTicketRepository.findByAssignedTechnicianIgnoreCase(assignedTechnician)
+            .stream()
+            .map(this::mapToListResponse)
             .toList();
 }
 
@@ -311,6 +319,28 @@ public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
 
     return String.format("TKT-%04d", nextNumber);
 }
+    private IncidentTicketResponse mapToListResponse(IncidentTicket ticket) {
+        return IncidentTicketResponse.builder()
+                .id(ticket.getId())
+                .ticketCode(ticket.getTicketCode())
+                .title(ticket.getTitle())
+                .description(ticket.getDescription())
+                .category(ticket.getCategory())
+                .priority(ticket.getPriority())
+                .status(ticket.getStatus())
+                .location(ticket.getLocation())
+                .resourceName(ticket.getResourceName())
+                .preferredContact(ticket.getPreferredContact())
+                .contactName(ticket.getContactName())
+                .reportedBy(ticket.getReportedBy())
+                .assignedTechnician(ticket.getAssignedTechnician())
+                .rejectionReason(ticket.getRejectionReason())
+                .resolutionNotes(ticket.getResolutionNotes())
+                .createdAt(ticket.getCreatedAt())
+                .updatedAt(ticket.getUpdatedAt())
+                .attachments(Collections.emptyList())
+                .build();
+    }
 
     private IncidentTicketResponse mapToResponse(IncidentTicket ticket) {
         List<TicketAttachmentResponse> attachmentResponses =

@@ -5,15 +5,28 @@ import TechnicianView from "./pages/TechnicianView";
 import OAuthSuccess from "./pages/OAuthSuccess";
 import UserDashboard from "./pages/UserDashboard";
 
+
+import TicketCreate from "./pages/tickets/TicketCreate";
+import TicketList from "./pages/tickets/TicketList";
+import TicketDetails from "./pages/tickets/TicketDetails";
+import MyTickets from "./pages/tickets/MyTickets";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Login />} /> 
         <Route path="/oauth-success" element={<OAuthSuccess />} />
         <Route path="/user" element={<UserDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/technician" element={<TechnicianView />} />
+
+
+        <Route path="/tickets/new" element={<TicketCreate />} />
+        <Route path="/tickets" element={<TicketList />} />
+        <Route path="/tickets/:id" element={<TicketDetails />} />
+        <Route path="/my-tickets" element={<MyTickets />} />
+        
       </Routes>
     </BrowserRouter>
   );
