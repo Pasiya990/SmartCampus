@@ -11,21 +11,7 @@ export default function OAuthSuccess() {
 
       const payload = JSON.parse(atob(token.split(".")[1]));
       const role = payload.role;
-      const email = payload.sub;
-      const name = payload.name || payload.username || payload.sub;
-
-      localStorage.setItem("role", role);
-      localStorage.setItem("email", email);
-      localStorage.setItem("name", name);
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name,
-          email,
-          role,
-        })
-      );
+      
 
       if (role === "ADMIN") {
         window.location.href = "/admin";

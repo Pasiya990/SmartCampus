@@ -126,4 +126,12 @@ public ResponseEntity<String> deleteComment(
     incidentTicketService.deleteComment(commentId, request);
     return ResponseEntity.ok("Comment deleted successfully");
 }
+
+@GetMapping("/assigned-technician/{technicianName}")
+public ResponseEntity<List<IncidentTicketResponse>> getTicketsByAssignedTechnician(
+        @PathVariable String technicianName) {
+    return ResponseEntity.ok(
+            incidentTicketService.getTicketsByAssignedTechnician(technicianName)
+    );
+}
 }

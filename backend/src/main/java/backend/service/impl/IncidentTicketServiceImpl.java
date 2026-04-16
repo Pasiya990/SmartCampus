@@ -171,6 +171,14 @@ public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
 }
 
 @Override
+public List<IncidentTicketResponse> getTicketsByAssignedTechnician(String assignedTechnician) {
+    return incidentTicketRepository.findByAssignedTechnicianIgnoreCase(assignedTechnician)
+            .stream()
+            .map(this::mapToListResponse)
+            .toList();
+}
+
+@Override
 public TicketCommentResponse updateComment(Long commentId, UpdateTicketCommentRequest request) {
 
     TicketComment comment = ticketCommentRepository.findById(commentId)

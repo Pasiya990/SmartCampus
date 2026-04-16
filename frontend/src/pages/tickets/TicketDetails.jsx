@@ -29,31 +29,36 @@ const TicketDetails = () => {
   const [resolutionNotes, setResolutionNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
 
+    const token = localStorage.getItem("token");
+
+  let tokenPayload = {};
+  if (token) {
+    try {
+      tokenPayload = JSON.parse(atob(token.split(".")[1]));
+    } catch (error) {
+      console.error("Invalid token:", error);
+    }
+  }
+
   const storedUser = JSON.parse(localStorage.getItem("user")) || {};
-  const storedRole = localStorage.getItem("role") || storedUser.role || "USER";
-  const storedName =
+
+  const currentRole =
+    tokenPayload.role ||
+    localStorage.getItem("role") ||
+    storedUser.role ||
+    "USER";
+
+  const currentName =
+    tokenPayload.name ||
     localStorage.getItem("name") ||
     storedUser.name ||
     storedUser.fullName ||
+    tokenPayload.sub ||
     storedUser.email ||
     "Unknown User";
 
-  const currentRole = storedRole;
-
-  const [commentAuthorName] = useState(storedName);
-  const [commentAuthorRole] = useState(storedRole);
-
-  const techniciansByCategory = {
-    IT_EQUIPMENT: ["Tech IT 1", "Tech IT 2"],
-    HVAC: ["Tech HVAC 1", "Tech HVAC 2"],
-    STRUCTURAL: ["Tech Structural 1"],
-    ELECTRICAL: ["Tech Electrical 1", "Tech Electrical 2"],
-    PLUMBING: ["Tech Plumbing 1", "Tech Plumbing 2"],
-    SECURITY: ["Tech Security 1", "Tech Security 2"],
-    OTHER: ["General Technician"],
-  };
-
-  const availableTechnicians = techniciansByCategory[ticket?.category] || [];
+  const [commentAuthorName] = useState(currentName);
+  const [commentAuthorRole] = useState(currentRole);
 
   const fetchTicketDetails = async () => {
     try {
@@ -160,7 +165,7 @@ const TicketDetails = () => {
     e.preventDefault();
 
     if (!technicianName.trim()) {
-      alert("Please select a technician.");
+      alert("Please enter technician name.");
       return;
     }
 
@@ -357,18 +362,13 @@ const TicketDetails = () => {
           </div>
 
           <form className="ticket-details-form-inline" onSubmit={handleAssignTechnician}>
-            <select
+            <input
+              type="text"
               value={technicianName}
               onChange={(e) => setTechnicianName(e.target.value)}
               className="ticket-details-select"
-            >
-              <option value="">Select Technician</option>
-              {availableTechnicians.map((tech, index) => (
-                <option key={index} value={tech}>
-                  {tech}
-                </option>
-              ))}
-            </select>
+              placeholder="Enter technician name"
+            />
 
             <button type="submit" className="ticket-details-primary-btn">
               Assign
@@ -378,12 +378,6 @@ const TicketDetails = () => {
           <p className="ticket-details-helper-text">
             Current: {ticket.assignedTechnician || "Not Assigned"}
           </p>
-
-          {availableTechnicians.length === 0 && (
-            <p className="ticket-details-muted-text">
-              No technicians available for this category.
-            </p>
-          )}
         </div>
       )}
 

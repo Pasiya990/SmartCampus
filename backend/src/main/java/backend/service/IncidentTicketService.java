@@ -24,4 +24,5 @@ public interface IncidentTicketService {
     List<TicketCommentResponse> getCommentsByTicketId(Long ticketId);
     TicketCommentResponse updateComment(Long commentId, UpdateTicketCommentRequest request);
     void deleteComment(Long commentId, DeleteTicketCommentRequest request);
+    List<IncidentTicketResponse> getTicketsByAssignedTechnician(String assignedTechnician);
 }

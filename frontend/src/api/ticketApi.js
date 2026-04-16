@@ -60,3 +60,10 @@ export const updateTicketStatus = async (ticketId, statusData) => {
   const response = await API.patch(`/api/tickets/${ticketId}/status`, statusData);
   return response.data;
 };
+
+export const getTicketsByAssignedTechnician = async (technicianName) => {
+  const response = await API.get(
+    `/api/tickets/assigned-technician/${encodeURIComponent(technicianName)}`
+  );
+  return response.data;
+};

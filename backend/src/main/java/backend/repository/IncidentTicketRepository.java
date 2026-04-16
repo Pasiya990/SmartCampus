@@ -22,5 +22,7 @@ public interface IncidentTicketRepository extends JpaRepository<IncidentTicket, 
 
     boolean existsByTicketCode(String ticketCode);
 
+    List<IncidentTicket> findByAssignedTechnicianIgnoreCase(String assignedTechnician);
+
     
 }
