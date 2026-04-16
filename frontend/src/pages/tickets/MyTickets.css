@@ -1,0 +1,340 @@
+.my-tickets-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 32px 40px 40px;
+}
+
+.my-tickets-header {
+  max-width: 1500px;
+  margin: 0 auto 22px;
+}
+
+.my-tickets-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  letter-spacing: -0.02em;
+}
+
+.my-tickets-subtitle {
+  margin-top: 8px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.my-tickets-summary-grid {
+  max-width: 1500px;
+  margin: 0 auto 22px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+
+.my-tickets-summary-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 20px 20px 18px;
+  min-height: 100px;
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.my-tickets-summary-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  border-radius: 14px 14px 0 0;
+}
+
+.my-tickets-summary-total::before {
+  background-color: #720e9e;
+}
+
+.my-tickets-summary-open::before {
+  background-color: #1d4ed8;
+}
+
+.my-tickets-summary-progress::before {
+  background-color: #6d28d9;
+}
+
+.my-tickets-summary-resolved::before {
+  background-color: #16a34a;
+}
+
+.my-tickets-summary-rejected::before {
+  background-color: #dc2626;
+}
+
+.my-tickets-summary-closed::before {
+  background-color: #6b7280;
+}
+
+.my-tickets-summary-label {
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.my-tickets-summary-value {
+  color: #111827;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.my-tickets-card {
+  max-width: 1500px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.06);
+}
+
+.my-tickets-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.my-tickets-toolbar-left {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.my-tickets-toolbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.my-tickets-search,
+.my-tickets-select {
+  padding: 11px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.my-tickets-search {
+  min-width: 320px;
+}
+
+.my-tickets-search:focus,
+.my-tickets-select:focus {
+  border-color: #720e9e;
+  box-shadow: 0 0 0 3px rgba(114, 14, 158, 0.1);
+}
+
+.my-tickets-clear-btn {
+  background-color: #720e9e;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.my-tickets-clear-btn:hover {
+  background-color: #5d0b82;
+}
+
+.my-tickets-results-row {
+  margin-bottom: 14px;
+}
+
+.my-tickets-results-text {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.my-tickets-table-wrapper {
+  overflow-x: auto;
+}
+
+.my-tickets-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.my-tickets-table thead th {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  background-color: #f9fafb;
+  padding: 12px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.my-tickets-table tbody td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #111827;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.my-tickets-table tbody tr:hover td {
+  background-color: #fafafa;
+}
+
+.my-tickets-code-cell {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.my-tickets-title-cell {
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+}
+
+.my-tickets-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.my-tickets-priority-low {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.my-tickets-priority-medium {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.my-tickets-priority-high {
+  background-color: #fed7aa;
+  color: #9a3412;
+}
+
+.my-tickets-priority-critical {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.my-tickets-status-open {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.my-tickets-status-in_progress {
+  background-color: #ede9fe;
+  color: #6d28d9;
+}
+
+.my-tickets-status-resolved {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.my-tickets-status-rejected {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.my-tickets-status-closed {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.my-tickets-view-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #720e9e;
+  text-decoration: underline;
+}
+
+.my-tickets-view-link:hover {
+  color: #5d0b82;
+}
+
+.my-tickets-empty,
+.my-tickets-loading,
+.my-tickets-error {
+  max-width: 1500px;
+  margin: 40px auto;
+  font-size: 16px;
+}
+
+.my-tickets-error {
+  color: #b42318;
+}
+
+@media (max-width: 1100px) {
+  .my-tickets-summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .my-tickets-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .my-tickets-search {
+    min-width: 100%;
+  }
+
+  .my-tickets-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .my-tickets-toolbar-left,
+  .my-tickets-toolbar-right {
+    width: 100%;
+  }
+
+  .my-tickets-clear-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .my-tickets-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .my-tickets-title {
+    font-size: 26px;
+  }
+
+  .my-tickets-page {
+    padding: 24px 16px 32px;
+  }
+}
