@@ -1,11 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getAllTickets } from "../../api/ticketApi";
 import { Link } from "react-router-dom";
+import "./MyTickets.css";
 
 const MyTickets = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   const userName = localStorage.getItem("name") || "";
   const userEmail = localStorage.getItem("email") || "";
@@ -35,81 +39,180 @@ const MyTickets = () => {
     });
   }, [tickets, userName, userEmail]);
 
+  const filteredTickets = useMemo(() => {
+    return myTickets.filter((ticket) => {
+      const matchesSearch =
+        ticket.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        ticket.ticketCode?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStatus = statusFilter ? ticket.status === statusFilter : true;
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [myTickets, searchTerm, statusFilter]);
+
+  const totalTickets = myTickets.length;
+  const openCount = myTickets.filter((ticket) => ticket.status === "OPEN").length;
+  const inProgressCount = myTickets.filter(
+    (ticket) => ticket.status === "IN_PROGRESS"
+  ).length;
+  const resolvedCount = myTickets.filter(
+    (ticket) => ticket.status === "RESOLVED"
+  ).length;
+  const rejectedCount = myTickets.filter(
+    (ticket) => ticket.status === "REJECTED"
+  ).length;
+  const closedCount = myTickets.filter((ticket) => ticket.status === "CLOSED").length;
+
   if (loading) {
-    return <p style={{ padding: "20px" }}>Loading your tickets...</p>;
+    return <p className="my-tickets-loading">Loading your tickets...</p>;
   }
 
   if (errorMessage) {
-    return <p style={{ padding: "20px", color: "red" }}>{errorMessage}</p>;
+    return <p className="my-tickets-error">{errorMessage}</p>;
   }
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "40px auto", padding: "24px" }}>
-      <h2>My Tickets</h2>
+    <div className="my-tickets-page">
+      <div className="my-tickets-header">
+        <div>
+          <h2 className="my-tickets-title">My Tickets</h2>
+          <p className="my-tickets-subtitle">
+            Track incidents you have reported
+          </p>
+        </div>
+      </div>
 
-      {myTickets.length === 0 ? (
-        <p>No tickets found for your account.</p>
-      ) : (
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: "20px",
-          }}
-        >
-          <thead>
-            <tr>
-              <th style={thStyle}>Ticket Code</th>
-              <th style={thStyle}>Title</th>
-              <th style={thStyle}>Category</th>
-              <th style={thStyle}>Priority</th>
-              <th style={thStyle}>Status</th>
-              <th style={thStyle}>Location</th>
-              <th style={thStyle}>View Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {myTickets.map((ticket) => (
-              <tr key={ticket.id}>
-                <td style={tdStyle}>{ticket.ticketCode}</td>
-                <td style={tdStyle}>{ticket.title}</td>
-                <td style={tdStyle}>{ticket.category}</td>
-                <td style={tdStyle}>{ticket.priority}</td>
-                <td style={tdStyle}>{ticket.status}</td>
-                <td style={tdStyle}>{ticket.location}</td>
-                <td style={tdStyle}>
-                  <Link
-                    to={`/tickets/${ticket.id}`}
-                    style={{
-                      color: "#720e9e",
-                      fontWeight: "600",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    View Details
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <div className="my-tickets-summary-grid">
+        <div className="my-tickets-summary-card my-tickets-summary-total">
+          <span className="my-tickets-summary-label">Total</span>
+          <span className="my-tickets-summary-value">{totalTickets}</span>
+        </div>
+
+        <div className="my-tickets-summary-card my-tickets-summary-open">
+          <span className="my-tickets-summary-label">Open</span>
+          <span className="my-tickets-summary-value">{openCount}</span>
+        </div>
+
+        <div className="my-tickets-summary-card my-tickets-summary-progress">
+          <span className="my-tickets-summary-label">In Progress</span>
+          <span className="my-tickets-summary-value">{inProgressCount}</span>
+        </div>
+
+        <div className="my-tickets-summary-card my-tickets-summary-resolved">
+          <span className="my-tickets-summary-label">Resolved</span>
+          <span className="my-tickets-summary-value">{resolvedCount}</span>
+        </div>
+
+        <div className="my-tickets-summary-card my-tickets-summary-rejected">
+          <span className="my-tickets-summary-label">Rejected</span>
+          <span className="my-tickets-summary-value">{rejectedCount}</span>
+        </div>
+
+        <div className="my-tickets-summary-card my-tickets-summary-closed">
+          <span className="my-tickets-summary-label">Closed</span>
+          <span className="my-tickets-summary-value">{closedCount}</span>
+        </div>
+      </div>
+
+      <div className="my-tickets-card">
+        <div className="my-tickets-toolbar">
+          <div className="my-tickets-toolbar-left">
+            <input
+              type="text"
+              placeholder="Search by title or ticket code"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="my-tickets-search"
+            />
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="my-tickets-select"
+            >
+              <option value="">All Statuses</option>
+              <option value="OPEN">OPEN</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+              <option value="REJECTED">REJECTED</option>
+              <option value="CLOSED">CLOSED</option>
+            </select>
+          </div>
+
+          <div className="my-tickets-toolbar-right">
+            <button
+              className="my-tickets-clear-btn"
+              onClick={() => {
+                setSearchTerm("");
+                setStatusFilter("");
+              }}
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+
+        <div className="my-tickets-results-row">
+          <span className="my-tickets-results-text">
+            Showing <strong>{filteredTickets.length}</strong> ticket(s)
+          </span>
+        </div>
+
+        {filteredTickets.length === 0 ? (
+          <p className="my-tickets-empty">No tickets found for your account.</p>
+        ) : (
+          <div className="my-tickets-table-wrapper">
+            <table className="my-tickets-table">
+              <thead>
+                <tr>
+                  <th>Ticket Code</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Location</th>
+                  <th>View Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTickets.map((ticket) => (
+                  <tr key={ticket.id}>
+                    <td className="my-tickets-code-cell">{ticket.ticketCode}</td>
+                    <td className="my-tickets-title-cell">{ticket.title}</td>
+                    <td>{ticket.category}</td>
+                    <td>
+                      <span
+                        className={`my-tickets-badge my-tickets-priority-${ticket.priority?.toLowerCase()}`}
+                      >
+                        {ticket.priority}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`my-tickets-badge my-tickets-status-${ticket.status?.toLowerCase()}`}
+                      >
+                        {ticket.status}
+                      </span>
+                    </td>
+                    <td>{ticket.location}</td>
+                    <td>
+                      <Link
+                        to={`/tickets/${ticket.id}`}
+                        className="my-tickets-view-link"
+                      >
+                        View Details
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-const thStyle = {
-  textAlign: "left",
-  padding: "12px",
-  borderBottom: "1px solid #ddd",
-  color: "#555",
-  fontSize: "13px",
-};
-
-const tdStyle = {
-  padding: "14px 12px",
-  borderBottom: "1px solid #eee",
-  fontSize: "14px",
 };
 
 export default MyTickets;
