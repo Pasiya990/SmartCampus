@@ -1,183 +1,166 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../services/api";
+import "./TechnicianView.css";
 
 export default function TechnicianView() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Get technician name from localStorage (from login)
-  const technicianName =
-    localStorage.getItem("name") ||
-    JSON.parse(localStorage.getItem("user"))?.name ||
+  const technicianEmail =
+    localStorage.getItem("email") ||
+    JSON.parse(localStorage.getItem("user"))?.email ||
     "";
 
   useEffect(() => {
     const fetchAssignedTickets = async () => {
       try {
         const response = await API.get(
-          `/api/tickets/assigned-technician/${encodeURIComponent(technicianName)}`
+          `/api/tickets/assigned-technician/${encodeURIComponent(technicianEmail)}`
         );
         setTickets(response.data);
       } catch (error) {
         console.error("Error fetching technician tickets:", error);
-        setErrorMessage("Failed to load assigned tickets");
+        setErrorMessage("Failed to load assigned tickets.");
       } finally {
         setLoading(false);
       }
     };
 
-    if (technicianName) {
+    if (technicianEmail) {
       fetchAssignedTickets();
     } else {
-      setErrorMessage("Technician name not found");
+      setErrorMessage("Technician email not found.");
       setLoading(false);
     }
-  }, [technicianName]);
+  }, [technicianEmail]);
+
+  const openCount = tickets.filter((ticket) => ticket.status === "OPEN").length;
+  const inProgressCount = tickets.filter(
+    (ticket) => ticket.status === "IN_PROGRESS"
+  ).length;
+  const resolvedCount = tickets.filter(
+    (ticket) => ticket.status === "RESOLVED"
+  ).length;
+  const closedCount = tickets.filter((ticket) => ticket.status === "CLOSED").length;
 
   if (loading) {
-    return <p style={{ padding: "20px" }}>Loading assigned tickets...</p>;
+    return <p className="technician-loading">Loading assigned tickets...</p>;
   }
 
   if (errorMessage) {
-    return (
-      <p style={{ padding: "20px", color: "red" }}>
-        {errorMessage}
-      </p>
-    );
+    return <p className="technician-error">{errorMessage}</p>;
   }
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "40px auto", padding: "24px" }}>
-      <h2 style={{ marginBottom: "8px" }}>Technician Dashboard</h2>
-      <p style={{ color: "#555" }}>Welcome, {technicianName}</p>
+    <div className="technician-page">
+      <div className="technician-header">
+        <div>
+          <h2 className="technician-title">Technician Dashboard</h2>
+          <p className="technician-subtitle">
+            View and manage incidents assigned to you
+          </p>
+        </div>
+      </div>
 
-      <h3 style={{ marginTop: "30px" }}>Assigned Tickets</h3>
+      <div className="technician-welcome-card">
+        <span className="technician-welcome-label">Logged in as</span>
+        <span className="technician-welcome-value">{technicianEmail}</span>
+      </div>
 
-      {tickets.length === 0 ? (
-        <p style={{ marginTop: "20px" }}>No tickets assigned.</p>
-      ) : (
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            marginTop: "20px",
-          }}
-        >
-          <thead>
-            <tr>
-              <th style={thStyle}>Ticket Code</th>
-              <th style={thStyle}>Title</th>
-              <th style={thStyle}>Category</th>
-              <th style={thStyle}>Priority</th>
-              <th style={thStyle}>Status</th>
-              <th style={thStyle}>Location</th>
-              <th style={thStyle}>View</th>
-            </tr>
-          </thead>
+      <div className="technician-summary-grid">
+        <div className="technician-summary-card technician-summary-total">
+          <span className="technician-summary-label">Total Assigned</span>
+          <span className="technician-summary-value">{tickets.length}</span>
+        </div>
 
-          <tbody>
-            {tickets.map((ticket) => (
-              <tr key={ticket.id}>
-                <td style={tdStyle}>{ticket.ticketCode}</td>
-                <td style={tdStyle}>{ticket.title}</td>
-                <td style={tdStyle}>{ticket.category}</td>
+        <div className="technician-summary-card technician-summary-open">
+          <span className="technician-summary-label">Open</span>
+          <span className="technician-summary-value">{openCount}</span>
+        </div>
 
-                {/* Priority with color */}
-                <td style={tdStyle}>
-                  <span style={getPriorityStyle(ticket.priority)}>
-                    {ticket.priority}
-                  </span>
-                </td>
+        <div className="technician-summary-card technician-summary-progress">
+          <span className="technician-summary-label">In Progress</span>
+          <span className="technician-summary-value">{inProgressCount}</span>
+        </div>
 
-                {/* Status with color */}
-                <td style={tdStyle}>
-                  <span style={getStatusStyle(ticket.status)}>
-                    {ticket.status}
-                  </span>
-                </td>
+        <div className="technician-summary-card technician-summary-resolved">
+          <span className="technician-summary-label">Resolved</span>
+          <span className="technician-summary-value">{resolvedCount}</span>
+        </div>
 
-                <td style={tdStyle}>{ticket.location}</td>
+        <div className="technician-summary-card technician-summary-closed">
+          <span className="technician-summary-label">Closed</span>
+          <span className="technician-summary-value">{closedCount}</span>
+        </div>
+      </div>
 
-                <td style={tdStyle}>
-                  <Link
-                    to={`/tickets/${ticket.id}`}
-                    style={{
-                      color: "#720e9e",
-                      fontWeight: "600",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    View Details
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <div className="technician-card">
+        <div className="technician-card-top">
+          <h3 className="technician-section-title">Assigned Tickets</h3>
+          <span className="technician-result-count">
+            {tickets.length} ticket(s)
+          </span>
+        </div>
+
+        {tickets.length === 0 ? (
+          <p className="technician-empty">No tickets assigned.</p>
+        ) : (
+          <div className="technician-table-wrapper">
+            <table className="technician-table">
+              <thead>
+                <tr>
+                  <th>Ticket Code</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Location</th>
+                  <th>View</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {tickets.map((ticket) => (
+                  <tr key={ticket.id}>
+                    <td className="technician-code-cell">{ticket.ticketCode}</td>
+                    <td className="technician-title-cell">{ticket.title}</td>
+                    <td>{ticket.category}</td>
+
+                    <td>
+                      <span
+                        className={`technician-badge technician-priority-${ticket.priority?.toLowerCase()}`}
+                      >
+                        {ticket.priority}
+                      </span>
+                    </td>
+
+                    <td>
+                      <span
+                        className={`technician-badge technician-status-${ticket.status?.toLowerCase()}`}
+                      >
+                        {ticket.status}
+                      </span>
+                    </td>
+
+                    <td>{ticket.location}</td>
+
+                    <td>
+                      <Link
+                        to={`/tickets/${ticket.id}`}
+                        className="technician-view-link"
+                      >
+                        View Details
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-
-/* ---------- styles ---------- */
-
-const thStyle = {
-  textAlign: "left",
-  padding: "12px",
-  borderBottom: "1px solid #ddd",
-  fontSize: "13px",
-  color: "#666",
-};
-
-const tdStyle = {
-  padding: "14px 12px",
-  borderBottom: "1px solid #eee",
-  fontSize: "14px",
-};
-
-/* ---------- status colors ---------- */
-
-const getStatusStyle = (status) => {
-  switch (status) {
-    case "OPEN":
-      return badge("#e3f2fd", "#1976d2");
-    case "IN_PROGRESS":
-      return badge("#fff3e0", "#ef6c00");
-    case "RESOLVED":
-      return badge("#e8f5e9", "#2e7d32");
-    case "CLOSED":
-      return badge("#eceff1", "#455a64");
-    case "REJECTED":
-      return badge("#fdecea", "#c62828");
-    default:
-      return badge("#f5f5f5", "#555");
-  }
-};
-
-/* ---------- priority colors ---------- */
-
-const getPriorityStyle = (priority) => {
-  switch (priority) {
-    case "CRITICAL":
-      return badge("#fdecea", "#c62828");
-    case "HIGH":
-      return badge("#fff3e0", "#ef6c00");
-    case "MEDIUM":
-      return badge("#e3f2fd", "#1565c0");
-    case "LOW":
-      return badge("#f1f8e9", "#558b2f");
-    default:
-      return badge("#f5f5f5", "#555");
-  }
-};
-
-const badge = (bg, color) => ({
-  backgroundColor: bg,
-  color: color,
-  padding: "6px 10px",
-  borderRadius: "20px",
-  fontSize: "12px",
-  fontWeight: "600",
-});
