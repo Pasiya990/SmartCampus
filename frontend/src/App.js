@@ -9,6 +9,7 @@ import UserDashboard from "./pages/UserDashboard";
 import TicketCreate from "./pages/tickets/TicketCreate";
 import TicketList from "./pages/tickets/TicketList";
 import TicketDetails from "./pages/tickets/TicketDetails";
+import MyTickets from "./pages/tickets/MyTickets";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/tickets/new" element={<TicketCreate />} />
         <Route path="/tickets" element={<TicketList />} />
         <Route path="/tickets/:id" element={<TicketDetails />} />
+        <Route path="/my-tickets" element={<MyTickets />} />
         
       </Routes>
     </BrowserRouter>

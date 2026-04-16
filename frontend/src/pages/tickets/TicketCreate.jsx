@@ -3,6 +3,11 @@ import { createTicket } from "../../api/ticketApi";
 import "./TicketCreate.css";
 
 const TicketCreate = () => {
+  const loggedInName =
+    localStorage.getItem("name") ||
+    JSON.parse(localStorage.getItem("user"))?.name ||
+    "";
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -12,7 +17,7 @@ const TicketCreate = () => {
     resourceName: "",
     preferredContact: "",
     contactName: "",
-    reportedBy: "",
+    reportedBy: loggedInName,
   });
 
   const [files, setFiles] = useState([]);
@@ -62,7 +67,7 @@ const TicketCreate = () => {
         resourceName: "",
         preferredContact: "",
         contactName: "",
-        reportedBy: "",
+        reportedBy: loggedInName,
       });
 
       setFiles([]);
@@ -216,9 +221,9 @@ const TicketCreate = () => {
                 type="text"
                 name="reportedBy"
                 value={formData.reportedBy}
-                onChange={handleChange}
-                placeholder="Enter the reporter's name"
+                placeholder="Reporter name"
                 required
+                readOnly
               />
             </div>
 
