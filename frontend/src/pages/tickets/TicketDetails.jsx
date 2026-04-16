@@ -37,6 +37,8 @@ const TicketDetails = () => {
     storedUser.email ||
     "Unknown User";
 
+  const currentRole = storedRole;
+
   const [commentAuthorName] = useState(storedName);
   const [commentAuthorRole] = useState(storedRole);
 
@@ -266,76 +268,80 @@ const TicketDetails = () => {
         </div>
       </div>
 
-      <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
-        <h3>Assign Technician</h3>
-        <form onSubmit={handleAssignTechnician}>
-          <select
-            value={technicianName}
-            onChange={(e) => setTechnicianName(e.target.value)}
-            style={{ marginRight: "10px" }}
-          >
-            <option value="">Select Technician</option>
-            {availableTechnicians.map((tech, index) => (
-              <option key={index} value={tech}>
-                {tech}
-              </option>
-            ))}
-          </select>
-          <button type="submit">Assign</button>
-        </form>
-
-        <p style={{ marginTop: "10px" }}>
-          Current: {ticket.assignedTechnician || "Not Assigned"}
-        </p>
-
-        {availableTechnicians.length === 0 && (
-          <p style={{ color: "gray" }}>No technicians available for this category.</p>
-        )}
-      </div>
-
-      <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
-        <h3>Update Status</h3>
-        <form onSubmit={handleUpdateStatus}>
-          <div style={{ marginBottom: "10px" }}>
+      {currentRole === "ADMIN" && (
+        <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
+          <h3>Assign Technician</h3>
+          <form onSubmit={handleAssignTechnician}>
             <select
-              value={statusValue}
-              onChange={(e) => setStatusValue(e.target.value)}
+              value={technicianName}
+              onChange={(e) => setTechnicianName(e.target.value)}
+              style={{ marginRight: "10px" }}
             >
-              <option value="">Select Status</option>
-              <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="RESOLVED">RESOLVED</option>
-              <option value="REJECTED">REJECTED</option>
-              <option value="CLOSED">CLOSED</option>
+              <option value="">Select Technician</option>
+              {availableTechnicians.map((tech, index) => (
+                <option key={index} value={tech}>
+                  {tech}
+                </option>
+              ))}
             </select>
-          </div>
+            <button type="submit">Assign</button>
+          </form>
 
-          {statusValue === "RESOLVED" && (
-            <div style={{ marginBottom: "10px" }}>
-              <label>Resolution Notes</label><br />
-              <textarea
-                value={resolutionNotes}
-                onChange={(e) => setResolutionNotes(e.target.value)}
-                rows="3"
-                style={{ width: "100%" }}
-              />
-            </div>
+          <p style={{ marginTop: "10px" }}>
+            Current: {ticket.assignedTechnician || "Not Assigned"}
+          </p>
+
+          {availableTechnicians.length === 0 && (
+            <p style={{ color: "gray" }}>No technicians available for this category.</p>
           )}
+        </div>
+      )}
 
-          {statusValue === "REJECTED" && (
+      {(currentRole === "ADMIN" || currentRole === "TECHNICIAN") && (
+        <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
+          <h3>Update Status</h3>
+          <form onSubmit={handleUpdateStatus}>
             <div style={{ marginBottom: "10px" }}>
-              <label>Rejection Reason</label><br />
-              <textarea
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                rows="3"
-                style={{ width: "100%" }}
-              />
+              <select
+                value={statusValue}
+                onChange={(e) => setStatusValue(e.target.value)}
+              >
+                <option value="">Select Status</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="RESOLVED">RESOLVED</option>
+                <option value="REJECTED">REJECTED</option>
+                <option value="CLOSED">CLOSED</option>
+              </select>
             </div>
-          )}
 
-          <button type="submit">Update Status</button>
-        </form>
-      </div>
+            {statusValue === "RESOLVED" && (
+              <div style={{ marginBottom: "10px" }}>
+                <label>Resolution Notes</label><br />
+                <textarea
+                  value={resolutionNotes}
+                  onChange={(e) => setResolutionNotes(e.target.value)}
+                  rows="3"
+                  style={{ width: "100%" }}
+                />
+              </div>
+            )}
+
+            {statusValue === "REJECTED" && (
+              <div style={{ marginBottom: "10px" }}>
+                <label>Rejection Reason</label><br />
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  rows="3"
+                  style={{ width: "100%" }}
+                />
+              </div>
+            )}
+
+            <button type="submit">Update Status</button>
+          </form>
+        </div>
+      )}
 
       <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
         <h3>Comments</h3>
