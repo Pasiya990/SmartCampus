@@ -154,7 +154,7 @@ public class BookingService {
     private BookingResponse toResponse(Booking b){
         return BookingResponse.builder()
             .id(b.getId())
-            .resourceId(b.getResource().getId())
+            .resourceID(b.getResource().getId())
             .resourceName(b.getResource().getName())
             .userEmail(b.getUser().getEmail())
             .date(b.getDate())
