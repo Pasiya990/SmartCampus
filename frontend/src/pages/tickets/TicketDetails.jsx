@@ -6,6 +6,8 @@ import {
   addComment,
   updateComment,
   deleteComment,
+  assignTechnician,
+  updateTicketStatus,
 } from "../../api/ticketApi";
 
 const TicketDetails = () => {
@@ -21,6 +23,11 @@ const TicketDetails = () => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editMessage, setEditMessage] = useState("");
 
+  const [technicianName, setTechnicianName] = useState("");
+  const [statusValue, setStatusValue] = useState("");
+  const [resolutionNotes, setResolutionNotes] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
+
   const storedUser = JSON.parse(localStorage.getItem("user")) || {};
   const storedRole = localStorage.getItem("role") || storedUser.role || "USER";
   const storedName =
@@ -32,6 +39,18 @@ const TicketDetails = () => {
 
   const [commentAuthorName] = useState(storedName);
   const [commentAuthorRole] = useState(storedRole);
+
+  const techniciansByCategory = {
+    IT_EQUIPMENT: ["Tech IT 1", "Tech IT 2"],
+    HVAC: ["Tech HVAC 1", "Tech HVAC 2"],
+    STRUCTURAL: ["Tech Structural 1"],
+    ELECTRICAL: ["Tech Electrical 1", "Tech Electrical 2"],
+    PLUMBING: ["Tech Plumbing 1", "Tech Plumbing 2"],
+    SECURITY: ["Tech Security 1", "Tech Security 2"],
+    OTHER: ["General Technician"],
+  };
+
+  const availableTechnicians = techniciansByCategory[ticket?.category] || [];
 
   const fetchTicketDetails = async () => {
     try {
@@ -134,6 +153,56 @@ const TicketDetails = () => {
     }
   };
 
+  const handleAssignTechnician = async (e) => {
+    e.preventDefault();
+
+    if (!technicianName.trim()) {
+      alert("Please select a technician.");
+      return;
+    }
+
+    try {
+      await assignTechnician(id, technicianName);
+      setTechnicianName("");
+      await fetchTicketDetails();
+      alert("Technician assigned successfully.");
+    } catch (error) {
+      console.error("Assign technician error:", error);
+      alert("Failed to assign technician.");
+    }
+  };
+
+  const handleUpdateStatus = async (e) => {
+    e.preventDefault();
+
+    if (!statusValue) {
+      alert("Please select a status.");
+      return;
+    }
+
+    const payload = { status: statusValue };
+
+    if (statusValue === "RESOLVED") {
+      payload.resolutionNotes = resolutionNotes;
+    }
+
+    if (statusValue === "REJECTED") {
+      payload.rejectionReason = rejectionReason;
+    }
+
+    try {
+      await updateTicketStatus(id, payload);
+      setStatusValue("");
+      setResolutionNotes("");
+      setRejectionReason("");
+      await fetchTicketDetails();
+      alert("Status updated successfully.");
+    } catch (error) {
+      console.error("Update status error:", error);
+      alert("Failed to update status.");
+    }
+  };
+
   if (loading) {
     return <p style={{ padding: "20px" }}>Loading ticket details...</p>;
   }
@@ -195,6 +264,77 @@ const TicketDetails = () => {
             <p>No attachments</p>
           )}
         </div>
+      </div>
+
+      <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
+        <h3>Assign Technician</h3>
+        <form onSubmit={handleAssignTechnician}>
+          <select
+            value={technicianName}
+            onChange={(e) => setTechnicianName(e.target.value)}
+            style={{ marginRight: "10px" }}
+          >
+            <option value="">Select Technician</option>
+            {availableTechnicians.map((tech, index) => (
+              <option key={index} value={tech}>
+                {tech}
+              </option>
+            ))}
+          </select>
+          <button type="submit">Assign</button>
+        </form>
+
+        <p style={{ marginTop: "10px" }}>
+          Current: {ticket.assignedTechnician || "Not Assigned"}
+        </p>
+
+        {availableTechnicians.length === 0 && (
+          <p style={{ color: "gray" }}>No technicians available for this category.</p>
+        )}
+      </div>
+
+      <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
+        <h3>Update Status</h3>
+        <form onSubmit={handleUpdateStatus}>
+          <div style={{ marginBottom: "10px" }}>
+            <select
+              value={statusValue}
+              onChange={(e) => setStatusValue(e.target.value)}
+            >
+              <option value="">Select Status</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+              <option value="REJECTED">REJECTED</option>
+              <option value="CLOSED">CLOSED</option>
+            </select>
+          </div>
+
+          {statusValue === "RESOLVED" && (
+            <div style={{ marginBottom: "10px" }}>
+              <label>Resolution Notes</label><br />
+              <textarea
+                value={resolutionNotes}
+                onChange={(e) => setResolutionNotes(e.target.value)}
+                rows="3"
+                style={{ width: "100%" }}
+              />
+            </div>
+          )}
+
+          {statusValue === "REJECTED" && (
+            <div style={{ marginBottom: "10px" }}>
+              <label>Rejection Reason</label><br />
+              <textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows="3"
+                style={{ width: "100%" }}
+              />
+            </div>
+          )}
+
+          <button type="submit">Update Status</button>
+        </form>
       </div>
 
       <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>

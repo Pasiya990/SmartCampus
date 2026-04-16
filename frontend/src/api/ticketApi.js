@@ -48,3 +48,15 @@ export const deleteComment = async (commentId, deleteData) => {
   });
   return response.data;
 };
+
+export const assignTechnician = async (ticketId, technicianName) => {
+  const response = await API.patch(`/api/tickets/${ticketId}/assign-technician`, {
+    technicianName,
+  });
+  return response.data;
+};
+
+export const updateTicketStatus = async (ticketId, statusData) => {
+  const response = await API.patch(`/api/tickets/${ticketId}/status`, statusData);
+  return response.data;
+};
