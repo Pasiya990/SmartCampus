@@ -9,6 +9,7 @@ import {
   assignTechnician,
   updateTicketStatus,
 } from "../../api/ticketApi";
+import "./TicketDetails.css";
 
 const TicketDetails = () => {
   const { id } = useParams();
@@ -206,76 +207,160 @@ const TicketDetails = () => {
   };
 
   if (loading) {
-    return <p style={{ padding: "20px" }}>Loading ticket details...</p>;
+    return <p className="ticket-details-loading">Loading ticket details...</p>;
   }
 
   if (errorMessage) {
-    return <p style={{ padding: "20px", color: "red" }}>{errorMessage}</p>;
+    return <p className="ticket-details-error">{errorMessage}</p>;
   }
 
   if (!ticket) {
-    return <p style={{ padding: "20px" }}>Ticket not found.</p>;
+    return <p className="ticket-details-loading">Ticket not found.</p>;
   }
 
   return (
-    <div style={{ maxWidth: "900px", margin: "40px auto", padding: "24px" }}>
-      <h2>Ticket Details</h2>
-
-      <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "20px" }}>
-        <p><strong>ID:</strong> {ticket.id}</p>
-        <p><strong>Ticket Code:</strong> {ticket.ticketCode}</p>
-        <p><strong>Title:</strong> {ticket.title}</p>
-        <p><strong>Description:</strong> {ticket.description}</p>
-        <p><strong>Category:</strong> {ticket.category}</p>
-        <p><strong>Priority:</strong> {ticket.priority}</p>
-        <p><strong>Status:</strong> {ticket.status}</p>
-        <p><strong>Location:</strong> {ticket.location}</p>
-        <p><strong>Resource Name:</strong> {ticket.resourceName}</p>
-        <p><strong>Preferred Contact:</strong> {ticket.preferredContact}</p>
-        <p><strong>Contact Name:</strong> {ticket.contactName}</p>
-        <p><strong>Reported By:</strong> {ticket.reportedBy}</p>
-        <p><strong>Assigned Technician:</strong> {ticket.assignedTechnician || "Not Assigned"}</p>
-        <p><strong>Rejection Reason:</strong> {ticket.rejectionReason || "N/A"}</p>
-        <p><strong>Resolution Notes:</strong> {ticket.resolutionNotes || "N/A"}</p>
-        <p><strong>Created At:</strong> {ticket.createdAt}</p>
-        <p><strong>Updated At:</strong> {ticket.updatedAt || "N/A"}</p>
-
-        <div style={{ marginTop: "20px" }}>
-          <strong>Attachments:</strong>
-          {ticket.attachments && ticket.attachments.length > 0 ? (
-            <div style={{ marginTop: "10px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-              {ticket.attachments.map((attachment) => (
-                <div key={attachment.id}>
-                  <img
-                    src={attachment.fileUrl}
-                    alt={attachment.fileName}
-                    style={{
-                      width: "180px",
-                      height: "140px",
-                      objectFit: "cover",
-                      border: "1px solid #ccc",
-                    }}
-                  />
-                  <p style={{ maxWidth: "180px", wordBreak: "break-word" }}>
-                    {attachment.fileName}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>No attachments</p>
-          )}
+    <div className="ticket-details-page">
+      <div className="ticket-details-header">
+        <div>
+          <h2 className="ticket-details-title">Ticket Details</h2>
+          <p className="ticket-details-subtitle">
+            Full incident information and workflow actions
+          </p>
         </div>
       </div>
 
+      <div className="ticket-details-topbar">
+        <div className="ticket-details-code-block">
+          <span className="ticket-details-code-label">Ticket Code</span>
+          <span className="ticket-details-code-value">{ticket.ticketCode}</span>
+        </div>
+
+        <div className="ticket-details-badges">
+          <span
+            className={`ticket-details-badge ticket-details-priority-${ticket.priority?.toLowerCase()}`}
+          >
+            {ticket.priority}
+          </span>
+          <span
+            className={`ticket-details-badge ticket-details-status-${ticket.status?.toLowerCase()}`}
+          >
+            {ticket.status}
+          </span>
+        </div>
+      </div>
+
+      <div className="ticket-details-card">
+        <div className="ticket-details-card-header">
+          <h3>Incident Information</h3>
+        </div>
+
+        <div className="ticket-details-grid">
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">ID</span>
+            <span className="ticket-details-value">{ticket.id}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Category</span>
+            <span className="ticket-details-value">{ticket.category}</span>
+          </div>
+
+          <div className="ticket-details-field ticket-details-field-wide">
+            <span className="ticket-details-label">Title</span>
+            <span className="ticket-details-value">{ticket.title}</span>
+          </div>
+
+          <div className="ticket-details-field ticket-details-field-wide">
+            <span className="ticket-details-label">Description</span>
+            <span className="ticket-details-value">{ticket.description}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Location</span>
+            <span className="ticket-details-value">{ticket.location}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Resource Name</span>
+            <span className="ticket-details-value">{ticket.resourceName || "N/A"}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Preferred Contact</span>
+            <span className="ticket-details-value">{ticket.preferredContact}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Contact Name</span>
+            <span className="ticket-details-value">{ticket.contactName || "N/A"}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Reported By</span>
+            <span className="ticket-details-value">{ticket.reportedBy}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Assigned Technician</span>
+            <span className="ticket-details-value">
+              {ticket.assignedTechnician || "Not Assigned"}
+            </span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Rejection Reason</span>
+            <span className="ticket-details-value">{ticket.rejectionReason || "N/A"}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Resolution Notes</span>
+            <span className="ticket-details-value">{ticket.resolutionNotes || "N/A"}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Created At</span>
+            <span className="ticket-details-value">{ticket.createdAt}</span>
+          </div>
+
+          <div className="ticket-details-field">
+            <span className="ticket-details-label">Updated At</span>
+            <span className="ticket-details-value">{ticket.updatedAt || "N/A"}</span>
+          </div>
+        </div>
+      </div>
+
+      {ticket.attachments && ticket.attachments.length > 0 && (
+        <div className="ticket-details-card">
+          <div className="ticket-details-card-header">
+            <h3>Attachments</h3>
+          </div>
+
+          <div className="ticket-details-attachments">
+            {ticket.attachments.map((attachment) => (
+              <div className="ticket-details-attachment-item" key={attachment.id}>
+                <img
+                  src={attachment.fileUrl}
+                  alt={attachment.fileName}
+                  className="ticket-details-attachment-image"
+                />
+                <p className="ticket-details-attachment-name">{attachment.fileName}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {currentRole === "ADMIN" && (
-        <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
-          <h3>Assign Technician</h3>
-          <form onSubmit={handleAssignTechnician}>
+        <div className="ticket-details-card">
+          <div className="ticket-details-card-header">
+            <h3>Assign Technician</h3>
+          </div>
+
+          <form className="ticket-details-form-inline" onSubmit={handleAssignTechnician}>
             <select
               value={technicianName}
               onChange={(e) => setTechnicianName(e.target.value)}
-              style={{ marginRight: "10px" }}
+              className="ticket-details-select"
             >
               <option value="">Select Technician</option>
               {availableTechnicians.map((tech, index) => (
@@ -284,116 +369,142 @@ const TicketDetails = () => {
                 </option>
               ))}
             </select>
-            <button type="submit">Assign</button>
+
+            <button type="submit" className="ticket-details-primary-btn">
+              Assign
+            </button>
           </form>
 
-          <p style={{ marginTop: "10px" }}>
+          <p className="ticket-details-helper-text">
             Current: {ticket.assignedTechnician || "Not Assigned"}
           </p>
 
           {availableTechnicians.length === 0 && (
-            <p style={{ color: "gray" }}>No technicians available for this category.</p>
+            <p className="ticket-details-muted-text">
+              No technicians available for this category.
+            </p>
           )}
         </div>
       )}
 
       {(currentRole === "ADMIN" || currentRole === "TECHNICIAN") && (
-        <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
-          <h3>Update Status</h3>
-          <form onSubmit={handleUpdateStatus}>
-            <div style={{ marginBottom: "10px" }}>
-              <select
-                value={statusValue}
-                onChange={(e) => setStatusValue(e.target.value)}
-              >
-                <option value="">Select Status</option>
-                <option value="IN_PROGRESS">IN_PROGRESS</option>
-                <option value="RESOLVED">RESOLVED</option>
-                <option value="REJECTED">REJECTED</option>
-                <option value="CLOSED">CLOSED</option>
-              </select>
-            </div>
+        <div className="ticket-details-card">
+          <div className="ticket-details-card-header">
+            <h3>Update Status</h3>
+          </div>
+
+          <form className="ticket-details-status-form" onSubmit={handleUpdateStatus}>
+            <select
+              value={statusValue}
+              onChange={(e) => setStatusValue(e.target.value)}
+              className="ticket-details-select"
+            >
+              <option value="">Select Status</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+              <option value="REJECTED">REJECTED</option>
+              <option value="CLOSED">CLOSED</option>
+            </select>
 
             {statusValue === "RESOLVED" && (
-              <div style={{ marginBottom: "10px" }}>
-                <label>Resolution Notes</label><br />
+              <div className="ticket-details-form-group">
+                <label>Resolution Notes</label>
                 <textarea
                   value={resolutionNotes}
                   onChange={(e) => setResolutionNotes(e.target.value)}
-                  rows="3"
-                  style={{ width: "100%" }}
+                  rows="4"
+                  className="ticket-details-textarea"
                 />
               </div>
             )}
 
             {statusValue === "REJECTED" && (
-              <div style={{ marginBottom: "10px" }}>
-                <label>Rejection Reason</label><br />
+              <div className="ticket-details-form-group">
+                <label>Rejection Reason</label>
                 <textarea
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  rows="3"
-                  style={{ width: "100%" }}
+                  rows="4"
+                  className="ticket-details-textarea"
                 />
               </div>
             )}
 
-            <button type="submit">Update Status</button>
+            <button type="submit" className="ticket-details-primary-btn">
+              Update Status
+            </button>
           </form>
         </div>
       )}
 
-      <div style={{ border: "1px solid #ccc", padding: "20px", marginTop: "24px" }}>
-        <h3>Comments</h3>
+      <div className="ticket-details-card">
+        <div className="ticket-details-card-header">
+          <h3>Comments</h3>
+        </div>
 
         {comments.length === 0 ? (
-          <p>No comments yet.</p>
+          <p className="ticket-details-muted-text">No comments yet.</p>
         ) : (
-          <div style={{ marginBottom: "20px" }}>
+          <div className="ticket-details-comments-list">
             {comments.map((comment) => (
-              <div
-                key={comment.id}
-                style={{
-                  border: "1px solid #ddd",
-                  padding: "12px",
-                  marginBottom: "10px",
-                  borderRadius: "6px",
-                }}
-              >
-                <p><strong>{comment.authorName}</strong> ({comment.authorRole})</p>
+              <div className="ticket-details-comment-item" key={comment.id}>
+                <div className="ticket-details-comment-top">
+                  <div>
+                    <span className="ticket-details-comment-author">
+                      {comment.authorName}
+                    </span>
+                    <span className="ticket-details-comment-role">
+                      ({comment.authorRole})
+                    </span>
+                  </div>
+                  <span className="ticket-details-comment-date">
+                    {comment.createdAt}
+                  </span>
+                </div>
 
                 {editingCommentId === comment.id ? (
-                  <>
+                  <div className="ticket-details-comment-edit">
                     <textarea
                       value={editMessage}
                       onChange={(e) => setEditMessage(e.target.value)}
-                      rows="3"
-                      style={{ width: "100%", marginBottom: "10px" }}
+                      rows="4"
+                      className="ticket-details-textarea"
                     />
-                    <button onClick={() => handleUpdateComment(comment.id)}>
-                      Save
-                    </button>
-                    <button
-                      onClick={() => {
-                        setEditingCommentId(null);
-                        setEditMessage("");
-                      }}
-                      style={{ marginLeft: "8px" }}
-                    >
-                      Cancel
-                    </button>
-                  </>
+                    <div className="ticket-details-comment-actions">
+                      <button
+                        type="button"
+                        className="ticket-details-primary-btn"
+                        onClick={() => handleUpdateComment(comment.id)}
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="ticket-details-secondary-btn"
+                        onClick={() => {
+                          setEditingCommentId(null);
+                          setEditMessage("");
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 ) : (
                   <>
-                    <p>{comment.message}</p>
-                    <small>{comment.createdAt}</small>
-                    <div style={{ marginTop: "10px" }}>
-                      <button onClick={() => handleEditClick(comment)}>
+                    <p className="ticket-details-comment-message">{comment.message}</p>
+                    <div className="ticket-details-comment-actions">
+                      <button
+                        type="button"
+                        className="ticket-details-link-btn"
+                        onClick={() => handleEditClick(comment)}
+                      >
                         Edit
                       </button>
                       <button
+                        type="button"
+                        className="ticket-details-link-btn ticket-details-delete-link"
                         onClick={() => handleDeleteComment(comment.id)}
-                        style={{ marginLeft: "8px" }}
                       >
                         Delete
                       </button>
@@ -405,23 +516,27 @@ const TicketDetails = () => {
           </div>
         )}
 
-        <form onSubmit={handleAddComment}>
-          <div style={{ marginBottom: "12px" }}>
+        <form className="ticket-details-comment-form" onSubmit={handleAddComment}>
+          <div className="ticket-details-comment-identity">
             <strong>Commenting as:</strong> {commentAuthorName} ({commentAuthorRole})
           </div>
 
-          <div style={{ marginBottom: "10px" }}>
-            <label>Message</label><br />
+          <div className="ticket-details-form-group">
+            <label>Message</label>
             <textarea
               value={commentMessage}
               onChange={(e) => setCommentMessage(e.target.value)}
               rows="4"
-              style={{ width: "100%" }}
+              className="ticket-details-textarea"
               required
             />
           </div>
 
-          <button type="submit" disabled={commentLoading}>
+          <button
+            type="submit"
+            className="ticket-details-primary-btn"
+            disabled={commentLoading}
+          >
             {commentLoading ? "Adding..." : "Add Comment"}
           </button>
         </form>
