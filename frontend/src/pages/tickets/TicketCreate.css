@@ -1,0 +1,132 @@
+.ticket-create-page {
+  min-height: 100vh;
+  background-color: #ffffff;
+  padding: 40px 20px;
+}
+
+.ticket-create-card {
+  max-width: 850px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.ticket-create-title {
+  margin: 0 0 24px;
+  color: #720e9e;
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ticket-create-success {
+  background-color: #f6edfb;
+  color: #720e9e;
+  border: 1px solid #d8b7ea;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+
+.ticket-create-error {
+  background-color: #fff1f2;
+  color: #b42318;
+  border: 1px solid #f0c7cc;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+
+.ticket-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ticket-create-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.ticket-create-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ticket-create-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+}
+
+.ticket-create-group input,
+.ticket-create-group select,
+.ticket-create-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #333333;
+  background-color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ticket-create-group textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.ticket-create-group input:focus,
+.ticket-create-group select:focus,
+.ticket-create-group textarea:focus {
+  border-color: #720e9e;
+  box-shadow: 0 0 0 3px rgba(114, 14, 158, 0.12);
+}
+
+.ticket-create-button {
+  align-self: flex-start;
+  background-color: #720e9e;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.ticket-create-button:hover {
+  background-color: #5d0b82;
+}
+
+.ticket-create-button:active {
+  transform: translateY(1px);
+}
+
+.ticket-create-button:disabled {
+  background-color: #b784cc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .ticket-create-card {
+    padding: 22px;
+  }
+
+  .ticket-create-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-create-button {
+    width: 100%;
+  }
+}
