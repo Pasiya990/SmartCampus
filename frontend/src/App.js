@@ -1,30 +1,21 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import BookingFormPage from './pages/BookingFormPage';
+import MyBookingsPage from './pages/MyBookingsPage';
+import AdminBookingsPage from './pages/AdminBookingsPage';
 
-function App() {
-  const [message, setMessage] = useState("Connecting...");
-
-  useEffect(() => {
-    fetch(process.env.REACT_APP_API_URL + "/test")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-
-        if (data.length >= 0) {
-          setMessage("MongoDB Connected Successfully ✅");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setMessage("Connection Failed ❌");
-      });
-  }, []);
-
+export default function App() {
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>SmartCampus</h1>
-      <h2>{message}</h2>
-    </div>
+    <BrowserRouter>
+      <nav style={{ padding: '12px 24px', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 20 }}>
+        <Link to="/book">New Booking</Link>
+        <Link to="/my-bookings">My Bookings</Link>
+        <Link to="/admin/bookings">Admin View</Link>
+      </nav>
+      <Routes>
+        <Route path="/book" element={<BookingFormPage />} />
+        <Route path="/my-bookings" element={<MyBookingsPage />} />
+        <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
