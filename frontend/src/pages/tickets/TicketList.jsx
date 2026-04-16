@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getAllTickets } from "../../api/ticketApi";
+import { Link } from "react-router-dom";
 
 const TicketList = () => {
   const [tickets, setTickets] = useState([]);
@@ -52,25 +53,29 @@ const TicketList = () => {
               <th>Priority</th>
               <th>Status</th>
               <th>Location</th>
+              <th>Resource Name</th>
               <th>Reported By</th>
               <th>Assigned Technician</th>
             </tr>
           </thead>
           <tbody>
-            {tickets.map((ticket) => (
-              <tr key={ticket.id}>
-                <td>{ticket.id}</td>
-                <td>{ticket.ticketCode}</td>
-                <td>{ticket.title}</td>
-                <td>{ticket.category}</td>
-                <td>{ticket.priority}</td>
-                <td>{ticket.status}</td>
-                <td>{ticket.location}</td>
-                <td>{ticket.reportedBy}</td>
-                <td>{ticket.assignedTechnician || "Not Assigned"}</td>
-              </tr>
-            ))}
-          </tbody>
+  {tickets.map((ticket) => (
+    <tr key={ticket.id}>
+      <td>{ticket.id}</td>
+      <td>{ticket.ticketCode}</td>
+      <td>
+        <Link to={`/tickets/${ticket.id}`}>{ticket.title}</Link>
+      </td>
+      <td>{ticket.category}</td>
+      <td>{ticket.priority}</td>
+      <td>{ticket.status}</td>
+      <td>{ticket.location}</td>
+      <td>{ticket.resourceName}</td>
+      <td>{ticket.reportedBy}</td>
+      <td>{ticket.assignedTechnician || "Not Assigned"}</td>
+    </tr>
+  ))}
+</tbody>
         </table>
       )}
     </div>

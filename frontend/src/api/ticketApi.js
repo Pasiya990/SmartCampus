@@ -21,3 +21,8 @@ export const getAllTickets = async () => {
   const response = await API.get("/api/tickets");
   return response.data;
 };
+
+export const getTicketById = async (id) => {
+  const response = await API.get(`/api/tickets/${id}`);
+  return response.data;
+};
