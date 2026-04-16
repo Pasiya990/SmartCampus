@@ -83,41 +83,53 @@ const TicketCreate = () => {
 
   return (
     <div className="ticket-create-page">
-      <div className="ticket-create-card">
-        <h2 className="ticket-create-title">Create New Ticket</h2>
+      <div className="ticket-create-header">
+        <h2 className="ticket-create-title">Create Incident Ticket</h2>
+        <p className="ticket-create-subtitle">
+          Submit a new issue with location, priority, and supporting details
+        </p>
+      </div>
 
+      <div className="ticket-create-card">
         {successMessage && (
-          <p className="ticket-create-success">{successMessage}</p>
+          <div className="ticket-create-alert ticket-create-alert-success">
+            {successMessage}
+          </div>
         )}
 
         {errorMessage && (
-          <p className="ticket-create-error">{errorMessage}</p>
+          <div className="ticket-create-alert ticket-create-alert-error">
+            {errorMessage}
+          </div>
         )}
 
         <form className="ticket-create-form" onSubmit={handleSubmit}>
-          <div className="ticket-create-group">
-            <label>Title</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          <div className="ticket-create-grid">
+            <div className="ticket-create-field ticket-create-field-wide">
+              <label>Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                placeholder="Enter a short title for the incident"
+                required
+              />
+            </div>
 
-          <div className="ticket-create-group">
-            <label>Description</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="ticket-create-field ticket-create-field-wide">
+              <label>Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Describe the issue clearly"
+                rows="5"
+                required
+              />
+            </div>
 
-          <div className="ticket-create-row">
-            <div className="ticket-create-group">
+            <div className="ticket-create-field">
               <label>Category</label>
               <select
                 name="category"
@@ -136,7 +148,7 @@ const TicketCreate = () => {
               </select>
             </div>
 
-            <div className="ticket-create-group">
+            <div className="ticket-create-field">
               <label>Priority</label>
               <select
                 name="priority"
@@ -151,82 +163,88 @@ const TicketCreate = () => {
                 <option value="CRITICAL">Critical</option>
               </select>
             </div>
-          </div>
 
-          <div className="ticket-create-row">
-            <div className="ticket-create-group">
+            <div className="ticket-create-field">
               <label>Location</label>
               <input
                 type="text"
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
+                placeholder="Enter the issue location"
                 required
               />
             </div>
 
-            <div className="ticket-create-group">
+            <div className="ticket-create-field">
               <label>Resource Name</label>
               <input
                 type="text"
                 name="resourceName"
                 value={formData.resourceName}
                 onChange={handleChange}
+                placeholder="Optional resource or asset name"
               />
             </div>
-          </div>
 
-          <div className="ticket-create-row">
-            <div className="ticket-create-group">
+            <div className="ticket-create-field">
               <label>Preferred Contact</label>
               <input
                 type="text"
                 name="preferredContact"
                 value={formData.preferredContact}
                 onChange={handleChange}
+                placeholder="Email or phone"
                 required
               />
             </div>
 
-            <div className="ticket-create-group">
+            <div className="ticket-create-field">
               <label>Contact Name</label>
               <input
                 type="text"
                 name="contactName"
                 value={formData.contactName}
                 onChange={handleChange}
+                placeholder="Optional contact name"
               />
+            </div>
+
+            <div className="ticket-create-field ticket-create-field-wide">
+              <label>Reported By</label>
+              <input
+                type="text"
+                name="reportedBy"
+                value={formData.reportedBy}
+                onChange={handleChange}
+                placeholder="Enter the reporter's name"
+                required
+              />
+            </div>
+
+            <div className="ticket-create-field ticket-create-field-wide">
+              <label>Upload Images (max 3)</label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileChange}
+              />
+              <span className="ticket-create-helper-text">
+                Attach up to 3 images related to the issue
+              </span>
             </div>
           </div>
 
-          <div className="ticket-create-group">
-            <label>Reported By</label>
-            <input
-              type="text"
-              name="reportedBy"
-              value={formData.reportedBy}
-              onChange={handleChange}
-              required
-            />
+          <div className="ticket-create-actions">
+            <button
+              className="ticket-create-primary-btn"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Submitting..." : "Create Ticket"}
+            </button>
           </div>
-
-          <div className="ticket-create-group">
-            <label>Upload Images (max 3)</label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileChange}
-            />
-          </div>
-
-          <button
-            className="ticket-create-button"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Submitting..." : "Create Ticket"}
-          </button>
         </form>
       </div>
     </div>
