@@ -37,3 +37,14 @@ export const addComment = async (ticketId, commentData) => {
   return response.data;
 };
 
+export const updateComment = async (commentId, commentData) => {
+  const response = await API.put(`/api/tickets/comments/${commentId}`, commentData);
+  return response.data;
+};
+
+export const deleteComment = async (commentId, deleteData) => {
+  const response = await API.delete(`/api/tickets/comments/${commentId}`, {
+    data: deleteData,
+  });
+  return response.data;
+};

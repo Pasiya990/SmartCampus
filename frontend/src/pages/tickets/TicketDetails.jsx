@@ -4,6 +4,8 @@ import {
   getTicketById,
   getCommentsByTicketId,
   addComment,
+  updateComment,
+  deleteComment,
 } from "../../api/ticketApi";
 
 const TicketDetails = () => {
@@ -15,6 +17,9 @@ const TicketDetails = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [commentMessage, setCommentMessage] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
+
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editMessage, setEditMessage] = useState("");
 
   const storedUser = JSON.parse(localStorage.getItem("user")) || {};
   const storedRole = localStorage.getItem("role") || storedUser.role || "USER";
@@ -82,6 +87,50 @@ const TicketDetails = () => {
       alert("Failed to add comment.");
     } finally {
       setCommentLoading(false);
+    }
+  };
+
+  const handleEditClick = (comment) => {
+    setEditingCommentId(comment.id);
+    setEditMessage(comment.message);
+  };
+
+  const handleUpdateComment = async (commentId) => {
+    if (!editMessage.trim()) {
+      alert("Please enter updated comment message.");
+      return;
+    }
+
+    try {
+      await updateComment(commentId, {
+        editorName: commentAuthorName,
+        editorRole: commentAuthorRole,
+        message: editMessage,
+      });
+
+      setEditingCommentId(null);
+      setEditMessage("");
+      await fetchComments();
+    } catch (error) {
+      console.error("Update comment error:", error);
+      alert("Failed to update comment.");
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    const confirmed = window.confirm("Are you sure you want to delete this comment?");
+    if (!confirmed) return;
+
+    try {
+      await deleteComment(commentId, {
+        actorName: commentAuthorName,
+        actorRole: commentAuthorRole,
+      });
+
+      await fetchComments();
+    } catch (error) {
+      console.error("Delete comment error:", error);
+      alert("Failed to delete comment.");
     }
   };
 
@@ -166,8 +215,45 @@ const TicketDetails = () => {
                 }}
               >
                 <p><strong>{comment.authorName}</strong> ({comment.authorRole})</p>
-                <p>{comment.message}</p>
-                <small>{comment.createdAt}</small>
+
+                {editingCommentId === comment.id ? (
+                  <>
+                    <textarea
+                      value={editMessage}
+                      onChange={(e) => setEditMessage(e.target.value)}
+                      rows="3"
+                      style={{ width: "100%", marginBottom: "10px" }}
+                    />
+                    <button onClick={() => handleUpdateComment(comment.id)}>
+                      Save
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingCommentId(null);
+                        setEditMessage("");
+                      }}
+                      style={{ marginLeft: "8px" }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p>{comment.message}</p>
+                    <small>{comment.createdAt}</small>
+                    <div style={{ marginTop: "10px" }}>
+                      <button onClick={() => handleEditClick(comment)}>
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteComment(comment.id)}
+                        style={{ marginLeft: "8px" }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
