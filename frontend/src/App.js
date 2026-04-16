@@ -7,6 +7,7 @@ import UserDashboard from "./pages/UserDashboard";
 
 
 import TicketCreate from "./pages/tickets/TicketCreate";
+import TicketList from "./pages/tickets/TicketList";
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
 
 
         <Route path="/tickets/new" element={<TicketCreate />} />
+        <Route path="/tickets" element={<TicketList />} />
+        
       </Routes>
     </BrowserRouter>
   );

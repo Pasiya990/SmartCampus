@@ -10,8 +10,14 @@ export const createTicket = async (ticketData, files) => {
       formData.append("files", file);
     });
   }
+  
 
   const response = await API.post("/api/tickets", formData);
 
+  return response.data;
+};
+
+export const getAllTickets = async () => {
+  const response = await API.get("/api/tickets");
   return response.data;
 };
