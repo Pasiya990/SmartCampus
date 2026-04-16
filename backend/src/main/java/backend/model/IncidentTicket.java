@@ -88,11 +88,11 @@ public class IncidentTicket {
         this.updatedAt = LocalDateTime.now();
     }
 
-   @Builder.Default
-   @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+     @Builder.Default
+   @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
    private List<TicketAttachment> attachments = new ArrayList<>();
 
    @Builder.Default
-   @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+   @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
    private List<TicketComment> comments = new ArrayList<>();
 }
