@@ -15,6 +15,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
+import org.springframework.http.HttpMethod;
 
 
 @Configuration
@@ -39,6 +40,9 @@ public class SecurityConfig {
             http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll())
 
                 // 🔥 ADD THIS
                 .sessionManagement(session -> session
@@ -69,25 +73,20 @@ public class SecurityConfig {
             return http.build();
         }
   
-            @Bean
-            public CorsConfigurationSource corsConfigurationSource() {
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
             CorsConfiguration config = new CorsConfiguration();
-
+        
             config.setAllowedOrigins(List.of("http://localhost:3000"));
-            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-            config.setAllowedHeaders(List.of(
-               "Authorization",
-               "Content-Type",
-                "X-User-Id",
-               "X-User-Role"
-            ));
-
+            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+            config.setAllowedHeaders(List.of("*"));
+            config.setAllowCredentials(true);
+        
             UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
             source.registerCorsConfiguration("/**", config);
-
+        
             return source;
-            }
+        }
 
         @Bean
         public PasswordEncoder passwordEncoder() {

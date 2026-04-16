@@ -11,11 +11,14 @@ export default function Login() {
   
       const token = res.data;
       localStorage.setItem("token", token);
+
+
   
       // 🔥 Decode token
       const payload = JSON.parse(atob(token.split(".")[1]));
       const role = payload.role;
   
+
       alert("Login success");
   
       // 🔥 Redirect based on role

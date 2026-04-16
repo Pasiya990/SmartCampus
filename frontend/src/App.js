@@ -15,6 +15,7 @@ import MyTickets from "./pages/tickets/MyTickets";
 import BookingFormPage from './pages/BookingFormPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import AdminBookingsPage from './pages/AdminBookingsPage';
+import { Link } from "react-router-dom";
 
 function App() {
   return (
@@ -48,3 +49,5 @@ function App() {
     </BrowserRouter>
   );
 }
+
+export default App;

@@ -8,17 +8,24 @@ export default function TechnicianView() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const technicianEmail =
-    localStorage.getItem("email") ||
-    JSON.parse(localStorage.getItem("user"))?.email ||
-    "";
+  // 🔥 Decode email from JWT (ONLY for display)
+  let technicianEmail = "";
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      technicianEmail = payload.sub || payload.email || "";
+    } catch (e) {
+      console.error("Invalid token:", e);
+    }
+  }
 
   useEffect(() => {
     const fetchAssignedTickets = async () => {
       try {
-        const response = await API.get(
-          `/api/tickets/assigned-technician/${encodeURIComponent(technicianEmail)}`
-        );
+        // 🔥 NO EMAIL IN URL (token handles everything)
+        const response = await API.get("/api/tickets/assigned-technician");
         setTickets(response.data);
       } catch (error) {
         console.error("Error fetching technician tickets:", error);
@@ -28,22 +35,13 @@ export default function TechnicianView() {
       }
     };
 
-    if (technicianEmail) {
-      fetchAssignedTickets();
-    } else {
-      setErrorMessage("Technician email not found.");
-      setLoading(false);
-    }
-  }, [technicianEmail]);
+    fetchAssignedTickets();
+  }, []);
 
-  const openCount = tickets.filter((ticket) => ticket.status === "OPEN").length;
-  const inProgressCount = tickets.filter(
-    (ticket) => ticket.status === "IN_PROGRESS"
-  ).length;
-  const resolvedCount = tickets.filter(
-    (ticket) => ticket.status === "RESOLVED"
-  ).length;
-  const closedCount = tickets.filter((ticket) => ticket.status === "CLOSED").length;
+  const openCount = tickets.filter((t) => t.status === "OPEN").length;
+  const inProgressCount = tickets.filter((t) => t.status === "IN_PROGRESS").length;
+  const resolvedCount = tickets.filter((t) => t.status === "RESOLVED").length;
+  const closedCount = tickets.filter((t) => t.status === "CLOSED").length;
 
   if (loading) {
     return <p className="technician-loading">Loading assigned tickets...</p>;
@@ -64,9 +62,12 @@ export default function TechnicianView() {
         </div>
       </div>
 
+      {/* 🔥 Email display (optional, from token) */}
       <div className="technician-welcome-card">
         <span className="technician-welcome-label">Logged in as</span>
-        <span className="technician-welcome-value">{technicianEmail}</span>
+        <span className="technician-welcome-value">
+          {technicianEmail || "Unknown"}
+        </span>
       </div>
 
       <div className="technician-summary-grid">
@@ -129,17 +130,13 @@ export default function TechnicianView() {
                     <td>{ticket.category}</td>
 
                     <td>
-                      <span
-                        className={`technician-badge technician-priority-${ticket.priority?.toLowerCase()}`}
-                      >
+                      <span className={`technician-badge technician-priority-${ticket.priority?.toLowerCase()}`}>
                         {ticket.priority}
                       </span>
                     </td>
 
                     <td>
-                      <span
-                        className={`technician-badge technician-status-${ticket.status?.toLowerCase()}`}
-                      >
+                      <span className={`technician-badge technician-status-${ticket.status?.toLowerCase()}`}>
                         {ticket.status}
                       </span>
                     </td>

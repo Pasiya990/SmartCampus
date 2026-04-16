@@ -68,7 +68,7 @@ public ResponseEntity<IncidentTicketResponse> createTicket(
             @Valid @RequestBody AssignTechnicianRequest request) {
 
         return ResponseEntity.ok(
-                incidentTicketService.assignTechnician(id, request.getTechnicianName())
+                incidentTicketService.assignTechnician(id, request.getTechnicianEmail())
         );
     }
 
@@ -127,11 +127,14 @@ public ResponseEntity<String> deleteComment(
     return ResponseEntity.ok("Comment deleted successfully");
 }
 
-@GetMapping("/assigned-technician/{technicianName}")
+@GetMapping("/assigned-technician")
 public ResponseEntity<List<IncidentTicketResponse>> getTicketsByAssignedTechnician(
-        @PathVariable String technicianName) {
+        org.springframework.security.core.Authentication authentication) {
+
+    String email = authentication.getName(); // 🔥 from JWT
+
     return ResponseEntity.ok(
-            incidentTicketService.getTicketsByAssignedTechnician(technicianName)
+            incidentTicketService.getTicketsByAssignedTechnician(email)
     );
 }
 }

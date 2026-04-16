@@ -9,7 +9,7 @@ import java.time.LocalTime;
 public class BookingRequest {
     
     @NotNull(message = "Resource ID is required")
-    private Long resourceID;
+    private Long resourceId;
 
     @NotNull(message = "Date is required")
     @FutureOrPresent(message = "Date cannot be in the past")
