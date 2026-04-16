@@ -21,10 +21,16 @@ export const getAllBookings = (status) =>
   });
 
 export const approveBooking = (id) =>
-  axios.put(`${BASE}/${id}/approve`, {}, { headers: headers('ADMIN') });
+  axios.put(`${BASE}/${id}/approve`, null , { headers: headers('ADMIN') });
 
 export const rejectBooking = (id, reason) =>
   axios.put(`${BASE}/${id}/reject`, { reason }, { headers: headers('ADMIN') });
 
 export const cancelBooking = (id) =>
-  axios.put(`${BASE}/${id}/cancel`, {}, { headers: headers() });
+  axios.put(`${BASE}/${id}/cancel`, null , { headers: headers() });
+
+export const deleteOwnBooking = (id) =>
+  axios.delete(`${BASE}/${id}/own`, { headers: headers() });
+
+export const editBooking = (id, data) =>
+  axios.put(`${BASE}/${id}/edit`, data, { headers: headers() });
