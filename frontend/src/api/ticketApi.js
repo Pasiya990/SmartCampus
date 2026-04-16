@@ -26,3 +26,14 @@ export const getTicketById = async (id) => {
   const response = await API.get(`/api/tickets/${id}`);
   return response.data;
 };
+
+export const getCommentsByTicketId = async (ticketId) => {
+  const response = await API.get(`/api/tickets/${ticketId}/comments`);
+  return response.data;
+};
+
+export const addComment = async (ticketId, commentData) => {
+  const response = await API.post(`/api/tickets/${ticketId}/comments`, commentData);
+  return response.data;
+};
+
