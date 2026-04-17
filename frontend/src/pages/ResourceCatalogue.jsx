@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { resourceService } from '../services/resourceService';
 import ResourceModal from '../components/ResourceModal';
 import toast from 'react-hot-toast';
@@ -19,8 +18,6 @@ const TYPE_ICONS = {
 };
 
 export default function ResourceCatalogue() {
-  const navigate = useNavigate();
-
   const [resources, setResources] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,17 +64,9 @@ export default function ResourceCatalogue() {
     try {
       const params = {};
 
-      if (search.type) {
-        params.type = search.type;
-      }
-
-      if (search.keyword.trim()) {
-        params.keyword = search.keyword.trim();
-      }
-
-      if (search.minCapacity !== '') {
-        params.minCapacity = Number(search.minCapacity);
-      }
+      if (search.type) params.type = search.type;
+      if (search.keyword.trim()) params.keyword = search.keyword.trim();
+      if (search.minCapacity !== '') params.minCapacity = Number(search.minCapacity);
 
       const res =
         Object.keys(params).length > 0
@@ -110,7 +99,7 @@ export default function ResourceCatalogue() {
 
     try {
       await resourceService.delete(id);
-      toast.success('Resource deleted successfully');
+      toast.success('Resource deleted');
       loadAllResources();
     } catch (err) {
       const msg =
@@ -144,7 +133,9 @@ export default function ResourceCatalogue() {
       return;
     }
 
-    navigate(`/booking/${resource.id}`);
+    toast.success(`Booking started for ${resource.name} 📅`);
+    // Later you can replace this with:
+    // setBookingModal({ open: true, resource });
   };
 
   return (
@@ -155,7 +146,7 @@ export default function ResourceCatalogue() {
         <div className="page-header">
           <div>
             <h1 className="page-title">Facilities &amp; Assets</h1>
-            <p className="page-sub">Smart Campus Operations Hub</p>
+            <p className="page-sub">Smart Campus Operations Hub — Module A</p>
           </div>
 
           <button
