@@ -150,6 +150,76 @@ public class BookingService {
             ));
     }
 
+// User deletes their own CANCELLED or REJECTED booking
+public void deleteOwnBooking(Long bookingId, Long userId) {
+    Booking booking = getBookingOrThrow(bookingId);
+    if (!booking.getUser().getId().equals(userId)) {
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN, "You can only delete your own bookings"
+        );
+    }
+    if (booking.getStatus() != BookingStatus.CANCELLED &&
+        booking.getStatus() != BookingStatus.REJECTED) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "You can only delete CANCELLED or REJECTED bookings"
+        );
+    }
+    bookingRepository.deleteById(bookingId);
+}
+
+// User edits their own PENDING booking — resets to PENDING
+public BookingResponse editBooking(Long bookingId, Long userId, BookingRequest request) {
+    Booking booking = getBookingOrThrow(bookingId);
+
+    if (!booking.getUser().getId().equals(userId)) {
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN, "You can only edit your own bookings"
+        );
+    }
+    if (booking.getStatus() != BookingStatus.PENDING) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "Only PENDING bookings can be edited"
+        );
+    }
+    if (!request.getStartTime().isBefore(request.getEndTime())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST, "Start time must be before end time"
+        );
+    }
+
+    // Check conflicts excluding current booking
+    List<Booking> conflicts = bookingRepository.findConflictingBookings(
+        request.getResourceId(),
+        request.getDate(),
+        request.getStartTime(),
+        request.getEndTime()
+    ).stream()
+        .filter(b -> !b.getId().equals(bookingId))
+        .toList();
+
+    if (!conflicts.isEmpty()) {
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT, "This resource is already booked for the selected time"
+        );
+    }
+
+    Resource resource = resourceRepository.findById(request.getResourceId())
+        .orElseThrow(() -> new ResponseStatusException(
+            HttpStatus.NOT_FOUND, "Resource not found"
+        ));
+
+    booking.setResource(resource);
+    booking.setDate(request.getDate());
+    booking.setStartTime(request.getStartTime());
+    booking.setEndTime(request.getEndTime());
+    booking.setPurpose(request.getPurpose());
+    booking.setAttendees(request.getAttendees());
+    booking.setStatus(BookingStatus.PENDING);
+    booking.setRejectionReason(null);
+
+    return toResponse(bookingRepository.save(booking));
+}
+
     //Map entity to response DTO
     private BookingResponse toResponse(Booking b){
         return BookingResponse.builder()

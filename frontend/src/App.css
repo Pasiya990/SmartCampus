@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #eef0f8;
+  --surface: #ffffff;
+  --surface-hover: #f7f8fc;
+  --border: #e2e5ef;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-light: #eef2ff;
+  --green: #10b981;
+  --green-bg: #d1fae5;
+  --green-text: #065f46;
+  --red: #ef4444;
+  --red-bg: #fee2e2;
+  --red-text: #991b1b;
+  --yellow-bg: #fef9c3;
+  --yellow-text: #854d0e;
+  --gray-bg: #f3f4f6;
+  --gray-text: #374151;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 32px rgba(0,0,0,0.1);
+  --radius: 16px;
+  --radius-sm: 8px;
+  --font: 'DM Sans', sans-serif;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+a { text-decoration: none; }

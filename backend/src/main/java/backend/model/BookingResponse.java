@@ -10,7 +10,7 @@ import java.time.LocalTime;
 public class BookingResponse {
     
     private Long id;
-    private Long resourceID;
+    private Long resourceId;
     private String resourceName;
     private String userEmail;
     private LocalDate date;

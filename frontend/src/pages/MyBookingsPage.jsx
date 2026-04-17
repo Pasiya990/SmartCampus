@@ -121,11 +121,7 @@ export default function MyBookingsPage() {
             {(b.status === 'CANCELLED' || b.status === 'REJECTED') && (
               <button
                 className="btn-reject"
-                onClick={() => {
-                  alert("CLICK WORKING"); // 👈 ADD THIS
-                  console.log("DELETE CLICKED:", b.id);
-                  handleDelete(b.id);
-                }}
+                onClick={() => handleDelete(b.id)}
               >
                 Delete
               </button>

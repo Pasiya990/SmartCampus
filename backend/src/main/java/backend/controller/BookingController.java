@@ -91,4 +91,24 @@ public class BookingController {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
     }
+
+    // DELETE /api/bookings/{id}/own — user deletes own cancelled/rejected booking
+@DeleteMapping("/{id}/own")
+public ResponseEntity<Void> deleteOwnBooking(
+    @PathVariable Long id,
+    @RequestHeader("X-User-Id") Long userId
+) {
+    bookingService.deleteOwnBooking(id, userId);
+    return ResponseEntity.noContent().build();
+}
+
+// PUT /api/bookings/{id}/edit — user edits own pending booking
+@PutMapping("/{id}/edit")
+public ResponseEntity<BookingResponse> editBooking(
+    @PathVariable Long id,
+    @RequestHeader("X-User-Id") Long userId,
+    @Valid @RequestBody BookingRequest request
+) {
+    return ResponseEntity.ok(bookingService.editBooking(id, userId, request));
+}
 }
