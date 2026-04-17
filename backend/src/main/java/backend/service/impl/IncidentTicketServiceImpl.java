@@ -354,25 +354,59 @@ public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
                                         .build())
                                 .toList();
 
-        return IncidentTicketResponse.builder()
-                .id(ticket.getId())
-                .ticketCode(ticket.getTicketCode())
-                .title(ticket.getTitle())
-                .description(ticket.getDescription())
-                .category(ticket.getCategory())
-                .priority(ticket.getPriority())
-                .status(ticket.getStatus())
-                .location(ticket.getLocation())
-                .resourceName(ticket.getResourceName())
-                .preferredContact(ticket.getPreferredContact())
-                .contactName(ticket.getContactName())
-                .reportedBy(ticket.getReportedBy())
-                .assignedTechnician(ticket.getAssignedTechnician())
-                .rejectionReason(ticket.getRejectionReason())
-                .resolutionNotes(ticket.getResolutionNotes())
-                .createdAt(ticket.getCreatedAt())
-                .updatedAt(ticket.getUpdatedAt())
-                .attachments(attachmentResponses)
-                .build();
+long ageInMinutes = 0;
+Long resolutionTimeInMinutes = null;
+String timerLabel = "Pending";
+
+if (ticket.getCreatedAt() != null) {
+    ageInMinutes = java.time.Duration
+            .between(ticket.getCreatedAt(), java.time.LocalDateTime.now())
+            .toMinutes();
+}
+
+if ((ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED)
+        && ticket.getUpdatedAt() != null) {
+    resolutionTimeInMinutes = java.time.Duration
+            .between(ticket.getCreatedAt(), ticket.getUpdatedAt())
+            .toMinutes();
+}
+
+if (ticket.getStatus() == TicketStatus.OPEN) {
+    timerLabel = "Pending";
+} else if (ticket.getStatus() == TicketStatus.IN_PROGRESS) {
+    timerLabel = "Being handled";
+} else if (ticket.getStatus() == TicketStatus.RESOLVED) {
+    timerLabel = "Resolved";
+} else if (ticket.getStatus() == TicketStatus.CLOSED) {
+    timerLabel = "Closed";
+} else if (ticket.getStatus() == TicketStatus.REJECTED) {
+    timerLabel = "Rejected";
+}
+return IncidentTicketResponse.builder()
+        .id(ticket.getId())
+        .ticketCode(ticket.getTicketCode())
+        .title(ticket.getTitle())
+        .description(ticket.getDescription())
+        .category(ticket.getCategory())
+        .priority(ticket.getPriority())
+        .status(ticket.getStatus())
+        .location(ticket.getLocation())
+        .resourceName(ticket.getResourceName())
+        .preferredContact(ticket.getPreferredContact())
+        .contactName(ticket.getContactName())
+        .reportedBy(ticket.getReportedBy())
+        .assignedTechnician(ticket.getAssignedTechnician())
+        .rejectionReason(ticket.getRejectionReason())
+        .resolutionNotes(ticket.getResolutionNotes())
+        .createdAt(ticket.getCreatedAt())
+        .updatedAt(ticket.getUpdatedAt())
+        .attachments(attachmentResponses)
+
+        // ✅ NEW FIELDS
+        .ageInMinutes(ageInMinutes)
+        .resolutionTimeInMinutes(resolutionTimeInMinutes)
+        .timerLabel(timerLabel)
+
+        .build();
     }
 }

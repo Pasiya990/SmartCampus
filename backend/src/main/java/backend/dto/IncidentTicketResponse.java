@@ -34,5 +34,8 @@ public class IncidentTicketResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<TicketAttachmentResponse> attachments;
+    private Long ageInMinutes;
+    private Long resolutionTimeInMinutes;
+    private String timerLabel;
 
 }

@@ -29,6 +29,27 @@ const TicketDetails = () => {
   const [resolutionNotes, setResolutionNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
 
+  // 🔥 format minutes to readable time
+const formatTime = (minutes) => {
+  if (minutes == null) return "N/A";
+
+  const days = Math.floor(minutes / (60 * 24));
+  const hours = Math.floor((minutes % (60 * 24)) / 60);
+  const mins = minutes % 60;
+
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${mins}m`;
+  return `${mins} mins`;
+};
+
+const getTimerColor = (minutes) => {
+  if (minutes == null) return "#111c4e";
+
+  if (minutes < 60) return "#16a34a";   // green
+  if (minutes < 240) return "#f59e0b";  // orange
+  return "#dc2626";                     // red
+};
+
     const token = localStorage.getItem("token");
 
   let tokenPayload = {};
@@ -165,7 +186,7 @@ const TicketDetails = () => {
     e.preventDefault();
 
     if (!technicianName.trim()) {
-      alert("Please enter technician name.");
+      alert("Please enter technician email.");
       return;
     }
 
@@ -254,6 +275,34 @@ const TicketDetails = () => {
         </div>
       </div>
 
+      <div className="ticket-details-timer-row">
+  <div className="ticket-details-timer-card">
+    <span className="ticket-details-timer-title">Timer Status</span>
+    <span className="ticket-details-timer-value">
+      {ticket.timerLabel || "N/A"}
+    </span>
+  </div>
+
+  <div className="ticket-details-timer-card">
+    <span className="ticket-details-timer-title">Ticket Age</span>
+    <span
+  className="ticket-details-timer-value"
+  style={{ color: getTimerColor(ticket.ageInMinutes) }}
+>
+  {formatTime(ticket.ageInMinutes)}
+</span>
+  </div>
+
+  <div className="ticket-details-timer-card">
+    <span className="ticket-details-timer-title">Resolved In</span>
+    <span className="ticket-details-timer-value">
+      {ticket.resolutionTimeInMinutes != null
+  ? formatTime(ticket.resolutionTimeInMinutes)
+  : "Not resolved yet"}
+    </span>
+  </div>
+</div>
+
       <div className="ticket-details-card">
         <div className="ticket-details-card-header">
           <h3>Incident Information</h3>
@@ -334,6 +383,8 @@ const TicketDetails = () => {
         </div>
       </div>
 
+      
+
       {ticket.attachments && ticket.attachments.length > 0 && (
         <div className="ticket-details-card">
           <div className="ticket-details-card-header">
@@ -367,7 +418,7 @@ const TicketDetails = () => {
               value={technicianName}
               onChange={(e) => setTechnicianName(e.target.value)}
               className="ticket-details-select"
-              placeholder="Enter technician name"
+              placeholder="Enter technician email"
             />
 
             <button type="submit" className="ticket-details-primary-btn">

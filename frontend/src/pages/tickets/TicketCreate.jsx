@@ -50,7 +50,18 @@ const TicketCreate = () => {
     setLoading(true);
     setSuccessMessage("");
     setErrorMessage("");
+    // ✅ Preferred Contact Validation (Email OR Phone)
+   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+   const phoneRegex = /^(?:\+94|0)?[0-9]{9}$/;
 
+if (
+  !emailRegex.test(formData.preferredContact) &&
+  !phoneRegex.test(formData.preferredContact)
+) {
+  setErrorMessage("Enter a valid email or phone number");
+  setLoading(false);
+  return;
+} 
     try {
       const createdTicket = await createTicket(formData, files);
 
@@ -199,7 +210,7 @@ const TicketCreate = () => {
                 name="preferredContact"
                 value={formData.preferredContact}
                 onChange={handleChange}
-                placeholder="Email or phone"
+                placeholder="Enter Email or valid phone number"
                 required
               />
             </div>
