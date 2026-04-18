@@ -1,50 +1,56 @@
-// import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import AdminDashboard from "./pages/AdminDashboard";
+import TechnicianView from "./pages/TechnicianView";
+import OAuthSuccess from "./pages/OAuthSuccess";
+import UserDashboard from "./pages/UserDashboard";
 
-// function App() {
-//   const [message, setMessage] = useState("Connecting...");
 
-//   useEffect(() => {
-//     fetch(process.env.REACT_APP_API_URL + "/test")
-//       .then((res) => res.json())
-//       .then((data) => {
-//         console.log(data);
+import TicketCreate from "./pages/tickets/TicketCreate";
+import TicketList from "./pages/tickets/TicketList";
+import TicketDetails from "./pages/tickets/TicketDetails";
+import MyTickets from "./pages/tickets/MyTickets";
 
-//         if (data.length >= 0) {
-//           setMessage("PostgresSQL Connected Successfully ✅");
-//         }
-//       })
-//       .catch((err) => {
-//         console.error(err);
-//         setMessage("Connection Failed ❌");
-//       });
-//   }, []);
+import BookingFormPage from './pages/BookingFormPage';
+import MyBookingsPage from './pages/MyBookingsPage';
+import AdminBookingsPage from './pages/AdminBookingsPage';
+import { Link } from "react-router-dom";
 
-//   return (
-//     <div style={{ textAlign: "center", marginTop: "50px" }}>
-//       <h1>SmartCampus</h1>
-//       <h2>{message}</h2>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-
 import ResourceCatalogue from "./pages/ResourceCatalogue";
-import BookingFormPage from "./pages/BookingFormPage";
 
 function App() {
   return (
-    <Router>
-      <Toaster position="top-right" reverseOrder={false} />
+    <BrowserRouter>
+    
+    <Toaster position="top-right" reverseOrder={false} />
+
       <Routes>
+        <Route path="/book" element={<BookingFormPage />} />
+        <Route path="/my-bookings" element={<MyBookingsPage />} />
+        <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+          
+        <Route path="/" element={<Login />} /> 
+        <Route path="/oauth-success" element={<OAuthSuccess />} />
+        <Route path="/user" element={<UserDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/technician" element={<TechnicianView />} />
+
+
+        <Route path="/tickets/new" element={<TicketCreate />} />
+        <Route path="/tickets" element={<TicketList />} />
+        <Route path="/tickets/:id" element={<TicketDetails />} />
+        <Route path="/my-tickets" element={<MyTickets />} />
+        
+          
         <Route path="/" element={<ResourceCatalogue />} />
         <Route path="/booking/:id" element={<BookingFormPage />} />
+
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
+
+  
 }
 
 export default App;

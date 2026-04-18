@@ -19,12 +19,12 @@ public class CloudinaryServiceImpl implements CloudinaryService {
     @Override
     public Map uploadFile(MultipartFile file) throws IOException {
 
-        // ✅ NULL CHECK
+        // ✅ IMPORTANT: allow optional file (DO NOT BREAK MEMBER 3)
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
+            return null;
         }
 
-        // ✅ VALIDATE TYPE (from member 1)
+        // ✅ Validate only if file exists
         String contentType = file.getContentType();
 
         if (contentType == null ||
@@ -34,7 +34,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             throw new IllegalArgumentException("Only JPG and PNG allowed");
         }
 
-        // ✅ UPLOAD (with folder from member 1)
+
         Map uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap(
@@ -43,7 +43,6 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 )
         );
 
-        // ✅ DEBUG (optional)
         System.out.println("Cloudinary upload: " + uploadResult);
 
         return uploadResult;

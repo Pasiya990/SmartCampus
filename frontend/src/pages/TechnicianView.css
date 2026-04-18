@@ -1,0 +1,306 @@
+.technician-page {
+  min-height: 100vh;
+  background: #F8F8FA;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 70% -10%, rgba(108, 71, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 10% 90%, rgba(127, 119, 221, 0.06) 0%, transparent 50%);
+  padding: 48px 24px 72px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #1A1830;
+  box-sizing: border-box;
+}
+
+/* ─── Header ──────────────────────────────────────────── */
+.technician-header {
+  max-width: 1100px;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.technician-title {
+  font-size: 26px;
+  font-weight: 600;
+  color: #1A1830;
+  letter-spacing: -0.5px;
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.technician-subtitle {
+  font-size: 14px;
+  color: #9C98B0;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Welcome card ────────────────────────────────────── */
+.technician-welcome-card {
+  max-width: 1100px;
+  margin: 0 auto 20px;
+  background: #EEEDFE;
+  border: 1px solid #CECBF6;
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.technician-welcome-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #534AB7;
+  letter-spacing: 0.02em;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.technician-welcome-value {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #3C3489;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ─── Summary Grid ────────────────────────────────────── */
+.technician-summary-grid {
+  max-width: 1100px;
+  margin: 0 auto 24px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.technician-summary-card {
+  background: #ffffff;
+  border: 1px solid #E4E2EC;
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: 0 1px 3px rgba(80, 60, 180, 0.05);
+  border-top: 3px solid transparent;
+}
+
+.technician-summary-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #9C98B0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.technician-summary-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.technician-summary-total    { border-top-color: #6C47FF; }
+.technician-summary-total    .technician-summary-value { color: #6C47FF; }
+
+.technician-summary-open     { border-top-color: #378ADD; }
+.technician-summary-open     .technician-summary-value { color: #185FA5; }
+
+.technician-summary-progress { border-top-color: #EF9F27; }
+.technician-summary-progress .technician-summary-value { color: #854F0B; }
+
+.technician-summary-resolved { border-top-color: #1D9E75; }
+.technician-summary-resolved .technician-summary-value { color: #0F6E56; }
+
+.technician-summary-closed   { border-top-color: #888780; }
+.technician-summary-closed   .technician-summary-value { color: #5F5E5A; }
+
+/* ─── Main card ───────────────────────────────────────── */
+.technician-card {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid #E4E2EC;
+  box-shadow: 0 1px 3px rgba(80, 60, 180, 0.06), 0 4px 16px rgba(80, 60, 180, 0.07);
+  overflow: hidden;
+}
+
+.technician-card::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #6C47FF 0%, #7F77DD 100%);
+}
+
+.technician-card-top {
+  padding: 18px 24px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #F1F0F5;
+}
+
+.technician-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1A1830;
+  margin: 0;
+  letter-spacing: -0.2px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.technician-result-count {
+  font-size: 13px;
+  color: #9C98B0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* ─── Empty / Loading / Error ─────────────────────────── */
+.technician-empty {
+  padding: 40px 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #9C98B0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.technician-loading,
+.technician-error {
+  padding: 60px 24px;
+  text-align: center;
+  font-size: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.technician-loading { color: #9C98B0; }
+.technician-error   { color: #A32D2D; }
+
+/* ─── Table ───────────────────────────────────────────── */
+.technician-table-wrapper {
+  overflow-x: auto;
+  padding: 0 0 4px;
+}
+
+.technician-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px;
+}
+
+.technician-table thead tr {
+  background: #F8F8FA;
+}
+
+.technician-table th {
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #9C98B0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.technician-table td {
+  padding: 13px 16px;
+  color: #1A1830;
+  border-bottom: 1px solid #F1F0F5;
+  vertical-align: middle;
+}
+
+.technician-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.technician-table tbody tr:hover {
+  background: #FAFAFA;
+}
+
+.technician-code-cell {
+  font-family: 'Courier New', monospace;
+  font-size: 12.5px;
+  color: #6C47FF;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.technician-title-cell {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ─── Badges ──────────────────────────────────────────── */
+.technician-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.technician-priority-low      { background: #EAF3DE; color: #3B6D11; }
+.technician-priority-medium   { background: #FAEEDA; color: #854F0B; }
+.technician-priority-high     { background: #FAECE7; color: #993C1D; }
+.technician-priority-critical { background: #FCEBEB; color: #A32D2D; }
+
+.technician-status-open        { background: #E6F1FB; color: #185FA5; }
+.technician-status-in_progress { background: #FAEEDA; color: #854F0B; }
+.technician-status-resolved    { background: #E1F5EE; color: #0F6E56; }
+.technician-status-rejected    { background: #FCEBEB; color: #A32D2D; }
+.technician-status-closed      { background: #F1EFE8; color: #5F5E5A; }
+
+/* ─── View link ───────────────────────────────────────── */
+.technician-view-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6C47FF;
+  text-decoration: none;
+  transition: color 0.18s ease;
+  white-space: nowrap;
+}
+
+.technician-view-link:hover {
+  color: #3C3489;
+  text-decoration: underline;
+}
+
+/* ─── Responsive ──────────────────────────────────────── */
+@media (max-width: 900px) {
+  .technician-summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .technician-page {
+    padding: 24px 16px 48px;
+  }
+
+  .technician-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .technician-card {
+    border-radius: 14px;
+  }
+
+  .technician-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .technician-welcome-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
