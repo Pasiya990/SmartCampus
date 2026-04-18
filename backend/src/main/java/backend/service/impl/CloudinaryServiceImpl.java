@@ -34,7 +34,7 @@ public class CloudinaryServiceImpl implements CloudinaryService {
             throw new IllegalArgumentException("Only JPG and PNG allowed");
         }
 
-        // ✅ Upload to Cloudinary
+
         Map uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
                 ObjectUtils.asMap(
@@ -43,7 +43,6 @@ public class CloudinaryServiceImpl implements CloudinaryService {
                 )
         );
 
-        // ✅ Optional debug
         System.out.println("Cloudinary upload: " + uploadResult);
 
         return uploadResult;

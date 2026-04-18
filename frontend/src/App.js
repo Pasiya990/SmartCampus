@@ -16,9 +16,14 @@ import MyBookingsPage from './pages/MyBookingsPage';
 import AdminBookingsPage from './pages/AdminBookingsPage';
 import { Link } from "react-router-dom";
 
+import { Toaster } from "react-hot-toast";
+import ResourceCatalogue from "./pages/ResourceCatalogue";
+
 function App() {
   return (
     <BrowserRouter>
+    
+    <Toaster position="top-right" reverseOrder={false} />
 
       <Routes>
         <Route path="/book" element={<BookingFormPage />} />
@@ -37,6 +42,9 @@ function App() {
         <Route path="/tickets/:id" element={<TicketDetails />} />
         <Route path="/my-tickets" element={<MyTickets />} />
         
+          
+        <Route path="/" element={<ResourceCatalogue />} />
+        <Route path="/booking/:id" element={<BookingFormPage />} />
 
       </Routes>
     </BrowserRouter>
