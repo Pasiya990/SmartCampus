@@ -21,6 +21,28 @@ const TYPE_ICONS = {
 export default function ResourceCatalogue() {
   const navigate = useNavigate();
 
+  let role = localStorage.getItem("role");
+
+  if (!role) {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        role = payload.role;
+        if (role) {
+          localStorage.setItem("role", role);
+        }
+      } catch (error) {
+        role = "USER";
+      }
+    }
+  }
+
+role = role || "USER";
+const isAdmin = role === "ADMIN";
+const isUser = role === "USER";
+
   const [resources, setResources] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,9 +100,7 @@ export default function ResourceCatalogue() {
 
       if (search.type) params.type = search.type;
       if (search.keyword.trim()) params.keyword = search.keyword.trim();
-      if (search.minCapacity !== "") {
-        params.minCapacity = Number(search.minCapacity);
-      }
+      if (search.minCapacity !== "") params.minCapacity = Number(search.minCapacity);
 
       const res =
         Object.keys(params).length > 0
@@ -115,7 +135,6 @@ export default function ResourceCatalogue() {
       toast.success("Resource deleted");
       loadAllResources();
     } catch (err) {
-      console.error("Delete failed:", err);
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
@@ -133,7 +152,6 @@ export default function ResourceCatalogue() {
       toast.success(`Status updated to ${nextStatus}`);
       loadAllResources();
     } catch (err) {
-      console.error("Status update failed:", err);
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
@@ -167,12 +185,14 @@ export default function ResourceCatalogue() {
             <p className="page-sub">Smart Campus Operations Hub</p>
           </div>
 
-          <button
-            className="btn-primary"
-            onClick={() => setModal({ open: true, resource: null })}
-          >
-            + Add Resource
-          </button>
+          {isAdmin && (
+            <button
+              className="btn-primary"
+              onClick={() => setModal({ open: true, resource: null })}
+            >
+              + Add Resource
+            </button>
+          )}
         </div>
 
         <div className="glass-card filter-bar">
@@ -291,37 +311,43 @@ export default function ResourceCatalogue() {
                 )}
 
                 <div className="resource-actions">
-                  <button
-                    className="btn-icon"
-                    onClick={() => setModal({ open: true, resource: r })}
-                    title="Edit"
-                  >
-                    ✏️
-                  </button>
+                  {isAdmin && (
+                    <>
+                      <button
+                        className="btn-icon"
+                        onClick={() => setModal({ open: true, resource: r })}
+                        title="Edit"
+                      >
+                        ✏️
+                      </button>
 
-                  <button
-                    className="btn-icon"
-                    onClick={() => handleBook(r)}
-                    title="Book"
-                  >
-                    📅
-                  </button>
+                      <button
+                        className="btn-icon"
+                        onClick={() => handleStatusToggle(r)}
+                        title="Toggle status"
+                      >
+                        {r.status === "ACTIVE" ? "🔴" : "🟢"}
+                      </button>
 
-                  <button
-                    className="btn-icon"
-                    onClick={() => handleStatusToggle(r)}
-                    title="Toggle status"
-                  >
-                    {r.status === "ACTIVE" ? "🔴" : "🟢"}
-                  </button>
+                      <button
+                        className="btn-icon danger"
+                        onClick={() => handleDelete(r.id)}
+                        title="Delete"
+                      >
+                        🗑️
+                      </button>
+                    </>
+                  )}
 
-                  <button
-                    className="btn-icon danger"
-                    onClick={() => handleDelete(r.id)}
-                    title="Delete"
-                  >
-                    🗑️
-                  </button>
+                  {isUser && (
+                    <button
+                      className="btn-icon"
+                      onClick={() => handleBook(r)}
+                      title="Book"
+                    >
+                      📅
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -329,7 +355,7 @@ export default function ResourceCatalogue() {
         )}
       </div>
 
-      {modal.open && (
+      {isAdmin && modal.open && (
         <ResourceModal
           resource={modal.resource}
           types={types}
