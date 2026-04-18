@@ -1,58 +1,50 @@
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
+import AdminDashboard from "./pages/AdminDashboard";
+import TechnicianView from "./pages/TechnicianView";
+import OAuthSuccess from "./pages/OAuthSuccess";
+import UserDashboard from "./pages/UserDashboard";
+
+
+import TicketCreate from "./pages/tickets/TicketCreate";
+import TicketList from "./pages/tickets/TicketList";
+import TicketDetails from "./pages/tickets/TicketDetails";
+import MyTickets from "./pages/tickets/MyTickets";
+
 import BookingFormPage from './pages/BookingFormPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import AdminBookingsPage from './pages/AdminBookingsPage';
-import './App.css';
+import { Link } from "react-router-dom";
 
-function Navbar() {
-  const { pathname } = useLocation();
-  const links = [
-    { to: '/book', label: 'New Booking' },
-    { to: '/my-bookings', label: 'My Bookings' },
-    { to: '/admin/bookings', label: 'Admin View' },
-  ];
+function App() {
   return (
-    <nav style={{
-      background: 'var(--surface)',
-      borderBottom: '1px solid var(--border)',
-      padding: '0 32px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 4,
-      height: 60,
-      position: 'sticky',
-      top: 0,
-      zIndex: 100,
-      boxShadow: 'var(--shadow-sm)',
-    }}>
-      <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--accent)', marginRight: 24, letterSpacing: '-0.3px' }}>
-        🏛 CampusBook
-      </span>
-      {links.map(l => (
-        <Link key={l.to} to={l.to} style={{
-          padding: '6px 14px',
-          borderRadius: 8,
-          fontSize: 14,
-          fontWeight: 500,
-          color: pathname === l.to ? 'var(--accent)' : 'var(--text-secondary)',
-          background: pathname === l.to ? 'var(--accent-light)' : 'transparent',
-          transition: 'all 0.15s',
-        }}>
-          {l.label}
-        </Link>
-      ))}
-    </nav>
-  );
-}
+    <BrowserRouter>
+    
+     <nav style={{ padding: '12px 24px', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 20 }}>
+        <Link to="/book">New Booking</Link>
+        <Link to="/my-bookings">My Bookings</Link>
+        <Link to="/admin/bookings">Admin View</Link>
+      </nav>
 
-function AppContent() {
-  return (
-    <>
-      <Navbar />
       <Routes>
         <Route path="/book" element={<BookingFormPage />} />
         <Route path="/my-bookings" element={<MyBookingsPage />} />
         <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+          
+        <Route path="/" element={<Login />} /> 
+        <Route path="/oauth-success" element={<OAuthSuccess />} />
+        <Route path="/user" element={<UserDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/technician" element={<TechnicianView />} />
+
+
+        <Route path="/tickets/new" element={<TicketCreate />} />
+        <Route path="/tickets" element={<TicketList />} />
+        <Route path="/tickets/:id" element={<TicketDetails />} />
+        <Route path="/my-tickets" element={<MyTickets />} />
+        
+
       </Routes>
     </>
   );
@@ -65,3 +57,5 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
+export default App;
