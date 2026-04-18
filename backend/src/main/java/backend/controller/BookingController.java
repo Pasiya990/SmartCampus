@@ -4,13 +4,19 @@ import backend.model.BookingRequest;
 import backend.model.BookingResponse;
 import backend.model.BookingStatus;
 import backend.service.BookingService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -20,42 +26,51 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    // POST /api/bookings — create booking
+    // CREATE BOOKING
     @PostMapping
     public ResponseEntity<BookingResponse> createBooking(
-        @Valid @RequestBody BookingRequest request,
-        @RequestHeader("X-User-Id") Long userId
+        @Valid @RequestBody BookingRequest request
     ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(bookingService.createBooking(request, userId));
+            .body(bookingService.createBooking(request, email));
     }
 
-    // GET /api/bookings — get all (admin) or own (user)
+    // GET BOOKINGS 
     @GetMapping
     public ResponseEntity<List<BookingResponse>> getBookings(
-        @RequestHeader("X-User-Id") Long userId,
-        @RequestHeader(value = "X-User-Role", defaultValue = "USER") String role,
         @RequestParam(required = false) BookingStatus status
     ) {
-        boolean isAdmin = "ADMIN".equals(role);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        boolean isAdmin = auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
         return ResponseEntity.ok(
-            bookingService.getBookings(userId, isAdmin, status)
+            bookingService.getBookings(email, isAdmin, status)
         );
     }
 
-    // GET /api/bookings/{id} — get one booking
+    // GET SINGLE BOOKING
     @GetMapping("/{id}")
     public ResponseEntity<BookingResponse> getBooking(
-        @PathVariable Long id,
-        @RequestHeader("X-User-Id") Long userId,
-        @RequestHeader(value = "X-User-Role", defaultValue = "USER") String role
+        @PathVariable Long id
     ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        boolean isAdmin = auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
         return ResponseEntity.ok(
-            bookingService.getBookingById(id, userId, "ADMIN".equals(role))
+            bookingService.getBookingById(id, email, isAdmin)
         );
     }
 
-    // PUT /api/bookings/{id}/approve — admin approves
+    //  ADMIN APPROVE
     @PutMapping("/{id}/approve")
     public ResponseEntity<BookingResponse> approve(
         @PathVariable Long id
@@ -63,7 +78,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.approveBooking(id));
     }
 
-    // PUT /api/bookings/{id}/reject — admin rejects
+    //  ADMIN REJECT
     @PutMapping("/{id}/reject")
     public ResponseEntity<BookingResponse> reject(
         @PathVariable Long id,
@@ -74,16 +89,20 @@ public class BookingController {
         );
     }
 
-    // PUT /api/bookings/{id}/cancel — user cancels
+    //  USER CANCEL
     @PutMapping("/{id}/cancel")
     public ResponseEntity<BookingResponse> cancel(
-        @PathVariable Long id,
-        @RequestHeader("X-User-Id") Long userId
+        @PathVariable Long id
     ) {
-        return ResponseEntity.ok(bookingService.cancelBooking(id, userId));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        return ResponseEntity.ok(
+            bookingService.cancelBooking(id, email)
+        );
     }
 
-    // DELETE /api/bookings/{id} — admin deletes
+    //  ADMIN DELETE
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBooking(
         @PathVariable Long id
@@ -91,4 +110,46 @@ public class BookingController {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
     }
+
+    //USER DELETE OWN 
+    @DeleteMapping("/{id}/own")
+    public ResponseEntity<Void> deleteOwnBooking(
+        @PathVariable Long id
+    ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        bookingService.deleteOwnBooking(id, email);
+        return ResponseEntity.noContent().build();
+    }
+
+    //USER EDIT OWN
+    @PutMapping("/{id}/edit")
+    public ResponseEntity<BookingResponse> editBooking(
+        @PathVariable Long id,
+        @Valid @RequestBody BookingRequest request
+    ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        return ResponseEntity.ok(
+            bookingService.editBooking(id, email, request)
+        );
+    }
+
+    @GetMapping("/check-availability")
+public ResponseEntity<Boolean> checkAvailability(
+        @RequestParam Long resourceId,
+        @RequestParam String date,
+        @RequestParam String startTime,
+        @RequestParam String endTime
+) {
+    boolean available = bookingService.isSlotAvailable(
+        resourceId,
+        date,
+        startTime,
+        endTime
+    );
+    return ResponseEntity.ok(available);
+}
 }

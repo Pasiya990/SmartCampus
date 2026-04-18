@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -20,12 +19,6 @@ import { Link } from "react-router-dom";
 function App() {
   return (
     <BrowserRouter>
-    
-     <nav style={{ padding: '12px 24px', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 20 }}>
-        <Link to="/book">New Booking</Link>
-        <Link to="/my-bookings">My Bookings</Link>
-        <Link to="/admin/bookings">Admin View</Link>
-      </nav>
 
       <Routes>
         <Route path="/book" element={<BookingFormPage />} />
@@ -48,6 +41,8 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
+
+  
 }
 
 export default App;

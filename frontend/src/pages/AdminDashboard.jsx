@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import './Bookings.css';
 
 export default function AdminDashboard() {
   const [message, setMessage] = useState("");
@@ -19,7 +20,12 @@ export default function AdminDashboard() {
   }, []);
 
   const handleViewTickets = () => {
-    navigate("/tickets"); // ✅ updated path
+    navigate("/tickets");
+  };
+
+  
+  const handleViewBookings = () => {
+    navigate("/admin/bookings");
   };
 
   return (
@@ -29,6 +35,11 @@ export default function AdminDashboard() {
 
       <button onClick={handleViewTickets}>
         View All Tickets
+      </button>
+
+      
+      <button onClick={handleViewBookings} style={{ marginLeft: "10px" }}>
+        View All Bookings
       </button>
     </div>
   );

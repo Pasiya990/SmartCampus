@@ -1,21 +1,59 @@
 import { useState, useEffect } from 'react';
-import { createBooking } from '../api/bookingApi';
+import { useParams } from 'react-router-dom';
+import { createBooking, checkAvailability } from '../api/bookingApi';
 import axios from 'axios';
+import './BookingFormPage.css';
 
 export default function BookingFormPage() {
-  const [resources, setResources] = useState([]);
+
+  const { resourceId } = useParams(); 
+
+  const today = new Date().toISOString().split('T')[0]; 
+
+  const getNowTime = () => {
+    const now = new Date();
+    return now.toTimeString().slice(0, 5); 
+  };
+
+  const [resource, setResource] = useState(null);
+
   const [form, setForm] = useState({
-    resourceId: '', date: '', startTime: '',
-    endTime: '', purpose: '', attendees: 1,
+    resourceId: resourceId,
+    date: '',
+    startTime: '',
+    endTime: '',
+    purpose: '',
+    attendees: 1,
   });
+
+  const [availability, setAvailability] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
+  
   useEffect(() => {
-    axios.get('http://localhost:8080/api/resources')
-      .then(res => setResources(res.data))
-      .catch(() => setResources([]));
-  }, []);
+    axios.get(`http://localhost:8080/api/resources/${resourceId}`)
+      .then(res => setResource(res.data))
+      .catch(() => setResource(null));
+  }, [resourceId]);
+
+  
+  useEffect(() => {
+    if (form.resourceId && form.date && form.startTime && form.endTime) {
+
+      checkAvailability({
+        resourceId: form.resourceId,
+        date: form.date,
+        startTime: form.startTime,
+        endTime: form.endTime
+      })
+      .then(res => setAvailability(res.data))
+      .catch(() => setAvailability(null));
+
+    } else {
+      setAvailability(null);
+    }
+  }, [form.resourceId, form.date, form.startTime, form.endTime]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,69 +61,130 @@ export default function BookingFormPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); setMessage('');
+    setError('');
+    setMessage('');
+
+    if (availability === false) {
+      setError("Selected time slot is unavailable");
+      return;
+    }
+
     try {
       await createBooking({
         ...form,
         resourceId: Number(form.resourceId),
         attendees: Number(form.attendees),
       });
+
       setMessage('Booking request submitted successfully!');
-      setForm({ resourceId: '', date: '', startTime: '', endTime: '', purpose: '', attendees: 1 });
+      setForm({
+        resourceId,
+        date: '',
+        startTime: '',
+        endTime: '',
+        purpose: '',
+        attendees: 1
+      });
+
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to submit booking');
     }
   };
 
-  const inputStyle = {
-    width: '100%', padding: '8px 12px', marginBottom: 12,
-    border: '1px solid #D1D5DB', borderRadius: 8, fontSize: 14,
-  };
-  const labelStyle = { display: 'block', marginBottom: 4, fontSize: 14, fontWeight: 500 };
-
   return (
-    <div style={{ maxWidth: 520, margin: '40px auto', padding: 24, border: '1px solid #E5E7EB', borderRadius: 12 }}>
-      <h2 style={{ marginBottom: 24 }}>Request a Booking</h2>
+    <div className="bf-page">
+      <div className="bf-card">
 
-      {message && <div style={{ background: '#D1FAE5', color: '#065F46', padding: 10, borderRadius: 8, marginBottom: 12 }}>{message}</div>}
-      {error   && <div style={{ background: '#FEE2E2', color: '#991B1B', padding: 10, borderRadius: 8, marginBottom: 12 }}>{error}</div>}
+        <h2 className="bf-heading">Book Resource</h2>
 
-      <form onSubmit={handleSubmit}>
-        <label style={labelStyle}>Resource</label>
-        <select name="resourceId" value={form.resourceId} onChange={handleChange} required style={inputStyle}>
-          <option value="">Select a resource...</option>
-          {resources.map(r => (
-            <option key={r.id} value={r.id}>{r.name} — {r.location}</option>
-          ))}
-        </select>
-
-        <label style={labelStyle}>Date</label>
-        <input type="date" name="date" value={form.date} onChange={handleChange} required style={inputStyle} />
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <div>
-            <label style={labelStyle}>Start Time</label>
-            <input type="time" name="startTime" value={form.startTime} onChange={handleChange} required style={inputStyle} />
+        
+        {resource && (
+          <div className="bf-selected-resource">
+            <strong>{resource.name}</strong> — {resource.location}
           </div>
-          <div>
-            <label style={labelStyle}>End Time</label>
-            <input type="time" name="endTime" value={form.endTime} onChange={handleChange} required style={inputStyle} />
+        )}
+
+        {message && <div className="bf-success">✓ {message}</div>}
+        {error && <div className="bf-error">✗ {error}</div>}
+
+        <form onSubmit={handleSubmit}>
+
+          <label className="bf-label">Date</label>
+          <input
+            type="date"
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+            required
+            min={today}
+            className="bf-input"
+          />
+
+          <div className="bf-time-grid">
+            <div>
+              <label className="bf-label">Start Time</label>
+              <input
+                type="time"
+                name="startTime"
+                value={form.startTime}
+                onChange={handleChange}
+                required
+                min={form.date === today ? getNowTime() : '00:00'}
+                className="bf-input"
+              />
+            </div>
+
+            <div>
+              <label className="bf-label">End Time</label>
+              <input
+                type="time"
+                name="endTime"
+                value={form.endTime}
+                onChange={handleChange}
+                required
+                min={form.startTime || (form.date === today ? getNowTime() : '00:00')}
+                className="bf-input"
+              />
+            </div>
           </div>
-        </div>
 
-        <label style={labelStyle}>Purpose</label>
-        <input type="text" name="purpose" value={form.purpose} onChange={handleChange} required placeholder="e.g. Team meeting" style={inputStyle} />
+          
+          {availability !== null && (
+            <div className={availability ? "bf-success" : "bf-error"}>
+              {availability ? "✓ Slot Available" : "✗ Slot Unavailable"}
+            </div>
+          )}
 
-        <label style={labelStyle}>Expected Attendees</label>
-        <input type="number" name="attendees" value={form.attendees} onChange={handleChange} min="1" style={inputStyle} />
+          <label className="bf-label">Purpose</label>
+          <input
+            type="text"
+            name="purpose"
+            value={form.purpose}
+            onChange={handleChange}
+            required
+            className="bf-input"
+          />
 
-        <button type="submit" style={{
-          width: '100%', padding: '10px', background: '#2563EB',
-          color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, cursor: 'pointer'
-        }}>
-          Submit Booking Request
-        </button>
-      </form>
+          <label className="bf-label">Attendees</label>
+          <input
+            type="number"
+            name="attendees"
+            value={form.attendees}
+            onChange={handleChange}
+            min="1"
+            className="bf-input"
+          />
+
+          <button
+            type="submit"
+            className="bf-btn"
+            disabled={availability === false}
+          >
+            Submit Booking →
+          </button>
+
+        </form>
+      </div>
     </div>
   );
 }
