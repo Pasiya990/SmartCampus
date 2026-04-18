@@ -20,13 +20,14 @@ public class ResourceService {
     private final CloudinaryService cloudinaryService;
 
     public Resource create(ResourceFormDTO dto) {
-
         String imageUrl = null;
 
         try {
             if (dto.getImage() != null && !dto.getImage().isEmpty()) {
                 Map uploadResult = cloudinaryService.uploadFile(dto.getImage());
-                imageUrl = (String) uploadResult.get("secure_url");
+                if (uploadResult != null) {
+                    imageUrl = (String) uploadResult.get("secure_url");
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException("Image upload failed", e);
@@ -74,8 +75,10 @@ public class ResourceService {
         try {
             if (dto.getImage() != null && !dto.getImage().isEmpty()) {
                 Map uploadResult = cloudinaryService.uploadFile(dto.getImage());
-                String imageUrl = (String) uploadResult.get("secure_url");
-                existing.setImageUrl(imageUrl);
+                if (uploadResult != null) {
+                    String imageUrl = (String) uploadResult.get("secure_url");
+                    existing.setImageUrl(imageUrl);
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException("Image upload failed", e);

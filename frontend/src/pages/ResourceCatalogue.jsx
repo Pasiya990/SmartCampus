@@ -1,21 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { resourceService } from '../services/resourceService';
-import ResourceModal from '../components/ResourceModal';
-import toast from 'react-hot-toast';
-import './ResourceCatalogue.css';
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { resourceService } from "../services/resourceService";
+import ResourceModal from "../components/ResourceModal";
+import toast from "react-hot-toast";
+import "./ResourceCatalogue.css";
 
 const TYPE_ICONS = {
-  LECTURE_HALL: '🏛️',
-  LAB: '🔬',
-  MEETING_ROOM: '🗓️',
-  EQUIPMENT: '🎥',
-  SMART_RESOURCE: '💡',
-  OUTDOOR_EVENT_SPACE: '🌿',
-  AUDITORIUM_STAGE: '🎤',
-  LIBRARY_STUDY_AREA: '📚',
-  PODCAST_RECORDING_ROOM: '🎙️',
-  MEDIA_PRODUCTION_STUDIO: '🎬',
+  LECTURE_HALL: "🏛️",
+  LAB: "🔬",
+  MEETING_ROOM: "🗓️",
+  EQUIPMENT: "🎥",
+  SMART_RESOURCE: "💡",
+  OUTDOOR_EVENT_SPACE: "🌿",
+  AUDITORIUM_STAGE: "🎤",
+  LIBRARY_STUDY_AREA: "📚",
+  PODCAST_RECORDING_ROOM: "🎙️",
+  MEDIA_PRODUCTION_STUDIO: "🎬",
 };
 
 export default function ResourceCatalogue() {
@@ -24,11 +24,12 @@ export default function ResourceCatalogue() {
   const [resources, setResources] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
 
   const [search, setSearch] = useState({
-    type: '',
-    keyword: '',
-    minCapacity: '',
+    type: "",
+    keyword: "",
+    minCapacity: "",
   });
 
   const [modal, setModal] = useState({
@@ -38,11 +39,16 @@ export default function ResourceCatalogue() {
 
   const loadAllResources = useCallback(async () => {
     setLoading(true);
+    setPageError("");
+
     try {
       const res = await resourceService.getAll();
-      setResources(res.data);
+      setResources(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      toast.error('Failed to load resources');
+      console.error("Failed to load resources:", err);
+      setResources([]);
+      setPageError("Failed to load resources");
+      toast.error("Failed to load resources");
     } finally {
       setLoading(false);
     }
@@ -51,9 +57,10 @@ export default function ResourceCatalogue() {
   const loadTypes = useCallback(async () => {
     try {
       const res = await resourceService.getTypes();
-      setTypes(res.data);
+      setTypes(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      toast.error('Failed to load resource types');
+      console.error("Failed to load resource types:", err);
+      setTypes([]);
     }
   }, []);
 
@@ -64,25 +71,28 @@ export default function ResourceCatalogue() {
 
   const handleSearch = async () => {
     setLoading(true);
+    setPageError("");
+
     try {
       const params = {};
 
       if (search.type) params.type = search.type;
       if (search.keyword.trim()) params.keyword = search.keyword.trim();
-      if (search.minCapacity !== '') params.minCapacity = Number(search.minCapacity);
+      if (search.minCapacity !== "") {
+        params.minCapacity = Number(search.minCapacity);
+      }
 
       const res =
         Object.keys(params).length > 0
           ? await resourceService.search(params)
           : await resourceService.getAll();
 
-      setResources(res.data);
+      setResources(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      const msg =
-        err.response?.data?.message ||
-        err.response?.data?.error ||
-        'Search failed';
-      toast.error(msg);
+      console.error("Search failed:", err);
+      setResources([]);
+      setPageError("Search failed");
+      toast.error("Search failed");
     } finally {
       setLoading(false);
     }
@@ -90,49 +100,51 @@ export default function ResourceCatalogue() {
 
   const handleClear = async () => {
     setSearch({
-      type: '',
-      keyword: '',
-      minCapacity: '',
+      type: "",
+      keyword: "",
+      minCapacity: "",
     });
     await loadAllResources();
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this resource?')) return;
+    if (!window.confirm("Delete this resource?")) return;
 
     try {
       await resourceService.delete(id);
-      toast.success('Resource deleted');
+      toast.success("Resource deleted");
       loadAllResources();
     } catch (err) {
+      console.error("Delete failed:", err);
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
-        'Delete failed';
+        "Delete failed";
       toast.error(msg);
     }
   };
 
   const handleStatusToggle = async (resource) => {
     const nextStatus =
-      resource.status === 'ACTIVE' ? 'OUT_OF_SERVICE' : 'ACTIVE';
+      resource.status === "ACTIVE" ? "OUT_OF_SERVICE" : "ACTIVE";
 
     try {
       await resourceService.updateStatus(resource.id, nextStatus);
       toast.success(`Status updated to ${nextStatus}`);
       loadAllResources();
     } catch (err) {
+      console.error("Status update failed:", err);
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
-        'Status update failed';
+        "Status update failed";
       toast.error(msg);
     }
   };
 
   const handleBook = (resource) => {
-    if (resource.status !== 'ACTIVE') {
-      toast.error('This resource is currently out of service');
+    if (resource.status !== "ACTIVE") {
+      toast.error("This resource is currently out of service");
       return;
     }
 
@@ -169,7 +181,7 @@ export default function ResourceCatalogue() {
             placeholder="Search by location or building..."
             value={search.keyword}
             onChange={(e) =>
-              setSearch((s) => ({ ...s, keyword: e.target.value }))
+              setSearch((prev) => ({ ...prev, keyword: e.target.value }))
             }
           />
 
@@ -177,13 +189,13 @@ export default function ResourceCatalogue() {
             className="glass-select"
             value={search.type}
             onChange={(e) =>
-              setSearch((s) => ({ ...s, type: e.target.value }))
+              setSearch((prev) => ({ ...prev, type: e.target.value }))
             }
           >
             <option value="">All types</option>
             {types.map((t) => (
               <option key={t} value={t}>
-                {t.replaceAll('_', ' ')}
+                {t.replaceAll("_", " ")}
               </option>
             ))}
           </select>
@@ -194,7 +206,7 @@ export default function ResourceCatalogue() {
             placeholder="Min capacity"
             value={search.minCapacity}
             onChange={(e) =>
-              setSearch((s) => ({ ...s, minCapacity: e.target.value }))
+              setSearch((prev) => ({ ...prev, minCapacity: e.target.value }))
             }
           />
 
@@ -206,6 +218,12 @@ export default function ResourceCatalogue() {
             Clear
           </button>
         </div>
+
+        {pageError && (
+          <div style={{ marginBottom: "16px", color: "#dc2626", fontWeight: 600 }}>
+            {pageError}
+          </div>
+        )}
 
         {loading ? (
           <div className="loading-grid">
@@ -231,23 +249,23 @@ export default function ResourceCatalogue() {
                 )}
 
                 <div className="resource-icon">
-                  {TYPE_ICONS[r.type] || '🏢'}
+                  {TYPE_ICONS[r.type] || "🏢"}
                 </div>
 
                 <div className="resource-header">
                   <div>
                     <h3 className="resource-name">{r.name}</h3>
                     <p className="resource-type">
-                      {r.type?.replaceAll('_', ' ')}
+                      {r.type?.replaceAll("_", " ")}
                     </p>
                   </div>
 
                   <span
                     className={`status-badge ${
-                      r.status === 'ACTIVE' ? 'active' : 'inactive'
+                      r.status === "ACTIVE" ? "active" : "inactive"
                     }`}
                   >
-                    {r.status === 'ACTIVE' ? 'Active' : 'Out of Service'}
+                    {r.status === "ACTIVE" ? "Active" : "Out of Service"}
                   </span>
                 </div>
 
@@ -255,7 +273,7 @@ export default function ResourceCatalogue() {
                   {r.location && (
                     <span>
                       📍 {r.location}
-                      {r.building ? `, ${r.building}` : ''}
+                      {r.building ? `, ${r.building}` : ""}
                     </span>
                   )}
 
@@ -294,7 +312,7 @@ export default function ResourceCatalogue() {
                     onClick={() => handleStatusToggle(r)}
                     title="Toggle status"
                   >
-                    {r.status === 'ACTIVE' ? '🔴' : '🟢'}
+                    {r.status === "ACTIVE" ? "🔴" : "🟢"}
                   </button>
 
                   <button
