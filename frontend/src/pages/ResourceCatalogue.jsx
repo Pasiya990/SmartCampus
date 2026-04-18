@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { resourceService } from '../services/resourceService';
 import ResourceModal from '../components/ResourceModal';
 import toast from 'react-hot-toast';
@@ -18,6 +19,8 @@ const TYPE_ICONS = {
 };
 
 export default function ResourceCatalogue() {
+  const navigate = useNavigate();
+
   const [resources, setResources] = useState([]);
   const [types, setTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -133,9 +136,12 @@ export default function ResourceCatalogue() {
       return;
     }
 
-    toast.success(`Booking started for ${resource.name} 📅`);
-    // Later you can replace this with:
-    // setBookingModal({ open: true, resource });
+    navigate(`/booking/${resource.id}`, {
+      state: {
+        resourceId: resource.id,
+        resourceName: resource.name,
+      },
+    });
   };
 
   return (
