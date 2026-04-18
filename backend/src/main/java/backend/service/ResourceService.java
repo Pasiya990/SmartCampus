@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,17 @@ public class ResourceService {
     private final CloudinaryService cloudinaryService;
 
     public Resource create(ResourceFormDTO dto) {
-        String imageUrl = cloudinaryService.uploadImage(dto.getImage());
+
+        String imageUrl = null;
+
+        try {
+            if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+                Map uploadResult = cloudinaryService.uploadFile(dto.getImage());
+                imageUrl = (String) uploadResult.get("secure_url");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Image upload failed", e);
+        }
 
         Resource resource = Resource.builder()
                 .name(dto.getName())
@@ -60,9 +71,14 @@ public class ResourceService {
         existing.setAvailabilityStart(dto.getAvailabilityStart());
         existing.setAvailabilityEnd(dto.getAvailabilityEnd());
 
-        String imageUrl = cloudinaryService.uploadImage(dto.getImage());
-        if (imageUrl != null) {
-            existing.setImageUrl(imageUrl);
+        try {
+            if (dto.getImage() != null && !dto.getImage().isEmpty()) {
+                Map uploadResult = cloudinaryService.uploadFile(dto.getImage());
+                String imageUrl = (String) uploadResult.get("secure_url");
+                existing.setImageUrl(imageUrl);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Image upload failed", e);
         }
 
         return repository.save(existing);
