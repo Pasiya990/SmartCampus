@@ -4,10 +4,15 @@ import backend.model.*;
 import backend.repository.BookingRepository;
 import backend.repository.ResourceRepository;
 import backend.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -18,9 +23,10 @@ public class BookingService {
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
 
-    //Create a new booking request
-    public BookingResponse createBooking(BookingRequest request, Long userId){
-        if (!request.getStartTime().isBefore(request.getEndTime())){
+    //  Create booking 
+    public BookingResponse createBooking(BookingRequest request, String email) {
+
+        if (!request.getStartTime().isBefore(request.getEndTime())) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "Start time must be before end time"
             );
@@ -32,7 +38,8 @@ public class BookingService {
             request.getStartTime(),
             request.getEndTime()
         );
-        if (!conflicts.isEmpty()){
+
+        if (!conflicts.isEmpty()) {
             throw new ResponseStatusException(
                 HttpStatus.CONFLICT, "This resource is already booked for the selected time"
             );
@@ -43,7 +50,7 @@ public class BookingService {
                 HttpStatus.NOT_FOUND, "Resource not found"
             ));
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "User not found"
             ));
@@ -62,79 +69,106 @@ public class BookingService {
         return toResponse(bookingRepository.save(booking));
     }
 
-    //Get bookings - admin sees all, user sees own
-    public List<BookingResponse> getBookings(Long userId, boolean isAdmin, BookingStatus statusFilter){
+    //  Get bookings
+    public List<BookingResponse> getBookings(String email, boolean isAdmin, BookingStatus statusFilter) {
+
         List<Booking> bookings;
-        if (isAdmin){
+
+        if (isAdmin) {
             bookings = (statusFilter != null)
                 ? bookingRepository.findByStatus(statusFilter)
                 : bookingRepository.findAll();
-                
-        }else{
-            bookings = bookingRepository.findByUserId(userId);
+        } else {
+            User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "User not found"
+                ));
 
+            bookings = bookingRepository.findByUserId(user.getId());
         }
+
         return bookings.stream().map(this::toResponse).toList();
     }
 
-    //Get single booking
-    public BookingResponse getBookingById(Long bookingId, Long userId, boolean isAdmin){
-        Booking booking = bookingRepository.findById(bookingId)
-            .orElseThrow(() -> new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Booking not found"
-            ));
-        if (!isAdmin && !booking.getUser().getId().equals(userId)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+    //  Get single booking
+    public BookingResponse getBookingById(Long bookingId, String email, boolean isAdmin) {
+
+        Booking booking = getBookingOrThrow(bookingId);
+
+        if (!isAdmin) {
+            User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "User not found"
+                ));
+
+            if (!booking.getUser().getId().equals(user.getId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+            }
         }
+
         return toResponse(booking);
     }
 
-    //Admin approves booking
-    public BookingResponse approveBooking(Long bookingId){
+    //  Admin approve
+    public BookingResponse approveBooking(Long bookingId) {
         Booking booking = getBookingOrThrow(bookingId);
-        if(booking.getStatus() != BookingStatus.PENDING){
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "Only PENDING bookings can be approved"
             );
         }
+
         booking.setStatus(BookingStatus.APPROVED);
         return toResponse(bookingRepository.save(booking));
     }
 
-    //Admin rejects booking
-    public BookingResponse rejectBooking(Long bookingId, String reason){
+    //  Admin reject
+    public BookingResponse rejectBooking(Long bookingId, String reason) {
         Booking booking = getBookingOrThrow(bookingId);
-        if(booking.getStatus() != BookingStatus.PENDING){
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "Only PENDING bookings can be rejected"
             );
         }
+
         booking.setStatus(BookingStatus.REJECTED);
         booking.setRejectionReason(reason);
+
         return toResponse(bookingRepository.save(booking));
     }
 
-    //User cancels their own booking
-    public BookingResponse cancelBooking(Long bookingId, Long userId){
+    //  Cancel booking
+    public BookingResponse cancelBooking(Long bookingId, String email) {
+
         Booking booking = getBookingOrThrow(bookingId);
-        if(!booking.getUser().getId().equals(userId)){
+
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "User not found"
+            ));
+
+        if (!booking.getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(
                 HttpStatus.FORBIDDEN, "You can only cancel your own booking"
             );
         }
-        if(booking.getStatus() == BookingStatus.REJECTED ||
-           booking.getStatus() == BookingStatus.CANCELLED){
+
+        if (booking.getStatus() == BookingStatus.REJECTED ||
+            booking.getStatus() == BookingStatus.CANCELLED) {
             throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST, "Booking cannot be cancelled in its current state"
             );
         }
+
         booking.setStatus(BookingStatus.CANCELLED);
         return toResponse(bookingRepository.save(booking));
     }
 
-    //Admin deletes booking
-    public void deleteBooking(Long bookingId){
-        if(!bookingRepository.existsById(bookingId)){
+    //  Admin delete
+    public void deleteBooking(Long bookingId) {
+        if (!bookingRepository.existsById(bookingId)) {
             throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Booking not found"
             );
@@ -142,89 +176,105 @@ public class BookingService {
         bookingRepository.deleteById(bookingId);
     }
 
-    //Helper - get booking or throw 404
-    private Booking getBookingOrThrow(Long id){
+    //  User delete own
+    public void deleteOwnBooking(Long bookingId, String email) {
+
+        Booking booking = getBookingOrThrow(bookingId);
+
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "User not found"
+            ));
+
+        if (!booking.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "You can only delete your own bookings"
+            );
+        }
+
+        if (booking.getStatus() != BookingStatus.CANCELLED &&
+            booking.getStatus() != BookingStatus.REJECTED) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "You can only delete CANCELLED or REJECTED bookings"
+            );
+        }
+
+        bookingRepository.deleteById(bookingId);
+    }
+
+    //  Edit booking
+    public BookingResponse editBooking(Long bookingId, String email, BookingRequest request) {
+
+        Booking booking = getBookingOrThrow(bookingId);
+
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "User not found"
+            ));
+
+        if (!booking.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN, "You can only edit your own bookings"
+            );
+        }
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Only PENDING bookings can be edited"
+            );
+        }
+
+        if (!request.getStartTime().isBefore(request.getEndTime())) {
+            throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Start time must be before end time"
+            );
+        }
+
+        List<Booking> conflicts = bookingRepository.findConflictingBookings(
+            request.getResourceId(),
+            request.getDate(),
+            request.getStartTime(),
+            request.getEndTime()
+        ).stream()
+            .filter(b -> !b.getId().equals(bookingId))
+            .toList();
+
+        if (!conflicts.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT, "This resource is already booked for the selected time"
+            );
+        }
+
+        Resource resource = resourceRepository.findById(request.getResourceId())
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Resource not found"
+            ));
+
+        booking.setResource(resource);
+        booking.setDate(request.getDate());
+        booking.setStartTime(request.getStartTime());
+        booking.setEndTime(request.getEndTime());
+        booking.setPurpose(request.getPurpose());
+        booking.setAttendees(request.getAttendees());
+        booking.setStatus(BookingStatus.PENDING);
+        booking.setRejectionReason(null);
+
+        return toResponse(bookingRepository.save(booking));
+    }
+
+    // Helper
+    private Booking getBookingOrThrow(Long id) {
         return bookingRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Booking not found"
             ));
     }
 
-// User deletes their own CANCELLED or REJECTED booking
-public void deleteOwnBooking(Long bookingId, Long userId) {
-    Booking booking = getBookingOrThrow(bookingId);
-    if (!booking.getUser().getId().equals(userId)) {
-        throw new ResponseStatusException(
-            HttpStatus.FORBIDDEN, "You can only delete your own bookings"
-        );
-    }
-    if (booking.getStatus() != BookingStatus.CANCELLED &&
-        booking.getStatus() != BookingStatus.REJECTED) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST, "You can only delete CANCELLED or REJECTED bookings"
-        );
-    }
-    bookingRepository.deleteById(bookingId);
-}
-
-// User edits their own PENDING booking — resets to PENDING
-public BookingResponse editBooking(Long bookingId, Long userId, BookingRequest request) {
-    Booking booking = getBookingOrThrow(bookingId);
-
-    if (!booking.getUser().getId().equals(userId)) {
-        throw new ResponseStatusException(
-            HttpStatus.FORBIDDEN, "You can only edit your own bookings"
-        );
-    }
-    if (booking.getStatus() != BookingStatus.PENDING) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST, "Only PENDING bookings can be edited"
-        );
-    }
-    if (!request.getStartTime().isBefore(request.getEndTime())) {
-        throw new ResponseStatusException(
-            HttpStatus.BAD_REQUEST, "Start time must be before end time"
-        );
-    }
-
-    // Check conflicts excluding current booking
-    List<Booking> conflicts = bookingRepository.findConflictingBookings(
-        request.getResourceId(),
-        request.getDate(),
-        request.getStartTime(),
-        request.getEndTime()
-    ).stream()
-        .filter(b -> !b.getId().equals(bookingId))
-        .toList();
-
-    if (!conflicts.isEmpty()) {
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT, "This resource is already booked for the selected time"
-        );
-    }
-
-    Resource resource = resourceRepository.findById(request.getResourceId())
-        .orElseThrow(() -> new ResponseStatusException(
-            HttpStatus.NOT_FOUND, "Resource not found"
-        ));
-
-    booking.setResource(resource);
-    booking.setDate(request.getDate());
-    booking.setStartTime(request.getStartTime());
-    booking.setEndTime(request.getEndTime());
-    booking.setPurpose(request.getPurpose());
-    booking.setAttendees(request.getAttendees());
-    booking.setStatus(BookingStatus.PENDING);
-    booking.setRejectionReason(null);
-
-    return toResponse(bookingRepository.save(booking));
-}
-
-    //Map entity to response DTO
-    private BookingResponse toResponse(Booking b){
+    // Mapper
+    private BookingResponse toResponse(Booking b) {
         return BookingResponse.builder()
             .id(b.getId())
-            .resourceID(b.getResource().getId())
+            .resourceId(b.getResource().getId())
             .resourceName(b.getResource().getName())
             .userEmail(b.getUser().getEmail())
             .date(b.getDate())
@@ -236,4 +286,17 @@ public BookingResponse editBooking(Long bookingId, Long userId, BookingRequest r
             .rejectionReason(b.getRejectionReason())
             .build();
     }
+
+    public boolean isSlotAvailable(Long resourceId, String date,
+                               String startTime, String endTime) {
+
+    List<Booking> conflicts = bookingRepository.findConflictingBookings(
+        resourceId,
+        LocalDate.parse(date),
+        LocalTime.parse(startTime),
+        LocalTime.parse(endTime)
+    );
+
+    return conflicts.isEmpty();
+}
 }

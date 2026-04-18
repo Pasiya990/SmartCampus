@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -46,14 +45,6 @@ function App() {
         
 
       </Routes>
-    </>
-  );
-}
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <AppContent />
     </BrowserRouter>
   );
 }
