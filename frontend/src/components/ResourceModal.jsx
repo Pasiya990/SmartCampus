@@ -1,31 +1,31 @@
-import { useState } from 'react';
-import { resourceService } from '../services/resourceService';
-import toast from 'react-hot-toast';
-import './ResourceModal.css';
+import { useState } from "react";
+import { resourceService } from "../services/resourceService";
+import toast from "react-hot-toast";
+import "./ResourceModal.css";
 
 const DEFAULT_TYPES = [
-  'LECTURE_HALL',
-  'LAB',
-  'MEETING_ROOM',
-  'EQUIPMENT',
-  'SMART_RESOURCE',
-  'OUTDOOR_EVENT_SPACE',
-  'AUDITORIUM_STAGE',
-  'LIBRARY_STUDY_AREA',
-  'PODCAST_RECORDING_ROOM',
-  'MEDIA_PRODUCTION_STUDIO',
+  "LECTURE_HALL",
+  "LAB",
+  "MEETING_ROOM",
+  "EQUIPMENT",
+  "SMART_RESOURCE",
+  "OUTDOOR_EVENT_SPACE",
+  "AUDITORIUM_STAGE",
+  "LIBRARY_STUDY_AREA",
+  "PODCAST_RECORDING_ROOM",
+  "MEDIA_PRODUCTION_STUDIO",
 ];
 
 const EMPTY = {
-  name: '',
-  type: 'LECTURE_HALL',
-  capacity: '',
-  location: '',
-  building: '',
-  floor: '',
-  description: '',
-  availabilityStart: '',
-  availabilityEnd: '',
+  name: "",
+  type: "LECTURE_HALL",
+  capacity: "",
+  location: "",
+  building: "",
+  floor: "",
+  description: "",
+  availabilityStart: "",
+  availabilityEnd: "",
   image: null,
 };
 
@@ -34,9 +34,9 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
     resource
       ? {
           ...resource,
-          capacity: resource.capacity ?? '',
-          availabilityStart: resource.availabilityStart ?? '',
-          availabilityEnd: resource.availabilityEnd ?? '',
+          capacity: resource.capacity ?? "",
+          availabilityStart: resource.availabilityStart ?? "",
+          availabilityEnd: resource.availabilityEnd ?? "",
           image: null,
         }
       : EMPTY
@@ -44,17 +44,17 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
 
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
-  const [preview, setPreview] = useState(resource?.imageUrl || '');
+  const [preview, setPreview] = useState(resource?.imageUrl || "");
 
   const allTypes = types.length ? types : DEFAULT_TYPES;
 
   const validate = () => {
     const e = {};
 
-    if (!form.name.trim()) e.name = 'Name is required';
-    if (!form.location.trim()) e.location = 'Location is required';
+    if (!form.name.trim()) e.name = "Name is required";
+    if (!form.location.trim()) e.location = "Location is required";
     if (form.capacity && Number(form.capacity) < 1) {
-      e.capacity = 'Capacity must be at least 1';
+      e.capacity = "Capacity must be at least 1";
     }
 
     return e;
@@ -67,7 +67,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
     if (file) {
       setPreview(URL.createObjectURL(file));
     } else {
-      setPreview(resource?.imageUrl || '');
+      setPreview(resource?.imageUrl || "");
     }
   };
 
@@ -89,10 +89,10 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
 
       if (resource) {
         await resourceService.update(resource.id, payload);
-        toast.success('Resource updated!');
+        toast.success("Resource updated!");
       } else {
         await resourceService.create(payload);
-        toast.success('Resource created!');
+        toast.success("Resource created!");
       }
 
       onSaved();
@@ -100,7 +100,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
       const msg =
         err.response?.data?.message ||
         err.response?.data?.error ||
-        'Save failed';
+        "Save failed";
       toast.error(msg);
     } finally {
       setSaving(false);
@@ -108,10 +108,10 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
   };
 
   const fieldProps = (key) => ({
-    value: form[key] ?? '',
+    value: form[key] ?? "",
     onChange: (e) => {
       setForm((s) => ({ ...s, [key]: e.target.value }));
-      setErrors((s) => ({ ...s, [key]: '' }));
+      setErrors((s) => ({ ...s, [key]: "" }));
     },
   });
 
@@ -122,7 +122,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
     >
       <div className="modal-glass">
         <div className="modal-header">
-          <h2>{resource ? 'Edit Resource' : 'Add New Resource'}</h2>
+          <h2>{resource ? "Edit Resource" : "Add New Resource"}</h2>
           <button className="modal-close" onClick={onClose}>
             ✕
           </button>
@@ -133,19 +133,19 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
             <div className="field">
               <label>Name *</label>
               <input
-                className={`glass-input ${errors.name ? 'error' : ''}`}
+                className={`glass-input ${errors.name ? "error" : ""}`}
                 placeholder="e.g. Smart Classroom 01"
-                {...fieldProps('name')}
+                {...fieldProps("name")}
               />
               {errors.name && <span className="field-error">{errors.name}</span>}
             </div>
 
             <div className="field">
               <label>Type *</label>
-              <select className="glass-select" {...fieldProps('type')}>
+              <select className="glass-select" {...fieldProps("type")}>
                 {allTypes.map((t) => (
                   <option key={t} value={t}>
-                    {t.replaceAll('_', ' ')}
+                    {t.replaceAll("_", " ")}
                   </option>
                 ))}
               </select>
@@ -156,9 +156,9 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
             <div className="field">
               <label>Location *</label>
               <input
-                className={`glass-input ${errors.location ? 'error' : ''}`}
+                className={`glass-input ${errors.location ? "error" : ""}`}
                 placeholder="Block A / Open Grounds / Library Wing"
-                {...fieldProps('location')}
+                {...fieldProps("location")}
               />
               {errors.location && (
                 <span className="field-error">{errors.location}</span>
@@ -168,11 +168,11 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
             <div className="field">
               <label>Capacity</label>
               <input
-                className={`glass-input ${errors.capacity ? 'error' : ''}`}
+                className={`glass-input ${errors.capacity ? "error" : ""}`}
                 type="number"
                 min="1"
                 placeholder="20"
-                {...fieldProps('capacity')}
+                {...fieldProps("capacity")}
               />
               {errors.capacity && (
                 <span className="field-error">{errors.capacity}</span>
@@ -186,7 +186,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
               <input
                 className="glass-input"
                 placeholder="Main Building / Media Center"
-                {...fieldProps('building')}
+                {...fieldProps("building")}
               />
             </div>
 
@@ -195,7 +195,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
               <input
                 className="glass-input"
                 placeholder="Ground / 1st / 2nd"
-                {...fieldProps('floor')}
+                {...fieldProps("floor")}
               />
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
               <input
                 className="glass-input"
                 type="time"
-                {...fieldProps('availabilityStart')}
+                {...fieldProps("availabilityStart")}
               />
             </div>
 
@@ -215,7 +215,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
               <input
                 className="glass-input"
                 type="time"
-                {...fieldProps('availabilityEnd')}
+                {...fieldProps("availabilityEnd")}
               />
             </div>
           </div>
@@ -226,7 +226,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
               className="glass-input"
               rows={3}
               placeholder="Optional details about the resource..."
-              {...fieldProps('description')}
+              {...fieldProps("description")}
             />
           </div>
 
@@ -258,7 +258,7 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
           </button>
 
           <button className="btn-primary" onClick={handleSubmit} disabled={saving}>
-            {saving ? 'Saving...' : resource ? 'Update' : 'Create'}
+            {saving ? "Saving..." : resource ? "Update" : "Create"}
           </button>
         </div>
       </div>

@@ -28,6 +28,10 @@ export default function AdminDashboard() {
     navigate("/admin/bookings");
   };
 
+  const handleViewResources = () => {
+  navigate("/resources"); 
+  };
+
   return (
     <div>
       <h2>Admin Dashboard</h2>
@@ -40,6 +44,10 @@ export default function AdminDashboard() {
       
       <button onClick={handleViewBookings} style={{ marginLeft: "10px" }}>
         View All Bookings
+      </button>
+
+      <button onClick={handleViewResources} style={{ marginLeft: "10px" }}>
+      View Resource Catalogue
       </button>
     </div>
   );
