@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import backend.model.TicketComment;
 import backend.repository.TicketCommentRepository;
+import backend.enums.Role;
+import backend.model.User;
+import backend.repository.UserRepository;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -28,6 +31,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     private final TicketAttachmentRepository ticketAttachmentRepository;
     private final CloudinaryService cloudinaryService;
     private final TicketCommentRepository ticketCommentRepository;
+    private final UserRepository userRepository;
 
     @Override
     public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
@@ -83,20 +87,26 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     }
 
     @Override
-    public IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail) {
-        IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+public IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail) {
+    IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
-        ticket.setAssignedTechnician(technicianEmail);
+    User technician = userRepository.findByEmail(technicianEmail)
+            .orElseThrow(() -> new ResourceNotFoundException("No user found with email: " + technicianEmail));
 
-        if (ticket.getStatus() == null || ticket.getStatus() == TicketStatus.OPEN) {
-            ticket.setStatus(TicketStatus.IN_PROGRESS);
-        }
-
-        IncidentTicket updated = incidentTicketRepository.save(ticket);
-        return mapToResponse(updated);
+    if (technician.getRole() != Role.TECHNICIAN) {
+        throw new IllegalArgumentException("Selected email does not belong to a technician");
     }
 
+    ticket.setAssignedTechnician(technicianEmail);
+
+    if (ticket.getStatus() == null || ticket.getStatus() == TicketStatus.OPEN) {
+        ticket.setStatus(TicketStatus.IN_PROGRESS);
+    }
+
+    IncidentTicket updated = incidentTicketRepository.save(ticket);
+    return mapToResponse(updated);
+}
     @Override
     public IncidentTicketResponse updateTicketStatus(Long ticketId, UpdateTicketStatusRequest request) {
         IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
