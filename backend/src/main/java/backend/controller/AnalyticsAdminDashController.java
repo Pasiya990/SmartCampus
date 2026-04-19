@@ -1,6 +1,11 @@
 package backend.controller;
 
-import backend.model.*;
+import backend.dto.AnalyticsAdminDashBusiestDayDTO;
+import backend.dto.AnalyticsAdminDashOverviewDTO;
+import backend.dto.AnalyticsAdminDashPeakHourDTO;
+import backend.dto.AnalyticsAdminDashResourceTypeUsageDTO;
+import backend.dto.AnalyticsAdminDashSummaryDTO;
+import backend.dto.AnalyticsAdminDashTopResourceDTO;
 import backend.service.AnalyticsAdminDashService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

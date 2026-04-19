@@ -1,15 +1,28 @@
 package backend.service;
 
-import backend.model.*;
+import backend.dto.AnalyticsAdminDashBusiestDayDTO;
+import backend.dto.AnalyticsAdminDashOverviewDTO;
+import backend.dto.AnalyticsAdminDashPeakHourDTO;
+import backend.dto.AnalyticsAdminDashResourceTypeUsageDTO;
+import backend.dto.AnalyticsAdminDashSummaryDTO;
+import backend.dto.AnalyticsAdminDashTopResourceDTO;
+import backend.model.Booking;
+import backend.model.BookingStatus;
+import backend.model.Resource;
 import backend.repository.BookingRepository;
 import backend.repository.ResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.DayOfWeek;
-import java.util.*;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,6 +72,7 @@ public class AnalyticsAdminDashService {
 
     private AnalyticsAdminDashSummaryDTO buildSummary(List<Resource> resources, List<Booking> bookings) {
         long totalResources = resources.size();
+
         long activeResources = resources.stream()
                 .filter(r -> r.getStatus() == Resource.ResourceStatus.ACTIVE)
                 .count();
