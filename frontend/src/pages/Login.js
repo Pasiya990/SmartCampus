@@ -1,5 +1,6 @@
 import { useState } from "react";
 import API from "../services/api";
+import "./Login.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -42,31 +43,51 @@ export default function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="login-page">
+      <div className="bg-shape shape1"></div>
+      <div className="bg-shape shape2"></div>
+      <div className="bg-shape shape3"></div>
 
-      <input
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <div className="login-card">
+        <div className="login-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to continue to your account</p>
+        </div>
 
-      <input
-        placeholder="Password"
-        type="password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <div className="input-group">
+          <input
+            type="text"
+            placeholder="Email Address"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
 
-      <button onClick={handleLogin}>Login</button>
+        <div className="input-group">
+          <input
+            type="password"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-      <br /><br />
+        <button className="login-btn" onClick={handleLogin}>
+          Login
+        </button>
 
-      <button
-        onClick={() => {
-          window.location.href = "http://localhost:8080/oauth2/authorization/google";
-        }}
-      >
-        Login with Google
-      </button>
+        <div className="divider">
+          <span>OR</span>
+        </div>
+
+        <button
+          className="google-btn"
+          onClick={() => {
+            window.location.href =
+              "http://localhost:8080/oauth2/authorization/google";
+          }}
+        >
+          Login with Google
+        </button>
+      </div>
     </div>
   );
 }

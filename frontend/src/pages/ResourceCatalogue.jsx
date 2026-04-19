@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { resourceService } from "../services/resourceService";
 import ResourceModal from "../components/ResourceModal";
@@ -21,27 +21,26 @@ const TYPE_ICONS = {
 export default function ResourceCatalogue() {
   const navigate = useNavigate();
 
-  let role = localStorage.getItem("role");
-
-  if (!role) {
+  const role = useMemo(() => {
     const token = localStorage.getItem("token");
 
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
-        role = payload.role;
-        if (role) {
-          localStorage.setItem("role", role);
-        }
+        const tokenRole = payload.role || "USER";
+        localStorage.setItem("role", tokenRole);
+        return tokenRole;
       } catch (error) {
-        role = "USER";
+        console.error("Invalid token payload:", error);
       }
     }
-  }
 
-role = role || "USER";
-const isAdmin = role === "ADMIN";
-const isUser = role === "USER";
+    const storedRole = localStorage.getItem("role");
+    return storedRole || "USER";
+  }, []);
+
+  const isAdmin = role === "ADMIN";
+  const isUser = role === "USER";
 
   const [resources, setResources] = useState([]);
   const [types, setTypes] = useState([]);
