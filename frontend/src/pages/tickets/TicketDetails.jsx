@@ -24,7 +24,8 @@ const TicketDetails = () => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editMessage, setEditMessage] = useState("");
 
-  const [technicianName, setTechnicianName] = useState("");
+  
+  const [technicianEmail, setTechnicianEmail] = useState("");
   const [statusValue, setStatusValue] = useState("");
   const [resolutionNotes, setResolutionNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
@@ -183,23 +184,44 @@ const getTimerColor = (minutes) => {
   };
 
   const handleAssignTechnician = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!technicianName.trim()) {
-      alert("Please enter technician email.");
+  if (!technicianEmail.trim()) {
+    alert("Please enter technician email.");
+    return;
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(technicianEmail.trim())) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+
+  if (ticket.assignedTechnician) {
+    const confirmChange = window.confirm(
+      `This ticket is already assigned to ${ticket.assignedTechnician}. Do you want to reassign it?`
+    );
+
+    if (!confirmChange) {
       return;
     }
+  }
 
-    try {
-      await assignTechnician(id, technicianName);
-      setTechnicianName("");
-      await fetchTicketDetails();
-      alert("Technician assigned successfully.");
-    } catch (error) {
-      console.error("Assign technician error:", error);
-      alert("Failed to assign technician.");
-    }
-  };
+  try {
+    await assignTechnician(id, technicianEmail.trim());
+    setTechnicianEmail("");
+    await fetchTicketDetails();
+    alert("Technician assigned successfully.");
+  } catch (error) {
+    console.error("Assign technician error:", error);
+
+    alert(
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      "Failed to assign technician. Make sure the email belongs to a technician."
+    );
+  }
+};
 
   const handleUpdateStatus = async (e) => {
     e.preventDefault();
@@ -413,14 +435,12 @@ const getTimerColor = (minutes) => {
           </div>
 
           <form className="ticket-details-form-inline" onSubmit={handleAssignTechnician}>
-            <input
-              type="text"
-              value={technicianName}
-              onChange={(e) => setTechnicianName(e.target.value)}
-              className="ticket-details-select"
-              placeholder="Enter technician email"
+            <input  type="email"
+                    value={technicianEmail}
+                    onChange={(e) => setTechnicianEmail(e.target.value)}
+                    className="ticket-details-select"
+                    placeholder="Enter technician email"
             />
-
             <button type="submit" className="ticket-details-primary-btn">
               Assign
             </button>

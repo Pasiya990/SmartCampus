@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getAllTickets } from "../../api/ticketApi";
+import { getMyTickets } from "../../api/ticketApi";
 import { Link } from "react-router-dom";
 import "./MyTickets.css";
 
@@ -11,13 +11,10 @@ const MyTickets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
-  const userName = localStorage.getItem("name") || "";
-  const userEmail = localStorage.getItem("email") || "";
-
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const data = await getAllTickets();
+        const data = await getMyTickets();
         setTickets(data);
       } catch (error) {
         console.error("Fetch my tickets error:", error);
@@ -30,17 +27,8 @@ const MyTickets = () => {
     fetchTickets();
   }, []);
 
-  const myTickets = useMemo(() => {
-    return tickets.filter((ticket) => {
-      const reportedBy = (ticket.reportedBy || "").toLowerCase();
-      const nameMatch = userName && reportedBy === userName.toLowerCase();
-      const emailMatch = userEmail && reportedBy === userEmail.toLowerCase();
-      return nameMatch || emailMatch;
-    });
-  }, [tickets, userName, userEmail]);
-
   const filteredTickets = useMemo(() => {
-    return myTickets.filter((ticket) => {
+    return tickets.filter((ticket) => {
       const matchesSearch =
         ticket.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         ticket.ticketCode?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -49,20 +37,20 @@ const MyTickets = () => {
 
       return matchesSearch && matchesStatus;
     });
-  }, [myTickets, searchTerm, statusFilter]);
+  }, [tickets, searchTerm, statusFilter]);
 
-  const totalTickets = myTickets.length;
-  const openCount = myTickets.filter((ticket) => ticket.status === "OPEN").length;
-  const inProgressCount = myTickets.filter(
+  const totalTickets = tickets.length;
+  const openCount = tickets.filter((ticket) => ticket.status === "OPEN").length;
+  const inProgressCount = tickets.filter(
     (ticket) => ticket.status === "IN_PROGRESS"
   ).length;
-  const resolvedCount = myTickets.filter(
+  const resolvedCount = tickets.filter(
     (ticket) => ticket.status === "RESOLVED"
   ).length;
-  const rejectedCount = myTickets.filter(
+  const rejectedCount = tickets.filter(
     (ticket) => ticket.status === "REJECTED"
   ).length;
-  const closedCount = myTickets.filter((ticket) => ticket.status === "CLOSED").length;
+  const closedCount = tickets.filter((ticket) => ticket.status === "CLOSED").length;
 
   if (loading) {
     return <p className="my-tickets-loading">Loading your tickets...</p>;

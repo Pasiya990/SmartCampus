@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import API from "../services/api";
+import { getTicketsByAssignedTechnician } from "../api/ticketApi";
 import "./TechnicianView.css";
 
 export default function TechnicianView() {
@@ -8,7 +8,6 @@ export default function TechnicianView() {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // 🔥 Decode email from JWT (ONLY for display)
   let technicianEmail = "";
   const token = localStorage.getItem("token");
 
@@ -24,9 +23,8 @@ export default function TechnicianView() {
   useEffect(() => {
     const fetchAssignedTickets = async () => {
       try {
-        // 🔥 NO EMAIL IN URL (token handles everything)
-        const response = await API.get("/api/tickets/assigned-technician");
-        setTickets(response.data);
+        const data = await getTicketsByAssignedTechnician();
+        setTickets(data);
       } catch (error) {
         console.error("Error fetching technician tickets:", error);
         setErrorMessage("Failed to load assigned tickets.");
@@ -62,7 +60,6 @@ export default function TechnicianView() {
         </div>
       </div>
 
-      {/* 🔥 Email display (optional, from token) */}
       <div className="technician-welcome-card">
         <span className="technician-welcome-label">Logged in as</span>
         <span className="technician-welcome-value">
