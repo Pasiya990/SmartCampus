@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import "./AdminLayout.css";
 
 export default function AdminLayout({ children, activeMenu = "dashboard" }) {
@@ -34,6 +35,38 @@ export default function AdminLayout({ children, activeMenu = "dashboard" }) {
   const handleMenuClick = (path) => {
     navigate(path);
   };
+
+  const handleLogout = () => {
+  toast.custom((t) => (
+    <div className="logout-toast">
+      <h3>Logout</h3>
+      <p>Are you sure you want to log out?</p>
+
+      <div className="logout-actions">
+        <button
+          className="btn-logout-confirm"
+          onClick={() => {
+            toast.dismiss(t.id);
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            navigate("/login");
+          }}
+        >
+          Yes, Logout
+        </button>
+
+        <button
+          className="btn-logout-cancel"
+          onClick={() => toast.dismiss(t.id)}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  ), {
+    position: "top-center",
+  });
+};
 
   return (
     <div className="admin-layout-page">
@@ -74,6 +107,13 @@ export default function AdminLayout({ children, activeMenu = "dashboard" }) {
               onClick={() => handleMenuClick("/resources")}
             >
               Resources
+            </button>
+
+            <button
+                className="admin-side-btn logout-btn"
+                onClick={handleLogout}
+            >
+                Logout
             </button>
           </div>
         </div>
