@@ -17,7 +17,7 @@ public interface IncidentTicketService {
     IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files);
     List<IncidentTicketResponse> getAllTickets();
     IncidentTicketResponse getTicketById(Long id);
-    IncidentTicketResponse assignTechnician(Long ticketId, String technicianName);
+    IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail);
     IncidentTicketResponse updateTicketStatus(Long ticketId, backend.dto.UpdateTicketStatusRequest request);
     List<IncidentTicketResponse> filterTickets(TicketStatus status, PriorityLevel priority);
     TicketCommentResponse addComment(Long ticketId, AddTicketCommentRequest request);

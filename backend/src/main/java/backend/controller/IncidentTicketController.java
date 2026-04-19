@@ -129,11 +129,13 @@ public ResponseEntity<String> deleteComment(
     return ResponseEntity.ok("Comment deleted successfully");
 }
 
+
+
 @GetMapping("/assigned-technician")
 public ResponseEntity<List<IncidentTicketResponse>> getTicketsByAssignedTechnician(
-        org.springframework.security.core.Authentication authentication) {
+        Authentication authentication) {
 
-    String email = authentication.getName(); // 🔥 from JWT
+    String email = authentication.getName();
 
     return ResponseEntity.ok(
             incidentTicketService.getTicketsByAssignedTechnician(email)

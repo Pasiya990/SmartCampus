@@ -171,8 +171,8 @@ public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
 }
 
 @Override
-public List<IncidentTicketResponse> getTicketsByAssignedTechnician(String assignedTechnician) {
-    return incidentTicketRepository.findByAssignedTechnicianIgnoreCase(assignedTechnician)
+public List<IncidentTicketResponse> getTicketsByAssignedTechnician(String technicianEmail) {
+    return incidentTicketRepository.findByAssignedTechnicianIgnoreCase(technicianEmail)
             .stream()
             .map(this::mapToListResponse)
             .toList();
