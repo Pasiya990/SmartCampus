@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { getAllTickets } from "../../api/ticketApi";
 import { Link } from "react-router-dom";
 import "./TicketList.css";
+import AdminLayout from "../../components/AdminLayout";
 
 const TicketList = () => {
   const [tickets, setTickets] = useState([]);
@@ -65,6 +66,7 @@ const TicketList = () => {
   }
 
   return (
+    <AdminLayout activeMenu="tickets">
     <div className="ticket-list-page">
       <div className="ticket-list-header">
         <div>
@@ -240,6 +242,7 @@ const TicketList = () => {
         )}
       </div>
     </div>
+    </AdminLayout>
   );
 };
 
