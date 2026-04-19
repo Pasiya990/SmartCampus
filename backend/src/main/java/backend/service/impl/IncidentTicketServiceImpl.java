@@ -200,6 +200,14 @@ public TicketCommentResponse updateComment(Long commentId, UpdateTicketCommentRe
 }
 
 @Override
+public List<IncidentTicketResponse> getTicketsByUser(String email) {
+    return incidentTicketRepository.findByReportedBy(email)
+            .stream()
+            .map(this::mapToListResponse)
+            .toList();
+}
+
+@Override
 public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
 
     TicketComment comment = ticketCommentRepository.findById(commentId)

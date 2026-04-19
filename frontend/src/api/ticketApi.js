@@ -68,3 +68,8 @@ export const getTicketsByAssignedTechnician = async (technicianName) => {
   );
   return response.data;
 };
+
+export const getMyTickets = async () => {
+  const response = await API.get("/api/tickets/my-tickets");
+  return response.data;
+};
