@@ -4,6 +4,7 @@ import { resourceService } from "../services/resourceService";
 import ResourceModal from "../components/ResourceModal";
 import toast from "react-hot-toast";
 import "./ResourceCatalogue.css";
+import AdminLayout from "../components/AdminLayout";
 
 const TYPE_ICONS = {
   LECTURE_HALL: "🏛️",
@@ -174,6 +175,8 @@ export default function ResourceCatalogue() {
   };
 
   return (
+    <AdminLayout activeMenu="resources">
+    <div className="resource-page">
     <div className="catalogue-page">
       <div className="page-backdrop" />
 
@@ -366,5 +369,7 @@ export default function ResourceCatalogue() {
         />
       )}
     </div>
+     </div>
+  </AdminLayout>
   );
 }
