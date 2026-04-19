@@ -20,6 +20,7 @@ export default function AdminDashboard() {
   const [overview, setOverview] = useState(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(true);
   const [analyticsError, setAnalyticsError] = useState("");
+  const [activeMenu, setActiveMenu] = useState("dashboard");
 
   const navigate = useNavigate();
 
@@ -30,7 +31,7 @@ export default function AdminDashboard() {
         if (err.response?.status === 403) {
           setMessage("Forbidden - You are not allowed");
         } else {
-          setMessage("Error occurred");
+          setMessage("Hello ADMIN");
         }
       });
 
@@ -53,9 +54,10 @@ export default function AdminDashboard() {
       });
   }, []);
 
-  const handleViewTickets = () => navigate("/tickets");
-  const handleViewBookings = () => navigate("/admin/bookings");
-  const handleViewResources = () => navigate("/resources");
+  const handleMenuClick = (menuKey, path) => {
+    setActiveMenu(menuKey);
+    if (path) navigate(path);
+  };
 
   const statusChartData = useMemo(() => {
     if (!overview?.summary) return [];
@@ -67,34 +69,63 @@ export default function AdminDashboard() {
     ];
   }, [overview]);
 
-  const pieColors = ["#0d9488", "#f59e0b", "#ef4444", "#64748b"];
+  const pieColors = ["#6d5bd0", "#f0c34e", "#58c27d", "#f28b82"];
 
   return (
     <div className="admin-dashboard-page">
       <aside className="admin-sidebar">
-        <div className="admin-sidebar-header">
-          <h2>Admin Panel</h2>
-          <p>{message || "Hello ADMIN"}</p>
+        <div className="sidebar-top">
+          <div className="sidebar-logo">
+            <div className="logo-icon">📘</div>
+            <div>
+              <h2>Headstart</h2>
+              <p>{message || "Admin Panel"}</p>
+            </div>
+          </div>
+
+          <div className="sidebar-menu">
+            <button
+              className={`admin-side-btn ${activeMenu === "dashboard" ? "active" : ""}`}
+              onClick={() => setActiveMenu("dashboard")}
+            >
+              Dashboard
+            </button>
+
+            <button
+              className={`admin-side-btn ${activeMenu === "tickets" ? "active" : ""}`}
+              onClick={() => handleMenuClick("tickets", "/tickets")}
+            >
+              Tickets
+            </button>
+
+            <button
+              className={`admin-side-btn ${activeMenu === "bookings" ? "active" : ""}`}
+              onClick={() => handleMenuClick("bookings", "/admin/bookings")}
+            >
+              Bookings
+            </button>
+
+            <button
+              className={`admin-side-btn ${activeMenu === "resources" ? "active" : ""}`}
+              onClick={() => handleMenuClick("resources", "/resources")}
+            >
+              Resources
+            </button>
+          </div>
         </div>
 
-        <button className="admin-side-btn" onClick={handleViewTickets}>
-          View All Tickets
-        </button>
-
-        <button className="admin-side-btn" onClick={handleViewBookings}>
-          View All Bookings
-        </button>
-
-        <button className="admin-side-btn" onClick={handleViewResources}>
-          View Resource Catalogue
-        </button>
+        <div className="sidebar-bottom-art"></div>
+        <div className="sidebar-leaf leaf-1"></div>
+        <div className="sidebar-leaf leaf-2"></div>
+        <div className="sidebar-leaf leaf-3"></div>
+        <div className="sidebar-leaf leaf-4"></div>
       </aside>
 
       <main className="admin-main">
         <div className="admin-main-header">
-          <div>
-            <h1>Usage Analytics Dashboard</h1>
-            <p>Top resources, booking demand, and usage patterns</p>
+          <div className="header-left">
+            <h1>Dashboard</h1>
+            <p>Campus resource insights and booking analytics</p>
           </div>
         </div>
 
@@ -109,90 +140,117 @@ export default function AdminDashboard() {
         {!loadingAnalytics && !analyticsError && overview && (
           <>
             <section className="summary-grid">
-              <div className="summary-card">
+              <div className="summary-card soft-pink">
                 <span>Total Resources</span>
                 <h3>{overview.summary?.totalResources ?? 0}</h3>
               </div>
 
-              <div className="summary-card">
+              <div className="summary-card soft-purple">
                 <span>Active Resources</span>
                 <h3>{overview.summary?.activeResources ?? 0}</h3>
               </div>
 
-              <div className="summary-card">
+              <div className="summary-card soft-yellow">
                 <span>Approved Bookings</span>
                 <h3>{overview.summary?.approvedBookings ?? 0}</h3>
               </div>
 
-              <div className="summary-card">
+              <div className="summary-card soft-green">
                 <span>Approval Rate</span>
                 <h3>{overview.summary?.approvalRate ?? 0}%</h3>
               </div>
-
-              <div className="summary-card">
-                <span>Utilized Resources</span>
-                <h3>{overview.summary?.utilizedResources ?? 0}</h3>
-              </div>
-
-              <div className="summary-card">
-                <span>Avg Booking Hours</span>
-                <h3>{overview.summary?.averageApprovedBookingHours ?? 0}</h3>
-              </div>
             </section>
 
-            <section className="analytics-grid analytics-grid-top">
+            <section className="analytics-grid top-layout">
+              <div className="analytics-card calendar-card">
+                <div className="card-header">
+                  <h3>Overview</h3>
+                  <p>Weekly usage summary</p>
+                </div>
+
+                <div className="mini-stats-grid">
+                  <div className="mini-stat-box">
+                    <strong>{overview.summary?.utilizedResources ?? 0}</strong>
+                    <span>Utilized Resources</span>
+                  </div>
+
+                  <div className="mini-stat-box">
+                    <strong>{overview.summary?.averageApprovedBookingHours ?? 0}</strong>
+                    <span>Avg Booking Hours</span>
+                  </div>
+
+                  <div className="mini-stat-box">
+                    <strong>{overview.summary?.pendingBookings ?? 0}</strong>
+                    <span>Pending</span>
+                  </div>
+
+                  <div className="mini-stat-box">
+                    <strong>{overview.summary?.cancelledBookings ?? 0}</strong>
+                    <span>Cancelled</span>
+                  </div>
+                </div>
+
+                <div className="notification-box">
+                  <h4>Latest Insight</h4>
+                  <p>
+                    Peak demand and top resource usage are shown through charts and summaries
+                    for faster admin decision-making.
+                  </p>
+                </div>
+              </div>
+
               <div className="analytics-card chart-card">
                 <div className="card-header">
                   <h3>Top Resources</h3>
                   <p>Most frequently approved resources</p>
                 </div>
 
-                <ResponsiveContainer width="100%" height={320}>
+                <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={overview.topResources || []}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="resourceName" tick={{ fontSize: 12 }} />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="bookingCount" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="bookingCount" fill="#6d5bd0" radius={[10, 10, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+            </section>
 
+            <section className="analytics-grid middle-layout">
               <div className="analytics-card chart-card">
                 <div className="card-header">
                   <h3>Peak Booking Hours</h3>
                   <p>Busiest approved booking times</p>
                 </div>
 
-                <ResponsiveContainer width="100%" height={320}>
+                <ResponsiveContainer width="100%" height={280}>
                   <BarChart data={overview.peakHours || []}>
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="label" tick={{ fontSize: 12 }} />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="bookingCount" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="bookingCount" fill="#8fd3e8" radius={[10, 10, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-            </section>
 
-            <section className="analytics-grid analytics-grid-bottom">
               <div className="analytics-card chart-card">
                 <div className="card-header">
-                  <h3>Booking Status Distribution</h3>
-                  <p>Overall workflow distribution</p>
+                  <h3>Status Distribution</h3>
+                  <p>Overall booking workflow</p>
                 </div>
 
-                <ResponsiveContainer width="100%" height={320}>
+                <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
                     <Pie
                       data={statusChartData}
                       cx="50%"
                       cy="50%"
-                      outerRadius={110}
+                      innerRadius={60}
+                      outerRadius={100}
                       dataKey="value"
                       nameKey="name"
-                      label
                     >
                       {statusChartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
@@ -202,35 +260,9 @@ export default function AdminDashboard() {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-
-              <div className="analytics-card chart-card">
-                <div className="card-header">
-                  <h3>Resource Type Usage</h3>
-                  <p>Approved bookings by resource type</p>
-                </div>
-
-                <ResponsiveContainer width="100%" height={320}>
-                  <BarChart
-                    data={overview.resourceTypeUsage || []}
-                    layout="vertical"
-                    margin={{ top: 10, right: 20, left: 35, bottom: 10 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis
-                      dataKey="resourceType"
-                      type="category"
-                      width={120}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip />
-                    <Bar dataKey="bookingCount" radius={[0, 8, 8, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
             </section>
 
-            <section className="analytics-grid analytics-grid-last">
+            <section className="analytics-grid bottom-layout">
               <div className="analytics-card">
                 <div className="card-header">
                   <h3>Busiest Days</h3>
@@ -263,36 +295,28 @@ export default function AdminDashboard() {
 
               <div className="analytics-card">
                 <div className="card-header">
-                  <h3>Top Resources Table</h3>
-                  <p>Resource performance breakdown</p>
+                  <h3>Resource Type Usage</h3>
+                  <p>Approved bookings by category</p>
                 </div>
 
-                <table className="analytics-table">
-                  <thead>
-                    <tr>
-                      <th>Resource</th>
-                      <th>Type</th>
-                      <th>Location</th>
-                      <th>Bookings</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {overview.topResources?.length > 0 ? (
-                      overview.topResources.map((item) => (
-                        <tr key={item.resourceId}>
-                          <td>{item.resourceName}</td>
-                          <td>{item.resourceType}</td>
-                          <td>{item.location}</td>
-                          <td>{item.bookingCount}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="4">No top resource data available</td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart
+                    data={overview.resourceTypeUsage || []}
+                    layout="vertical"
+                    margin={{ top: 5, right: 10, left: 25, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                    <XAxis type="number" />
+                    <YAxis
+                      type="category"
+                      dataKey="resourceType"
+                      width={120}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip />
+                    <Bar dataKey="bookingCount" fill="#58c27d" radius={[0, 10, 10, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </section>
           </>
