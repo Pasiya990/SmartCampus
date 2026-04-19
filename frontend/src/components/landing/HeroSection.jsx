@@ -1,11 +1,8 @@
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import heroImage from "../../assets/landing/hero-campus.jpg";
-import dashboardImage from "../../assets/landing/dashboard-preview.jpg";
+import previewImage from "../../assets/landing/catalogue-preview.jpg";
 
 export default function HeroSection() {
-  const navigate = useNavigate();
-
   return (
     <section className="hero-section">
       <div className="hero-overlay"></div>
@@ -18,22 +15,21 @@ export default function HeroSection() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <p className="hero-badge">Modern Campus Resource Management</p>
+          <p className="hero-badge">Simple. Fast. User Friendly.</p>
+
           <h1>
-            Smart Campus <span>Operations Hub</span>
+            Smart Campus
+            <span> Operations Hub</span>
           </h1>
+
           <p className="hero-text">
-            Manage resource bookings, facility assets, maintenance incidents,
-            and notifications through one clean and powerful web platform.
+            Book campus resources, report maintenance issues, and stay updated
+            through one simple and organized platform built for students and staff.
           </p>
 
           <div className="hero-buttons">
-            <button className="btn btn-primary" onClick={() => navigate("/login")}>
-              Explore System
-            </button>
-            <button className="btn btn-outline" onClick={() => navigate("/login")}>
-              Login
-            </button>
+            <button className="btn btn-primary">Get Started</button>
+            <button className="btn btn-outline">Login</button>
           </div>
         </motion.div>
 
@@ -44,7 +40,7 @@ export default function HeroSection() {
           transition={{ duration: 0.9 }}
         >
           <div className="hero-image-card">
-            <img src={dashboardImage} alt="Dashboard Preview" />
+            <img src={previewImage} alt="Resource Catalogue Preview" />
           </div>
         </motion.div>
       </div>

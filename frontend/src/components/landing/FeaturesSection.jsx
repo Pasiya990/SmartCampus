@@ -1,26 +1,26 @@
 import { motion } from "framer-motion";
-import { Building2, CalendarCheck2, Wrench, BellRing } from "lucide-react";
+import { Search, CalendarCheck2, Wrench, BellRing } from "lucide-react";
 
 const features = [
   {
-    icon: <Building2 size={34} />,
-    title: "Resource Catalogue",
-    desc: "Browse lecture halls, labs, meeting rooms, and equipment with filters and availability details.",
+    icon: <Search size={34} />,
+    title: "Find Resources Easily",
+    desc: "Search lecture halls, labs, meeting rooms, and equipment with clear details such as capacity, location, and availability.",
   },
   {
     icon: <CalendarCheck2 size={34} />,
-    title: "Booking Management",
-    desc: "Submit and manage booking requests with clear workflows and conflict-free scheduling.",
+    title: "Book in Minutes",
+    desc: "Submit booking requests quickly by selecting the date, time, purpose, and expected attendees.",
   },
   {
     icon: <Wrench size={34} />,
-    title: "Maintenance Tickets",
-    desc: "Create incident reports, attach evidence, and track technician progress smoothly.",
+    title: "Report Issues Fast",
+    desc: "Create maintenance or incident tickets with descriptions, priorities, and image evidence when needed.",
   },
   {
     icon: <BellRing size={34} />,
-    title: "Notifications",
-    desc: "Receive instant updates for approvals, status changes, and important ticket comments.",
+    title: "Track Updates",
+    desc: "Receive notifications for booking approvals, ticket progress, status changes, and important comments.",
   },
 ];
 
@@ -34,8 +34,8 @@ export default function FeaturesSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        <p className="section-tag">Core Features</p>
-        <h2>Everything needed to run campus operations smarter</h2>
+        <p className="section-tag">User Features</p>
+        <h2>Everything you need in one smart campus platform</h2>
       </motion.div>
 
       <div className="features-grid">
