@@ -17,6 +17,7 @@ import backend.repository.TicketCommentRepository;
 import backend.enums.Role;
 import backend.model.User;
 import backend.repository.UserRepository;
+import backend.service.TicketEmailService;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -32,6 +33,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     private final CloudinaryService cloudinaryService;
     private final TicketCommentRepository ticketCommentRepository;
     private final UserRepository userRepository;
+    private final TicketEmailService ticketEmailService;
 
     @Override
     public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
@@ -86,7 +88,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         return mapToResponse(ticket);
     }
 
-    @Override
+   @Override
 public IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail) {
     IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
             .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
@@ -105,6 +107,19 @@ public IncidentTicketResponse assignTechnician(Long ticketId, String technicianE
     }
 
     IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+    try {
+        ticketEmailService.sendTicketAssignedEmail(
+                technicianEmail,
+                updated.getTicketCode(),
+                updated.getTitle(),
+                updated.getPriority().name(),
+                updated.getLocation()
+        );
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
     return mapToResponse(updated);
 }
     @Override
