@@ -4,6 +4,33 @@ import "./AdminLayout.css";
 export default function AdminLayout({ children, activeMenu = "dashboard" }) {
   const navigate = useNavigate();
 
+  const getRole = () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      return "USER";
+    }
+
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      const tokenRole = (payload.role || payload.authorities || "USER").toString().toUpperCase();
+      return tokenRole;
+    } catch (error) {
+      console.error("Failed to decode token in AdminLayout:", error);
+      return "USER";
+    }
+  };
+
+  const role = getRole();
+  const isAdmin =
+    role === "ADMIN" ||
+    role === "ROLE_ADMIN" ||
+    role.includes("ADMIN");
+
+  if (!isAdmin) {
+    return <>{children}</>;
+  }
+
   const handleMenuClick = (path) => {
     navigate(path);
   };
