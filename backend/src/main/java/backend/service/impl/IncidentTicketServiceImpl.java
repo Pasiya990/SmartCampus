@@ -14,6 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import backend.model.TicketComment;
 import backend.repository.TicketCommentRepository;
+import backend.enums.Role;
+import backend.model.User;
+import backend.repository.UserRepository;
+import backend.service.TicketEmailService;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -28,6 +32,8 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     private final TicketAttachmentRepository ticketAttachmentRepository;
     private final CloudinaryService cloudinaryService;
     private final TicketCommentRepository ticketCommentRepository;
+    private final UserRepository userRepository;
+    private final TicketEmailService ticketEmailService;
 
     @Override
     public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
@@ -82,21 +88,40 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         return mapToResponse(ticket);
     }
 
-    @Override
-    public IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail) {
-        IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+   @Override
+public IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail) {
+    IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
-        ticket.setAssignedTechnician(technicianEmail);
+    User technician = userRepository.findByEmail(technicianEmail)
+            .orElseThrow(() -> new ResourceNotFoundException("No user found with email: " + technicianEmail));
 
-        if (ticket.getStatus() == null || ticket.getStatus() == TicketStatus.OPEN) {
-            ticket.setStatus(TicketStatus.IN_PROGRESS);
-        }
-
-        IncidentTicket updated = incidentTicketRepository.save(ticket);
-        return mapToResponse(updated);
+    if (technician.getRole() != Role.TECHNICIAN) {
+        throw new IllegalArgumentException("Selected email does not belong to a technician");
     }
 
+    ticket.setAssignedTechnician(technicianEmail);
+
+    if (ticket.getStatus() == null || ticket.getStatus() == TicketStatus.OPEN) {
+        ticket.setStatus(TicketStatus.IN_PROGRESS);
+    }
+
+    IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+    try {
+        ticketEmailService.sendTicketAssignedEmail(
+                technicianEmail,
+                updated.getTicketCode(),
+                updated.getTitle(),
+                updated.getPriority().name(),
+                updated.getLocation()
+        );
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return mapToResponse(updated);
+}
     @Override
     public IncidentTicketResponse updateTicketStatus(Long ticketId, UpdateTicketStatusRequest request) {
         IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
@@ -171,8 +196,8 @@ public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
 }
 
 @Override
-public List<IncidentTicketResponse> getTicketsByAssignedTechnician(String assignedTechnician) {
-    return incidentTicketRepository.findByAssignedTechnicianIgnoreCase(assignedTechnician)
+public List<IncidentTicketResponse> getTicketsByAssignedTechnician(String technicianEmail) {
+    return incidentTicketRepository.findByAssignedTechnicianIgnoreCase(technicianEmail)
             .stream()
             .map(this::mapToListResponse)
             .toList();
@@ -197,6 +222,14 @@ public TicketCommentResponse updateComment(Long commentId, UpdateTicketCommentRe
     TicketComment updated = ticketCommentRepository.save(comment);
 
     return mapToCommentResponse(updated);
+}
+
+@Override
+public List<IncidentTicketResponse> getTicketsByUser(String email) {
+    return incidentTicketRepository.findByReportedBy(email)
+            .stream()
+            .map(this::mapToListResponse)
+            .toList();
 }
 
 @Override
