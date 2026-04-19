@@ -131,18 +131,17 @@ export default function ResourceCatalogue() {
   };
 
   const handleBook = (resource) => {
-    if (resource.status !== 'ACTIVE') {
-      toast.error('This resource is currently out of service');
-      return;
-    }
+  if (resource.status !== 'ACTIVE') {
+    toast.error('This resource is currently out of service');
+    return;
+  }
 
-    navigate(`/booking/${resource.id}`, {
-      state: {
-        resourceId: resource.id,
-        resourceName: resource.name,
-      },
-    });
-  };
+  navigate(`/booking/${resource.id}`, {
+    state: {
+      resource: resource, // ✅ pass the full object, not just id/name
+    },
+  });
+};
 
   return (
     <div className="catalogue-page">

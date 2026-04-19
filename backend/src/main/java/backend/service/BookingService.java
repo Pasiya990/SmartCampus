@@ -22,6 +22,8 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
+    private final QRCodeService qrCodeService;  
+    private final EmailService emailService; 
 
     //  Create booking 
     public BookingResponse createBooking(BookingRequest request, String email) {
@@ -120,7 +122,20 @@ public class BookingService {
         }
 
         booking.setStatus(BookingStatus.APPROVED);
-        return toResponse(bookingRepository.save(booking));
+         BookingResponse response = toResponse(bookingRepository.save(booking));
+
+        try {
+            String qrContent = qrCodeService.buildQRContent(response);
+            byte[] qrCode = qrCodeService.generateQRCode(qrContent);
+            emailService.sendBookingApprovedEmail(
+                booking.getUser().getEmail(), response, qrCode
+            );
+        } catch (Exception e) {
+            // Don't fail approval if email fails
+            System.err.println("Email sending failed: " + e.getMessage());
+        }
+
+        return response;
     }
 
     //  Admin reject

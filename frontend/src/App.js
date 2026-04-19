@@ -26,7 +26,7 @@ function App() {
     <Toaster position="top-right" reverseOrder={false} />
 
       <Routes>
-        <Route path="/book" element={<BookingFormPage />} />
+        
         <Route path="/my-bookings" element={<MyBookingsPage />} />
         <Route path="/admin/bookings" element={<AdminBookingsPage />} />
           
@@ -42,9 +42,10 @@ function App() {
         <Route path="/tickets/:id" element={<TicketDetails />} />
         <Route path="/my-tickets" element={<MyTickets />} />
         
-          
-        <Route path="/" element={<ResourceCatalogue />} />
         <Route path="/booking/:id" element={<BookingFormPage />} />
+        <Route path="/resources" element={<ResourceCatalogue />} />  
+        <Route path="/" element={<ResourceCatalogue />} />
+        
 
       </Routes>
     </BrowserRouter>
