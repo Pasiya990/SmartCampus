@@ -17,6 +17,7 @@ import MyBookingsPage from "./pages/MyBookingsPage";
 import AdminBookingsPage from "./pages/AdminBookingsPage";
 
 import ResourceCatalogue from "./pages/ResourceCatalogue";
+import LandingPage from "./pages/LandingPage";
 
 function App() {
   return (
@@ -24,7 +25,8 @@ function App() {
       <Toaster position="top-right" reverseOrder={false} />
 
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/oauth-success" element={<OAuthSuccess />} />
 
         <Route path="/user" element={<UserDashboard />} />

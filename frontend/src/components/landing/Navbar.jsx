@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
+
   return (
     <motion.nav
       className="landing-navbar"
@@ -8,7 +11,9 @@ export default function Navbar() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="logo">SmartCampus</div>
+      <div className="logo" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+        SmartCampus
+      </div>
 
       <ul className="nav-links">
         <li><a href="#features">Features</a></li>
@@ -17,8 +22,12 @@ export default function Navbar() {
       </ul>
 
       <div className="nav-buttons">
-        <button className="btn btn-outline">Login</button>
-        <button className="btn btn-primary">Get Started</button>
+        <button className="btn btn-outline" onClick={() => navigate("/login")}>
+          Login
+        </button>
+        <button className="btn btn-primary" onClick={() => navigate("/login")}>
+          Get Started
+        </button>
       </div>
     </motion.nav>
   );

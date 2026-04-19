@@ -4,7 +4,7 @@ import FeaturesSection from "../components/landing/FeaturesSection";
 import WorkflowSection from "../components/landing/WorkflowSection";
 import PreviewSection from "../components/landing/PreviewSection";
 import Footer from "../components/landing/Footer";
-import "../styles/landing.css";
+import "./Landing.css";
 
 export default function LandingPage() {
   return (

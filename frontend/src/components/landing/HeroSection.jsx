@@ -1,12 +1,14 @@
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import heroImage from "../../assets/landing/hero-campus.jpg";
-import dashboardImage from "../../assets/landing/dashboard-preview.png";
+import dashboardImage from "../../assets/landing/dashboard-preview.jpg";
 
 export default function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="hero-section">
       <div className="hero-overlay"></div>
-
       <img src={heroImage} alt="Campus" className="hero-bg" />
 
       <div className="hero-content">
@@ -18,8 +20,7 @@ export default function HeroSection() {
         >
           <p className="hero-badge">Modern Campus Resource Management</p>
           <h1>
-            Smart Campus
-            <span> Operations Hub</span>
+            Smart Campus <span>Operations Hub</span>
           </h1>
           <p className="hero-text">
             Manage resource bookings, facility assets, maintenance incidents,
@@ -27,8 +28,12 @@ export default function HeroSection() {
           </p>
 
           <div className="hero-buttons">
-            <button className="btn btn-primary">Explore System</button>
-            <button className="btn btn-outline">Login</button>
+            <button className="btn btn-primary" onClick={() => navigate("/login")}>
+              Explore System
+            </button>
+            <button className="btn btn-outline" onClick={() => navigate("/login")}>
+              Login
+            </button>
           </div>
         </motion.div>
 

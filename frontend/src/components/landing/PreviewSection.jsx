@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import catalogueImage from "../../assets/landing/catalogue-preview.png";
-import bookingImage from "../../assets/landing/booking-preview.png";
-import notificationImage from "../../assets/landing/notification-preview.png";
-import dashboardImage from "../../assets/landing/dashboard-preview.png";
+import catalogueImage from "../../assets/landing/catalogue-preview.jpg";
+import bookingImage from "../../assets/landing/booking-preview.jpg";
+import notificationImage from "../../assets/landing/notification-preview.jpg";
+import dashboardImage from "../../assets/landing/dashboard-preview.jpg";
 
 const slides = [
   {
