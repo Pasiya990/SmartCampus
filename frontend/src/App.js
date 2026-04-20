@@ -6,6 +6,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import TechnicianView from "./pages/TechnicianView";
 import OAuthSuccess from "./pages/OAuthSuccess";
 import UserDashboard from "./pages/UserDashboard";
+import TechnicianDashboard from "./pages/TechnicianDashboard";
 
 import TicketCreate from "./pages/tickets/TicketCreate";
 import TicketList from "./pages/tickets/TicketList";
@@ -31,8 +32,7 @@ function App() {
 
         <Route path="/user" element={<UserDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/technician" element={<TechnicianView />} />
-
+        <Route path="/technician" element={<TechnicianDashboard />} />
         <Route path="/resources" element={<ResourceCatalogue />} />
 
         <Route path="/book" element={<BookingFormPage />} />
@@ -44,6 +44,8 @@ function App() {
         <Route path="/tickets" element={<TicketList />} />
         <Route path="/tickets/:id" element={<TicketDetails />} />
         <Route path="/my-tickets" element={<MyTickets />} />
+        <Route path="/technician/my-tickets" element={<TechnicianView />} />
+
       </Routes>
     </BrowserRouter>
   );
