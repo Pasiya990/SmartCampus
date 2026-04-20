@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createTicket } from "../../api/ticketApi";
 import "./TicketCreate.css";
 
@@ -24,6 +25,7 @@ const TicketCreate = () => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const showSuccessMessage = (message) => {
     setSuccessMessage(message);
@@ -135,11 +137,24 @@ const TicketCreate = () => {
       </div>
 
       <div className="ticket-create-header">
-        <h2 className="ticket-create-title">Create Incident Ticket</h2>
-        <p className="ticket-create-subtitle">
-          Submit a new issue with location, priority, and supporting details
-        </p>
-      </div>
+  <div className="ticket-create-header-left">
+
+    <button
+      className="ticket-create-back-btn"
+      onClick={() => navigate(-1)}
+    >
+      ←
+    </button>
+
+    <div>
+      <h2 className="ticket-create-title">Create Incident Ticket</h2>
+      <p className="ticket-create-subtitle">
+        Submit a new issue with location, priority, and supporting details
+      </p>
+    </div>
+
+  </div>
+</div>
 
       <div className="ticket-create-card">
         <form className="ticket-create-form" onSubmit={handleSubmit}>

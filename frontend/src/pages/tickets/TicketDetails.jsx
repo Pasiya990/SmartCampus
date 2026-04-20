@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   getTicketById,
   getCommentsByTicketId,
@@ -22,6 +22,7 @@ const TicketDetails = () => {
   const [commentLoading, setCommentLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [actionErrorMessage, setActionErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editMessage, setEditMessage] = useState("");
@@ -305,14 +306,24 @@ const TicketDetails = () => {
       </div>
 
       <div className="ticket-details-header">
-        <div>
-          <h2 className="ticket-details-title">Ticket Details</h2>
-          <p className="ticket-details-subtitle">
-            Full incident information and workflow actions
-          </p>
-        </div>
-      </div>
+  <div className="ticket-details-header-left">
+    
+    <button
+      className="ticket-details-back-btn"
+      onClick={() => navigate(-1)}
+    >
+      ←
+    </button>
 
+    <div>
+      <h2 className="ticket-details-title">Ticket Details</h2>
+      <p className="ticket-details-subtitle">
+        Full incident information and workflow actions
+      </p>
+    </div>
+
+  </div>
+</div>
       <div className="ticket-details-topbar">
         <div className="ticket-details-code-block">
           <span className="ticket-details-code-label">Ticket Code</span>
