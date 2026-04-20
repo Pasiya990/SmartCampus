@@ -19,7 +19,7 @@ export default function UserDashboard() {
       <p>Welcome, {name}</p>
       <p>{message}</p>
 
-      <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
+      <div style={{ display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" }}>
         
         <Link
           to="/tickets/new"
@@ -50,7 +50,6 @@ export default function UserDashboard() {
           View My Tickets
         </Link>
 
-        {/* ✅ NEW BUTTON */}
         <Link
           to="/my-bookings"
           style={{
@@ -65,6 +64,7 @@ export default function UserDashboard() {
           My Bookings
         </Link>
 
+        {/* ✅ NEW: Resource Catalogue */}
         <Link
           to="/resources"
           style={{
