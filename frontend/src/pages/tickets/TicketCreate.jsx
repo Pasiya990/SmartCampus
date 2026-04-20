@@ -1,52 +1,70 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTicket } from "../../api/ticketApi";
+import { resourceService } from "../../services/resourceService";
 import "./TicketCreate.css";
 
+const getEmailFromToken = () => {
+  const token = localStorage.getItem("token");
 
-  const getEmailFromToken = () => {
-    const token = localStorage.getItem("token");
-  
-    if (!token) return "";
-  
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.sub; // email
-    } catch (e) {
-      console.error("Invalid token", e);
-      return "";
-    }
-  };
-  
-  const TicketCreate = () => {
-    const loggedInEmail = getEmailFromToken();
+  if (!token) return "";
 
-    const [formData, setFormData] = useState({
-      title: "",
-      description: "",
-      category: "",
-      priority: "",
-      location: "",
-      resourceName: "",
-      preferredContact: "",
-      contactName: "",
-      reportedBy: loggedInEmail,
-    });
-    
-    useEffect(() => {
-      const email = getEmailFromToken();
-      setFormData((prev) => ({
-        ...prev,
-        reportedBy: email,
-      }));
-    }, []);
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.sub;
+  } catch (e) {
+    console.error("Invalid token", e);
+    return "";
+  }
+};
 
+const TicketCreate = () => {
+  const loggedInEmail = getEmailFromToken();
+
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    priority: "",
+    location: "",
+    resourceId: "",
+    resourceName: "",
+    preferredContact: "",
+    contactName: "",
+    reportedBy: loggedInEmail,
+  });
+
+  const [resources, setResources] = useState([]);
+  const [selectedBuilding, setSelectedBuilding] = useState("");
+  const [selectedFloor, setSelectedFloor] = useState("");
 
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const email = getEmailFromToken();
+    setFormData((prev) => ({
+      ...prev,
+      reportedBy: email,
+    }));
+  }, []);
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const response = await resourceService.getAvailable();
+        setResources(response.data);
+      } catch (error) {
+        console.error("Failed to fetch resources", error);
+      }
+    };
+
+    fetchResources();
+  }, []);
 
   const showSuccessMessage = (message) => {
     setSuccessMessage(message);
@@ -71,6 +89,56 @@ import "./TicketCreate.css";
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleBuildingChange = (e) => {
+    const building = e.target.value;
+    setSelectedBuilding(building);
+    setSelectedFloor("");
+
+    setFormData((prev) => ({
+      ...prev,
+      resourceId: "",
+      resourceName: "",
+      location: "",
+    }));
+  };
+
+  const handleFloorChange = (e) => {
+    const floor = e.target.value;
+    setSelectedFloor(floor);
+
+    setFormData((prev) => ({
+      ...prev,
+      resourceId: "",
+      resourceName: "",
+      location: "",
+    }));
+  };
+
+  const handleResourceChange = (e) => {
+    const selectedId = e.target.value;
+
+    const selectedResource = resources.find(
+      (resource) => String(resource.id) === String(selectedId)
+    );
+
+    if (!selectedResource) {
+      setFormData((prev) => ({
+        ...prev,
+        resourceId: "",
+        resourceName: "",
+        location: "",
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      resourceId: selectedResource.id,
+      resourceName: selectedResource.name,
+      location: selectedResource.location || "",
     }));
   };
 
@@ -104,6 +172,12 @@ import "./TicketCreate.css";
       return;
     }
 
+    if (!selectedBuilding || !selectedFloor || !formData.resourceId) {
+      showErrorMessage("Please select building, floor, and resource");
+      setLoading(false);
+      return;
+    }
+
     try {
       const createdTicket = await createTicket(formData, files);
 
@@ -117,12 +191,16 @@ import "./TicketCreate.css";
         category: "",
         priority: "",
         location: "",
+        resourceId: "",
         resourceName: "",
         preferredContact: "",
         contactName: "",
         reportedBy: loggedInEmail,
       });
 
+      setSelectedBuilding("");
+      setSelectedFloor("");
+      setResources(resources);
       setFiles([]);
       e.target.reset();
     } catch (error) {
@@ -138,6 +216,29 @@ import "./TicketCreate.css";
       setLoading(false);
     }
   };
+
+  const uniqueBuildings = [
+    ...new Set(
+      resources
+        .map((resource) => resource.building)
+        .filter((building) => building && building.trim() !== "")
+    ),
+  ];
+
+  const uniqueFloors = [
+    ...new Set(
+      resources
+        .filter((resource) => resource.building === selectedBuilding)
+        .map((resource) => resource.floor)
+        .filter((floor) => floor && String(floor).trim() !== "")
+    ),
+  ];
+
+  const filteredResources = resources.filter(
+    (resource) =>
+      resource.building === selectedBuilding &&
+      String(resource.floor) === String(selectedFloor)
+  );
 
   return (
     <div className="ticket-create-page">
@@ -160,6 +261,7 @@ import "./TicketCreate.css";
       <div className="ticket-create-header">
         <div className="ticket-create-header-left">
           <button
+            type="button"
             className="ticket-create-back-btn"
             onClick={() => navigate(-1)}
           >
@@ -247,32 +349,78 @@ import "./TicketCreate.css";
 
             <div className="ticket-create-field">
               <label>
+                Building <span className="ticket-create-required">*</span>
+              </label>
+              <select
+                value={selectedBuilding}
+                onChange={handleBuildingChange}
+                required
+              >
+                <option value="">Select Building</option>
+                {uniqueBuildings.map((building, index) => (
+                  <option key={index} value={building}>
+                    {building}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="ticket-create-field">
+              <label>
+                Floor <span className="ticket-create-required">*</span>
+              </label>
+              <select
+                value={selectedFloor}
+                onChange={handleFloorChange}
+                required
+                disabled={!selectedBuilding}
+              >
+                <option value="">Select Floor</option>
+                {uniqueFloors.map((floor, index) => (
+                  <option key={index} value={floor}>
+                    {floor}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="ticket-create-field">
+              <label>
+                Resource Name <span className="ticket-create-required">*</span>
+              </label>
+              <select
+                value={formData.resourceId}
+                onChange={handleResourceChange}
+                required
+                disabled={!selectedBuilding || !selectedFloor}
+              >
+                <option value="">Select Resource</option>
+                {filteredResources.map((resource) => (
+                  <option key={resource.id} value={resource.id}>
+                    {resource.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="ticket-create-field">
+              <label>
                 Location <span className="ticket-create-required">*</span>
               </label>
               <input
                 type="text"
                 name="location"
                 value={formData.location}
-                onChange={handleChange}
-                placeholder="Enter the issue location"
+                placeholder="Auto-filled from selected resource"
+                readOnly
                 required
               />
             </div>
 
             <div className="ticket-create-field">
-              <label>Resource Name</label>
-              <input
-                type="text"
-                name="resourceName"
-                value={formData.resourceName}
-                onChange={handleChange}
-                placeholder="Optional resource or asset name"
-              />
-            </div>
-
-            <div className="ticket-create-field">
               <label>
-                Preferred Contact <span className="ticket-create-required">*</span>
+                Preferred Contact{" "}
+                <span className="ticket-create-required">*</span>
               </label>
               <input
                 type="text"

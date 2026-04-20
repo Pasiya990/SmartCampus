@@ -276,8 +276,8 @@ const TicketDetails = () => {
   };
 
   if (loading) {
-    return <p className="ticket-details-loading">Loading ticket details...</p>;
-  }
+  return null; 
+}
 
   if (errorMessage) {
     return <p className="ticket-details-error">{errorMessage}</p>;

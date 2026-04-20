@@ -27,6 +27,8 @@ public class CreateIncidentTicketRequest {
 
     @NotBlank(message = "Location is required")
     private String location;
+    
+    private Long resourceId;
 
     private String resourceName;
 
