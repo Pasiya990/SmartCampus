@@ -1,25 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTicket } from "../../api/ticketApi";
 import "./TicketCreate.css";
 
-const TicketCreate = () => {
-  const loggedInEmail =
-    localStorage.getItem("email") ||
-    JSON.parse(localStorage.getItem("user"))?.email ||
-    "";
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    category: "",
-    priority: "",
-    location: "",
-    resourceName: "",
-    preferredContact: "",
-    contactName: "",
-    reportedBy: loggedInEmail,
-  });
+  const getEmailFromToken = () => {
+    const token = localStorage.getItem("token");
+  
+    if (!token) return "";
+  
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.sub; // email
+    } catch (e) {
+      console.error("Invalid token", e);
+      return "";
+    }
+  };
+  
+  const TicketCreate = () => {
+    const loggedInEmail = getEmailFromToken();
+
+    const [formData, setFormData] = useState({
+      title: "",
+      description: "",
+      category: "",
+      priority: "",
+      location: "",
+      resourceName: "",
+      preferredContact: "",
+      contactName: "",
+      reportedBy: loggedInEmail,
+    });
+    
+    useEffect(() => {
+      const email = getEmailFromToken();
+      setFormData((prev) => ({
+        ...prev,
+        reportedBy: email,
+      }));
+    }, []);
+
 
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
