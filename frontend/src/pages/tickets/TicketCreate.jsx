@@ -25,6 +25,24 @@ const TicketCreate = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setErrorMessage("");
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
+  const showErrorMessage = (message) => {
+    setErrorMessage(message);
+    setSuccessMessage("");
+
+    setTimeout(() => {
+      setErrorMessage("");
+    }, 4000);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -37,7 +55,7 @@ const TicketCreate = () => {
     const selectedFiles = Array.from(e.target.files);
 
     if (selectedFiles.length > 3) {
-      setErrorMessage("You can upload up to 3 images only.");
+      showErrorMessage("You can upload up to 3 images only.");
       return;
     }
 
@@ -50,22 +68,23 @@ const TicketCreate = () => {
     setLoading(true);
     setSuccessMessage("");
     setErrorMessage("");
-    // ✅ Preferred Contact Validation (Email OR Phone)
-   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-   const phoneRegex = /^(?:\+94|0)?[0-9]{9}$/;
 
-if (
-  !emailRegex.test(formData.preferredContact) &&
-  !phoneRegex.test(formData.preferredContact)
-) {
-  setErrorMessage("Enter a valid email or phone number");
-  setLoading(false);
-  return;
-} 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^(?:\+94|0)?[0-9]{9}$/;
+
+    if (
+      !emailRegex.test(formData.preferredContact) &&
+      !phoneRegex.test(formData.preferredContact)
+    ) {
+      showErrorMessage("Enter a valid email or phone number");
+      setLoading(false);
+      return;
+    }
+
     try {
       const createdTicket = await createTicket(formData, files);
 
-      setSuccessMessage(
+      showSuccessMessage(
         `Ticket created successfully. Ticket Code: ${createdTicket.ticketCode}`
       );
 
@@ -87,7 +106,7 @@ if (
       console.error("Create ticket error:", error);
       console.error("Response data:", error?.response?.data);
 
-      setErrorMessage(
+      showErrorMessage(
         error?.response?.data?.message ||
           error?.response?.data?.error ||
           "Failed to create ticket. Please try again."
@@ -99,6 +118,22 @@ if (
 
   return (
     <div className="ticket-create-page">
+      <div className="ticket-create-toast-container">
+        {successMessage && (
+          <div className="ticket-create-toast success">
+            <span>✅</span>
+            <p>{successMessage}</p>
+          </div>
+        )}
+
+        {errorMessage && (
+          <div className="ticket-create-toast error">
+            <span>⚠️</span>
+            <p>{errorMessage}</p>
+          </div>
+        )}
+      </div>
+
       <div className="ticket-create-header">
         <h2 className="ticket-create-title">Create Incident Ticket</h2>
         <p className="ticket-create-subtitle">
@@ -107,22 +142,12 @@ if (
       </div>
 
       <div className="ticket-create-card">
-        {successMessage && (
-          <div className="ticket-create-alert ticket-create-alert-success">
-            {successMessage}
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="ticket-create-alert ticket-create-alert-error">
-            {errorMessage}
-          </div>
-        )}
-
         <form className="ticket-create-form" onSubmit={handleSubmit}>
           <div className="ticket-create-grid">
             <div className="ticket-create-field ticket-create-field-wide">
-              <label>Title</label>
+              <label>
+  Title <span className="ticket-create-required">*</span>
+</label>
               <input
                 type="text"
                 name="title"
@@ -134,8 +159,9 @@ if (
             </div>
 
             <div className="ticket-create-field ticket-create-field-wide">
-              <label>Description</label>
-              <textarea
+<label>
+  Description <span className="ticket-create-required">*</span>
+</label>              <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
@@ -146,8 +172,9 @@ if (
             </div>
 
             <div className="ticket-create-field">
-              <label>Category</label>
-              <select
+<label>
+  Category <span className="ticket-create-required">*</span>
+</label>              <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
@@ -165,8 +192,9 @@ if (
             </div>
 
             <div className="ticket-create-field">
-              <label>Priority</label>
-              <select
+<label>
+  Priority <span className="ticket-create-required">*</span>
+</label>              <select
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
@@ -181,8 +209,9 @@ if (
             </div>
 
             <div className="ticket-create-field">
-              <label>Location</label>
-              <input
+<label>
+  Location <span className="ticket-create-required">*</span>
+</label>              <input
                 type="text"
                 name="location"
                 value={formData.location}
@@ -204,8 +233,9 @@ if (
             </div>
 
             <div className="ticket-create-field">
-              <label>Preferred Contact</label>
-              <input
+<label>
+  Preferred Contact <span className="ticket-create-required">*</span>
+</label>              <input
                 type="text"
                 name="preferredContact"
                 value={formData.preferredContact}

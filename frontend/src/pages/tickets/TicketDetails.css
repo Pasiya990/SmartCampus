@@ -525,6 +525,11 @@
   color: #5C5875;
   font-weight: 600;
 }
+.ticket-details-required {
+  color: #dc2626;
+  font-weight: 700;
+  margin-left: 4px;
+}
 
 /* ─── Loading / Error ─────────────────────────────────── */
 .ticket-details-loading,
@@ -535,8 +540,64 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
+
 .ticket-details-loading { color: #9C98B0; }
 .ticket-details-error   { color: #A32D2D; }
+
+.ticket-details-toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticket-details-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  min-width: 260px;
+  max-width: 320px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease;
+}
+
+.ticket-details-toast.success {
+  background: #ecfdf5;
+  color: #065f46;
+  border-left: 5px solid #10b981;
+}
+
+.ticket-details-toast.error {
+  background: #fef2f2;
+  color: #7f1d1d;
+  border-left: 5px solid #ef4444;
+}
+
+.ticket-details-toast span {
+  font-size: 18px;
+}
+
+.ticket-details-toast p {
+  margin: 0;
+  font-size: 14px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 
 /* ─── Responsive ──────────────────────────────────────── */
 @media (max-width: 600px) {
