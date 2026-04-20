@@ -44,11 +44,9 @@ export default function TechnicianView() {
 
   return (
     <TechnicianLayout activeMenu="mytickets">
-      {loading ? (
-        <p className="technician-loading">Loading assigned tickets...</p>
-      ) : errorMessage ? (
-        <p className="technician-error">{errorMessage}</p>
-      ) : (
+      {errorMessage ? (
+      <p className="technician-error">{errorMessage}</p>
+        ) : (
         <div className="technician-page">
           <div className="technician-header">
             <div>
