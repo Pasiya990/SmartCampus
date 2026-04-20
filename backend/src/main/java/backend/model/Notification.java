@@ -2,8 +2,9 @@ package backend.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -16,9 +17,12 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String message;
-    private String userEmail;
-    private boolean isRead;
+    private String email; // receiver
 
+    private String message;
+
+    private boolean readStatus;
+
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }

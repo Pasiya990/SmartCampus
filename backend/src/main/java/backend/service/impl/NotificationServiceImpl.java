@@ -6,7 +6,6 @@ import backend.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,10 +17,9 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void createNotification(String email, String message) {
         Notification notification = Notification.builder()
-                .userEmail(email)
+                .email(email)
                 .message(message)
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
+                .readStatus(false)
                 .build();
 
         notificationRepository.save(notification);
@@ -29,13 +27,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public List<Notification> getUserNotifications(String email) {
-        return notificationRepository.findByUserEmailOrderByCreatedAtDesc(email);
+        return notificationRepository.findByEmailOrderByCreatedAtDesc(email);
     }
 
     @Override
     public void markAsRead(Long id) {
-        Notification notification = notificationRepository.findById(id).orElseThrow();
-        notification.setRead(true);
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Notification not found"));
+
+        notification.setReadStatus(true);
         notificationRepository.save(notification);
     }
 }
