@@ -62,9 +62,12 @@ export const updateTicketStatus = async (ticketId, statusData) => {
   return response.data;
 };
 
-export const getTicketsByAssignedTechnician = async (technicianName) => {
-  const response = await API.get(
-    `/api/tickets/assigned-technician/${encodeURIComponent(technicianName)}`
-  );
+export const getTicketsByAssignedTechnician = async () => {
+  const response = await API.get("/api/tickets/assigned-technician");
+  return response.data;
+};
+
+export const getMyTickets = async () => {
+  const response = await API.get("/api/tickets/my-tickets");
   return response.data;
 };

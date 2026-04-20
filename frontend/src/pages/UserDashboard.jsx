@@ -65,6 +65,21 @@ export default function UserDashboard() {
           My Bookings
         </Link>
 
+        <Link
+          to="/resources"
+          style={{
+            backgroundColor: "#ffffff",
+            color: "#720e9e",
+            padding: "10px 16px",
+            borderRadius: "8px",
+            textDecoration: "none",
+            fontWeight: "600",
+            border: "1px solid #720e9e",
+          }}
+        >
+          View Resources
+        </Link>
+
       </div>
     </div>
   );

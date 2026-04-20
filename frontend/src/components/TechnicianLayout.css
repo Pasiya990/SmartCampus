@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  background: #ebe9f6;
+}
+
+.technician-layout-page {
+  min-height: 100vh;
+  display: flex;
+  gap: 26px;
+  padding: 28px;
+  background: linear-gradient(135deg, #ebe9f6 0%, #f3f1fb 100%);
+}
+
+.technician-layout-sidebar {
+  width: 210px;
+  min-width: 210px;
+  background: linear-gradient(180deg, #4b2b81 0%, #432978 55%, #3d236e 100%);
+  border-radius: 0 34px 34px 0;
+  padding: 22px 16px;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(65, 35, 117, 0.16);
+}
+
+.technician-sidebar-top {
+  position: relative;
+  z-index: 3;
+}
+
+.technician-sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding: 6px 4px 10px;
+}
+
+.technician-logo-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.technician-sidebar-logo h2 {
+  margin: 0 0 2px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.technician-sidebar-logo p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.technician-sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.technician-side-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+}
+
+.technician-side-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.technician-side-btn.active {
+  background: #ffffff;
+  color: #4b2b81;
+  font-weight: 600;
+  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.10);
+}
+
+.technician-sidebar-bottom-art {
+  position: absolute;
+  left: -18px;
+  bottom: -10px;
+  width: 220px;
+  height: 220px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.technician-sidebar-bottom-art::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 190px;
+  height: 190px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.16), transparent 60%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.02));
+  border-radius: 55% 45% 60% 40%;
+  transform: rotate(-18deg);
+}
+
+.technician-sidebar-bottom-art::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  bottom: 10px;
+  width: 150px;
+  height: 170px;
+  background:
+    radial-gradient(ellipse at 20% 90%, rgba(212, 244, 255, 0.95) 0 28%, transparent 30%),
+    radial-gradient(ellipse at 45% 78%, rgba(170, 211, 255, 0.85) 0 24%, transparent 26%),
+    radial-gradient(ellipse at 68% 65%, rgba(128, 158, 255, 0.70) 0 20%, transparent 22%),
+    radial-gradient(ellipse at 28% 58%, rgba(255, 183, 197, 0.45) 0 14%, transparent 16%),
+    radial-gradient(ellipse at 55% 38%, rgba(255, 255, 255, 0.16) 0 18%, transparent 20%);
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.10));
+  opacity: 0.95;
+}
+
+.technician-sidebar-leaf {
+  position: absolute;
+  bottom: 0;
+  border-radius: 100% 0 100% 0;
+  transform-origin: bottom left;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.technician-leaf-1 {
+  left: 8px;
+  bottom: 6px;
+  width: 95px;
+  height: 150px;
+  background: linear-gradient(180deg, #d9f0ff 0%, #93c5fd 100%);
+  transform: rotate(-18deg);
+}
+
+.technician-leaf-2 {
+  left: 52px;
+  bottom: 18px;
+  width: 78px;
+  height: 125px;
+  background: linear-gradient(180deg, #c7b8ff 0%, #8b5cf6 100%);
+  transform: rotate(8deg);
+}
+
+.technician-leaf-3 {
+  left: 88px;
+  bottom: 2px;
+  width: 62px;
+  height: 100px;
+  background: linear-gradient(180deg, #f9c7d2 0%, #f472b6 100%);
+  transform: rotate(22deg);
+}
+
+.technician-leaf-4 {
+  left: 28px;
+  bottom: -4px;
+  width: 120px;
+  height: 70px;
+  background: linear-gradient(180deg, #d8f7e4 0%, #86efac 100%);
+  border-radius: 60% 40% 60% 40%;
+  transform: rotate(-8deg);
+  opacity: 0.75;
+}
+
+.technician-layout-main {
+  flex: 1;
+  background: #fbfbfd;
+  border-radius: 30px;
+  padding: 28px 30px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.07);
+  min-width: 0;
+}
+
+@media (max-width: 850px) {
+  .technician-layout-page {
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .technician-layout-sidebar {
+    width: 100%;
+    min-width: 100%;
+    border-radius: 24px;
+  }
+
+  .technician-layout-main {
+    padding: 18px;
+    border-radius: 24px;
+  }
+}
