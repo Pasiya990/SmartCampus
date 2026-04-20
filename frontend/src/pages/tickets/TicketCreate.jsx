@@ -4,9 +4,9 @@ import { createTicket } from "../../api/ticketApi";
 import "./TicketCreate.css";
 
 const TicketCreate = () => {
-  const loggedInName =
-    localStorage.getItem("name") ||
-    JSON.parse(localStorage.getItem("user"))?.name ||
+  const loggedInEmail =
+    localStorage.getItem("email") ||
+    JSON.parse(localStorage.getItem("user"))?.email ||
     "";
 
   const [formData, setFormData] = useState({
@@ -18,7 +18,7 @@ const TicketCreate = () => {
     resourceName: "",
     preferredContact: "",
     contactName: "",
-    reportedBy: loggedInName,
+    reportedBy: loggedInEmail,
   });
 
   const [files, setFiles] = useState([]);
@@ -99,7 +99,7 @@ const TicketCreate = () => {
         resourceName: "",
         preferredContact: "",
         contactName: "",
-        reportedBy: loggedInName,
+        reportedBy: loggedInEmail,
       });
 
       setFiles([]);
@@ -137,32 +137,30 @@ const TicketCreate = () => {
       </div>
 
       <div className="ticket-create-header">
-  <div className="ticket-create-header-left">
+        <div className="ticket-create-header-left">
+          <button
+            className="ticket-create-back-btn"
+            onClick={() => navigate(-1)}
+          >
+            ←
+          </button>
 
-    <button
-      className="ticket-create-back-btn"
-      onClick={() => navigate(-1)}
-    >
-      ←
-    </button>
-
-    <div>
-      <h2 className="ticket-create-title">Create Incident Ticket</h2>
-      <p className="ticket-create-subtitle">
-        Submit a new issue with location, priority, and supporting details
-      </p>
-    </div>
-
-  </div>
-</div>
+          <div>
+            <h2 className="ticket-create-title">Create Incident Ticket</h2>
+            <p className="ticket-create-subtitle">
+              Submit a new issue with location, priority, and supporting details
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div className="ticket-create-card">
         <form className="ticket-create-form" onSubmit={handleSubmit}>
           <div className="ticket-create-grid">
             <div className="ticket-create-field ticket-create-field-wide">
               <label>
-  Title <span className="ticket-create-required">*</span>
-</label>
+                Title <span className="ticket-create-required">*</span>
+              </label>
               <input
                 type="text"
                 name="title"
@@ -174,9 +172,10 @@ const TicketCreate = () => {
             </div>
 
             <div className="ticket-create-field ticket-create-field-wide">
-<label>
-  Description <span className="ticket-create-required">*</span>
-</label>              <textarea
+              <label>
+                Description <span className="ticket-create-required">*</span>
+              </label>
+              <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
@@ -187,9 +186,10 @@ const TicketCreate = () => {
             </div>
 
             <div className="ticket-create-field">
-<label>
-  Category <span className="ticket-create-required">*</span>
-</label>              <select
+              <label>
+                Category <span className="ticket-create-required">*</span>
+              </label>
+              <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
@@ -207,9 +207,10 @@ const TicketCreate = () => {
             </div>
 
             <div className="ticket-create-field">
-<label>
-  Priority <span className="ticket-create-required">*</span>
-</label>              <select
+              <label>
+                Priority <span className="ticket-create-required">*</span>
+              </label>
+              <select
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
@@ -224,9 +225,10 @@ const TicketCreate = () => {
             </div>
 
             <div className="ticket-create-field">
-<label>
-  Location <span className="ticket-create-required">*</span>
-</label>              <input
+              <label>
+                Location <span className="ticket-create-required">*</span>
+              </label>
+              <input
                 type="text"
                 name="location"
                 value={formData.location}
@@ -248,9 +250,10 @@ const TicketCreate = () => {
             </div>
 
             <div className="ticket-create-field">
-<label>
-  Preferred Contact <span className="ticket-create-required">*</span>
-</label>              <input
+              <label>
+                Preferred Contact <span className="ticket-create-required">*</span>
+              </label>
+              <input
                 type="text"
                 name="preferredContact"
                 value={formData.preferredContact}
@@ -277,7 +280,7 @@ const TicketCreate = () => {
                 type="text"
                 name="reportedBy"
                 value={formData.reportedBy}
-                placeholder="Reporter name"
+                placeholder="Reporter email"
                 required
                 readOnly
               />
