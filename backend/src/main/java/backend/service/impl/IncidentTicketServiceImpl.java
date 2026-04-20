@@ -47,6 +47,8 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .category(request.getCategory())
                 .priority(request.getPriority())
                 .location(request.getLocation())
+                        .resourceId(request.getResourceId())
+
                 .resourceName(request.getResourceName())
                 .preferredContact(request.getPreferredContact())
                 .contactName(request.getContactName())
@@ -362,6 +364,8 @@ public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
                 .priority(ticket.getPriority())
                 .status(ticket.getStatus())
                 .location(ticket.getLocation())
+                            .resourceId(ticket.getResourceId())
+
                 .resourceName(ticket.getResourceName())
                 .preferredContact(ticket.getPreferredContact())
                 .contactName(ticket.getContactName())
@@ -424,6 +428,8 @@ return IncidentTicketResponse.builder()
         .priority(ticket.getPriority())
         .status(ticket.getStatus())
         .location(ticket.getLocation())
+                .resourceId(ticket.getResourceId())
+
         .resourceName(ticket.getResourceName())
         .preferredContact(ticket.getPreferredContact())
         .contactName(ticket.getContactName())

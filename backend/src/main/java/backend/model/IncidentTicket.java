@@ -48,6 +48,10 @@ public class IncidentTicket {
     @Column(nullable = false, length = 255)
     private String location;
 
+    @Column(name = "resource_id")
+    private Long resourceId;
+    
+
     @Column(name = "resource_name")
     private String resourceName;
 

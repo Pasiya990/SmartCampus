@@ -24,6 +24,7 @@ public class IncidentTicketResponse {
     private PriorityLevel priority;
     private TicketStatus status;
     private String location;
+    private Long resourceId;
     private String resourceName;
     private String preferredContact;
     private String contactName;
