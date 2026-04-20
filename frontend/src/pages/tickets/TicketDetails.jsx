@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   getTicketById,
   getCommentsByTicketId,
@@ -20,37 +20,38 @@ const TicketDetails = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [commentMessage, setCommentMessage] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [actionErrorMessage, setActionErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editMessage, setEditMessage] = useState("");
 
-  const [technicianName, setTechnicianName] = useState("");
+  const [technicianEmail, setTechnicianEmail] = useState("");
   const [statusValue, setStatusValue] = useState("");
   const [resolutionNotes, setResolutionNotes] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
 
-  // 🔥 format minutes to readable time
-const formatTime = (minutes) => {
-  if (minutes == null) return "N/A";
+  const formatTime = (minutes) => {
+    if (minutes == null) return "N/A";
 
-  const days = Math.floor(minutes / (60 * 24));
-  const hours = Math.floor((minutes % (60 * 24)) / 60);
-  const mins = minutes % 60;
+    const days = Math.floor(minutes / (60 * 24));
+    const hours = Math.floor((minutes % (60 * 24)) / 60);
+    const mins = minutes % 60;
 
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${mins}m`;
-  return `${mins} mins`;
-};
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${mins}m`;
+    return `${mins} mins`;
+  };
 
-const getTimerColor = (minutes) => {
-  if (minutes == null) return "#111c4e";
+  const getTimerColor = (minutes) => {
+    if (minutes == null) return "#111c4e";
+    if (minutes < 60) return "#16a34a";
+    if (minutes < 240) return "#f59e0b";
+    return "#dc2626";
+  };
 
-  if (minutes < 60) return "#16a34a";   // green
-  if (minutes < 240) return "#f59e0b";  // orange
-  return "#dc2626";                     // red
-};
-
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   let tokenPayload = {};
   if (token) {
@@ -80,6 +81,24 @@ const getTimerColor = (minutes) => {
 
   const [commentAuthorName] = useState(currentName);
   const [commentAuthorRole] = useState(currentRole);
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+    setActionErrorMessage("");
+
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 3000);
+  };
+
+  const showErrorMessage = (message) => {
+    setActionErrorMessage(message);
+    setSuccessMessage("");
+
+    setTimeout(() => {
+      setActionErrorMessage("");
+    }, 4000);
+  };
 
   const fetchTicketDetails = async () => {
     try {
@@ -115,7 +134,7 @@ const getTimerColor = (minutes) => {
     e.preventDefault();
 
     if (!commentMessage.trim()) {
-      alert("Please enter a comment message.");
+      showErrorMessage("Please enter a comment message.");
       return;
     }
 
@@ -130,9 +149,10 @@ const getTimerColor = (minutes) => {
 
       setCommentMessage("");
       await fetchComments();
+      showSuccessMessage("Comment added successfully.");
     } catch (error) {
       console.error("Add comment error:", error);
-      alert("Failed to add comment.");
+      showErrorMessage("Failed to add comment.");
     } finally {
       setCommentLoading(false);
     }
@@ -145,7 +165,7 @@ const getTimerColor = (minutes) => {
 
   const handleUpdateComment = async (commentId) => {
     if (!editMessage.trim()) {
-      alert("Please enter updated comment message.");
+      showErrorMessage("Please enter updated comment message.");
       return;
     }
 
@@ -159,9 +179,10 @@ const getTimerColor = (minutes) => {
       setEditingCommentId(null);
       setEditMessage("");
       await fetchComments();
+      showSuccessMessage("Comment updated successfully.");
     } catch (error) {
       console.error("Update comment error:", error);
-      alert("Failed to update comment.");
+      showErrorMessage("Failed to update comment.");
     }
   };
 
@@ -176,28 +197,50 @@ const getTimerColor = (minutes) => {
       });
 
       await fetchComments();
+      showSuccessMessage("Comment deleted successfully.");
     } catch (error) {
       console.error("Delete comment error:", error);
-      alert("Failed to delete comment.");
+      showErrorMessage("Failed to delete comment.");
     }
   };
 
   const handleAssignTechnician = async (e) => {
     e.preventDefault();
 
-    if (!technicianName.trim()) {
-      alert("Please enter technician email.");
+    if (!technicianEmail.trim()) {
+      showErrorMessage("Please enter technician email.");
       return;
     }
 
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(technicianEmail.trim())) {
+      showErrorMessage("Please enter a valid email address.");
+      return;
+    }
+
+    if (ticket.assignedTechnician) {
+      const confirmChange = window.confirm(
+        `This ticket is already assigned to ${ticket.assignedTechnician}. Do you want to reassign it?`
+      );
+
+      if (!confirmChange) {
+        return;
+      }
+    }
+
     try {
-      await assignTechnician(id, technicianName);
-      setTechnicianName("");
+      await assignTechnician(id, technicianEmail.trim());
+      setTechnicianEmail("");
       await fetchTicketDetails();
-      alert("Technician assigned successfully.");
+      showSuccessMessage("Technician assigned successfully.");
     } catch (error) {
       console.error("Assign technician error:", error);
-      alert("Failed to assign technician.");
+
+      showErrorMessage(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to assign technician. Make sure the email belongs to a technician."
+      );
     }
   };
 
@@ -205,7 +248,7 @@ const getTimerColor = (minutes) => {
     e.preventDefault();
 
     if (!statusValue) {
-      alert("Please select a status.");
+      showErrorMessage("Please select a status.");
       return;
     }
 
@@ -225,10 +268,10 @@ const getTimerColor = (minutes) => {
       setResolutionNotes("");
       setRejectionReason("");
       await fetchTicketDetails();
-      alert("Status updated successfully.");
+      showSuccessMessage("Status updated successfully.");
     } catch (error) {
       console.error("Update status error:", error);
-      alert("Failed to update status.");
+      showErrorMessage("Failed to update status.");
     }
   };
 
@@ -246,15 +289,41 @@ const getTimerColor = (minutes) => {
 
   return (
     <div className="ticket-details-page">
-      <div className="ticket-details-header">
-        <div>
-          <h2 className="ticket-details-title">Ticket Details</h2>
-          <p className="ticket-details-subtitle">
-            Full incident information and workflow actions
-          </p>
-        </div>
+      <div className="ticket-details-toast-container">
+        {successMessage && (
+          <div className="ticket-details-toast success">
+            <span>✅</span>
+            <p>{successMessage}</p>
+          </div>
+        )}
+
+        {actionErrorMessage && (
+          <div className="ticket-details-toast error">
+            <span>⚠️</span>
+            <p>{actionErrorMessage}</p>
+          </div>
+        )}
       </div>
 
+      <div className="ticket-details-header">
+  <div className="ticket-details-header-left">
+    
+    <button
+      className="ticket-details-back-btn"
+      onClick={() => navigate(-1)}
+    >
+      ←
+    </button>
+
+    <div>
+      <h2 className="ticket-details-title">Ticket Details</h2>
+      <p className="ticket-details-subtitle">
+        Full incident information and workflow actions
+      </p>
+    </div>
+
+  </div>
+</div>
       <div className="ticket-details-topbar">
         <div className="ticket-details-code-block">
           <span className="ticket-details-code-label">Ticket Code</span>
@@ -276,32 +345,32 @@ const getTimerColor = (minutes) => {
       </div>
 
       <div className="ticket-details-timer-row">
-  <div className="ticket-details-timer-card">
-    <span className="ticket-details-timer-title">Timer Status</span>
-    <span className="ticket-details-timer-value">
-      {ticket.timerLabel || "N/A"}
-    </span>
-  </div>
+        <div className="ticket-details-timer-card">
+          <span className="ticket-details-timer-title">Timer Status</span>
+          <span className="ticket-details-timer-value">
+            {ticket.timerLabel || "N/A"}
+          </span>
+        </div>
 
-  <div className="ticket-details-timer-card">
-    <span className="ticket-details-timer-title">Ticket Age</span>
-    <span
-  className="ticket-details-timer-value"
-  style={{ color: getTimerColor(ticket.ageInMinutes) }}
->
-  {formatTime(ticket.ageInMinutes)}
-</span>
-  </div>
+        <div className="ticket-details-timer-card">
+          <span className="ticket-details-timer-title">Ticket Age</span>
+          <span
+            className="ticket-details-timer-value"
+            style={{ color: getTimerColor(ticket.ageInMinutes) }}
+          >
+            {formatTime(ticket.ageInMinutes)}
+          </span>
+        </div>
 
-  <div className="ticket-details-timer-card">
-    <span className="ticket-details-timer-title">Resolved In</span>
-    <span className="ticket-details-timer-value">
-      {ticket.resolutionTimeInMinutes != null
-  ? formatTime(ticket.resolutionTimeInMinutes)
-  : "Not resolved yet"}
-    </span>
-  </div>
-</div>
+        <div className="ticket-details-timer-card">
+          <span className="ticket-details-timer-title">Resolved In</span>
+          <span className="ticket-details-timer-value">
+            {ticket.resolutionTimeInMinutes != null
+              ? formatTime(ticket.resolutionTimeInMinutes)
+              : "Not resolved yet"}
+          </span>
+        </div>
+      </div>
 
       <div className="ticket-details-card">
         <div className="ticket-details-card-header">
@@ -383,8 +452,6 @@ const getTimerColor = (minutes) => {
         </div>
       </div>
 
-      
-
       {ticket.attachments && ticket.attachments.length > 0 && (
         <div className="ticket-details-card">
           <div className="ticket-details-card-header">
@@ -414,13 +481,12 @@ const getTimerColor = (minutes) => {
 
           <form className="ticket-details-form-inline" onSubmit={handleAssignTechnician}>
             <input
-              type="text"
-              value={technicianName}
-              onChange={(e) => setTechnicianName(e.target.value)}
+              type="email"
+              value={technicianEmail}
+              onChange={(e) => setTechnicianEmail(e.target.value)}
               className="ticket-details-select"
               placeholder="Enter technician email"
             />
-
             <button type="submit" className="ticket-details-primary-btn">
               Assign
             </button>
@@ -452,28 +518,36 @@ const getTimerColor = (minutes) => {
             </select>
 
             {statusValue === "RESOLVED" && (
-              <div className="ticket-details-form-group">
-                <label>Resolution Notes</label>
-                <textarea
-                  value={resolutionNotes}
-                  onChange={(e) => setResolutionNotes(e.target.value)}
-                  rows="4"
-                  className="ticket-details-textarea"
-                />
-              </div>
-            )}
+  <div className="ticket-details-form-group">
+    <label>
+      Resolution Notes <span className="ticket-details-required">*</span>
+    </label>
+    <textarea
+      value={resolutionNotes}
+      onChange={(e) => setResolutionNotes(e.target.value)}
+      rows="4"
+      className="ticket-details-textarea"
+      placeholder="Enter resolution notes"
+      required
+    />
+  </div>
+)}
 
-            {statusValue === "REJECTED" && (
-              <div className="ticket-details-form-group">
-                <label>Rejection Reason</label>
-                <textarea
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  rows="4"
-                  className="ticket-details-textarea"
-                />
-              </div>
-            )}
+{statusValue === "REJECTED" && (
+  <div className="ticket-details-form-group">
+    <label>
+      Rejection Reason <span className="ticket-details-required">*</span>
+    </label>
+    <textarea
+      value={rejectionReason}
+      onChange={(e) => setRejectionReason(e.target.value)}
+      rows="4"
+      className="ticket-details-textarea"
+      placeholder="Enter rejection reason"
+      required
+    />
+  </div>
+)}
 
             <button type="submit" className="ticket-details-primary-btn">
               Update Status
@@ -567,8 +641,9 @@ const getTimerColor = (minutes) => {
           </div>
 
           <div className="ticket-details-form-group">
-            <label>Message</label>
-            <textarea
+<label>
+  Message <span className="ticket-details-required">*</span>
+</label>            <textarea
               value={commentMessage}
               onChange={(e) => setCommentMessage(e.target.value)}
               rows="4"

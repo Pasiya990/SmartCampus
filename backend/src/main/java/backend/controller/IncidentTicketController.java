@@ -18,6 +18,8 @@ import backend.dto.AddTicketCommentRequest;
 import backend.dto.TicketCommentResponse;
 import backend.dto.DeleteTicketCommentRequest;
 import backend.dto.UpdateTicketCommentRequest;
+import org.springframework.security.core.Authentication;
+
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -127,14 +129,22 @@ public ResponseEntity<String> deleteComment(
     return ResponseEntity.ok("Comment deleted successfully");
 }
 
+
+
 @GetMapping("/assigned-technician")
 public ResponseEntity<List<IncidentTicketResponse>> getTicketsByAssignedTechnician(
-        org.springframework.security.core.Authentication authentication) {
+        Authentication authentication) {
 
-    String email = authentication.getName(); // 🔥 from JWT
+    String email = authentication.getName();
 
     return ResponseEntity.ok(
             incidentTicketService.getTicketsByAssignedTechnician(email)
     );
 }
+
+ @GetMapping("/my-tickets")
+    public ResponseEntity<List<IncidentTicketResponse>> getMyTickets(Authentication authentication) {
+        String userEmail = authentication.getName();
+        return ResponseEntity.ok(incidentTicketService.getTicketsByUser(userEmail));
+    }
 }

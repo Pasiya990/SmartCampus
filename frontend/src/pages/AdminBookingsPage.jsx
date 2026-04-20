@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { getAllBookings, approveBooking, rejectBooking } from '../api/bookingApi';
 import StatusBadge from '../components/StatusBadge';
 import './Bookings.css';
+import AdminLayout from "../components/AdminLayout";
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState([]);
@@ -63,7 +64,8 @@ export default function AdminBookingsPage() {
   };
 
   return (
-    <div className="bk-page">
+    <AdminLayout activeMenu="bookings">
+      <div className="bk-page">
       <div className="bk-header">
         <div>
           <h2 className="bk-title">All Bookings</h2>
@@ -216,5 +218,6 @@ export default function AdminBookingsPage() {
         </div>
       )}
     </div>
+  </AdminLayout>
   );
 }
