@@ -1,23 +1,25 @@
 package backend.service.impl;
 
 import backend.dto.*;
+import backend.enums.Role;
 import backend.exception.ResourceNotFoundException;
 import backend.model.IncidentTicket;
+import backend.model.Resource;
 import backend.model.TicketAttachment;
+import backend.model.TicketComment;
 import backend.model.TicketStatus;
+import backend.model.User;
 import backend.repository.IncidentTicketRepository;
 import backend.repository.TicketAttachmentRepository;
+import backend.repository.TicketCommentRepository;
+import backend.repository.UserRepository;
 import backend.service.CloudinaryService;
 import backend.service.IncidentTicketService;
+import backend.service.ResourceService;
+import backend.service.TicketEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import backend.model.TicketComment;
-import backend.repository.TicketCommentRepository;
-import backend.enums.Role;
-import backend.model.User;
-import backend.repository.UserRepository;
-import backend.service.TicketEmailService;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -34,6 +36,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     private final TicketCommentRepository ticketCommentRepository;
     private final UserRepository userRepository;
     private final TicketEmailService ticketEmailService;
+    private final ResourceService resourceService;
 
     @Override
     public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
@@ -47,8 +50,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .category(request.getCategory())
                 .priority(request.getPriority())
                 .location(request.getLocation())
-                        .resourceId(request.getResourceId())
-
+                .resourceId(request.getResourceId())
                 .resourceName(request.getResourceName())
                 .preferredContact(request.getPreferredContact())
                 .contactName(request.getContactName())
@@ -61,10 +63,9 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
             for (MultipartFile file : files) {
                 if (file != null && !file.isEmpty()) {
                     saveAttachment(savedTicket, file);
+                } else {
+                    System.out.println("Empty file skipped");
                 }
-                else {
-            System.out.println("Empty file skipped");
-        }
             }
         }
 
@@ -74,7 +75,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         return mapToResponse(finalTicket);
     }
 
-        @Override
+    @Override
     public List<IncidentTicketResponse> getAllTickets() {
         return incidentTicketRepository.findAll()
                 .stream()
@@ -90,40 +91,45 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         return mapToResponse(ticket);
     }
 
-   @Override
-public IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail) {
-    IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
-            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+    @Override
+    public IncidentTicketResponse assignTechnician(Long ticketId, String technicianEmail) {
+        IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
-    User technician = userRepository.findByEmail(technicianEmail)
-            .orElseThrow(() -> new ResourceNotFoundException("No user found with email: " + technicianEmail));
+        User technician = userRepository.findByEmail(technicianEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found with email: " + technicianEmail));
 
-    if (technician.getRole() != Role.TECHNICIAN) {
-        throw new IllegalArgumentException("Selected email does not belong to a technician");
+        if (technician.getRole() != Role.TECHNICIAN) {
+            throw new IllegalArgumentException("Selected email does not belong to a technician");
+        }
+
+        ticket.setAssignedTechnician(technicianEmail);
+
+        if (ticket.getStatus() == null || ticket.getStatus() == TicketStatus.OPEN) {
+            ticket.setStatus(TicketStatus.IN_PROGRESS);
+
+            if (ticket.getResourceId() != null) {
+                resourceService.updateStatus(ticket.getResourceId(), Resource.ResourceStatus.OUT_OF_SERVICE);
+            }
+        }
+
+        IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+        try {
+            ticketEmailService.sendTicketAssignedEmail(
+                    technicianEmail,
+                    updated.getTicketCode(),
+                    updated.getTitle(),
+                    updated.getPriority().name(),
+                    updated.getLocation()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return mapToResponse(updated);
     }
 
-    ticket.setAssignedTechnician(technicianEmail);
-
-    if (ticket.getStatus() == null || ticket.getStatus() == TicketStatus.OPEN) {
-        ticket.setStatus(TicketStatus.IN_PROGRESS);
-    }
-
-    IncidentTicket updated = incidentTicketRepository.save(ticket);
-
-    try {
-        ticketEmailService.sendTicketAssignedEmail(
-                technicianEmail,
-                updated.getTicketCode(),
-                updated.getTitle(),
-                updated.getPriority().name(),
-                updated.getLocation()
-        );
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-
-    return mapToResponse(updated);
-}
     @Override
     public IncidentTicketResponse updateTicketStatus(Long ticketId, UpdateTicketStatusRequest request) {
         IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
@@ -145,6 +151,39 @@ public IncidentTicketResponse assignTechnician(Long ticketId, String technicianE
         }
 
         IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+        if (updated.getResourceId() != null) {
+            Long resourceId = updated.getResourceId();
+
+            if (newStatus == TicketStatus.IN_PROGRESS) {
+                resourceService.updateStatus(resourceId, Resource.ResourceStatus.OUT_OF_SERVICE);
+            }
+
+            if (newStatus == TicketStatus.RESOLVED || newStatus == TicketStatus.CLOSED) {
+                boolean hasOtherActiveTickets =
+                        incidentTicketRepository.existsByResourceIdAndStatusIn(
+                                resourceId,
+                                List.of(TicketStatus.OPEN, TicketStatus.IN_PROGRESS)
+                        );
+
+                if (!hasOtherActiveTickets) {
+                    resourceService.updateStatus(resourceId, Resource.ResourceStatus.ACTIVE);
+                }
+            }
+
+            if (newStatus == TicketStatus.REJECTED) {
+                boolean hasOtherActiveTickets =
+                        incidentTicketRepository.existsByResourceIdAndStatusIn(
+                                resourceId,
+                                List.of(TicketStatus.OPEN, TicketStatus.IN_PROGRESS)
+                        );
+
+                if (!hasOtherActiveTickets) {
+                    resourceService.updateStatus(resourceId, Resource.ResourceStatus.ACTIVE);
+                }
+            }
+        }
+
         return mapToResponse(updated);
     }
 
@@ -168,90 +207,91 @@ public IncidentTicketResponse assignTechnician(Long ticketId, String technicianE
     }
 
     @Override
-public TicketCommentResponse addComment(Long ticketId, AddTicketCommentRequest request) {
-    IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
-            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
+    public TicketCommentResponse addComment(Long ticketId, AddTicketCommentRequest request) {
+        IncidentTicket ticket = incidentTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
-    TicketComment comment = TicketComment.builder()
-            .authorName(request.getAuthorName())
-            .authorRole(request.getAuthorRole())
-            .message(request.getMessage())
-            .ticket(ticket)
-            .build();
+        TicketComment comment = TicketComment.builder()
+                .authorName(request.getAuthorName())
+                .authorRole(request.getAuthorRole())
+                .message(request.getMessage())
+                .ticket(ticket)
+                .build();
 
-    TicketComment savedComment = ticketCommentRepository.save(comment);
+        TicketComment savedComment = ticketCommentRepository.save(comment);
 
-    ticket.getComments().add(savedComment);
+        ticket.getComments().add(savedComment);
 
-    return mapToCommentResponse(savedComment);
-}
-
-@Override
-public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
-    incidentTicketRepository.findById(ticketId)
-            .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
-
-    return ticketCommentRepository.findByTicketIdOrderByCreatedAtAsc(ticketId)
-            .stream()
-            .map(this::mapToCommentResponse)
-            .toList();
-}
-
-@Override
-public List<IncidentTicketResponse> getTicketsByAssignedTechnician(String technicianEmail) {
-    return incidentTicketRepository.findByAssignedTechnicianIgnoreCase(technicianEmail)
-            .stream()
-            .map(this::mapToListResponse)
-            .toList();
-}
-
-@Override
-public TicketCommentResponse updateComment(Long commentId, UpdateTicketCommentRequest request) {
-
-    TicketComment comment = ticketCommentRepository.findById(commentId)
-            .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
-
-    boolean isOwner =
-            comment.getAuthorName().equalsIgnoreCase(request.getEditorName()) &&
-            comment.getAuthorRole().equalsIgnoreCase(request.getEditorRole());
-
-    if (!isOwner) {
-        throw new IllegalArgumentException("Only the comment owner can edit this comment");
+        return mapToCommentResponse(savedComment);
     }
 
-    comment.setMessage(request.getMessage());
+    @Override
+    public List<TicketCommentResponse> getCommentsByTicketId(Long ticketId) {
+        incidentTicketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found with id: " + ticketId));
 
-    TicketComment updated = ticketCommentRepository.save(comment);
-
-    return mapToCommentResponse(updated);
-}
-
-@Override
-public List<IncidentTicketResponse> getTicketsByUser(String email) {
-    return incidentTicketRepository.findByReportedBy(email)
-            .stream()
-            .map(this::mapToListResponse)
-            .toList();
-}
-
-@Override
-public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
-
-    TicketComment comment = ticketCommentRepository.findById(commentId)
-            .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
-
-    boolean isOwner =
-            comment.getAuthorName().equalsIgnoreCase(request.getActorName()) &&
-            comment.getAuthorRole().equalsIgnoreCase(request.getActorRole());
-
-    boolean isAdmin = "ADMIN".equalsIgnoreCase(request.getActorRole());
-
-    if (!isOwner && !isAdmin) {
-        throw new IllegalArgumentException("Only the comment owner or admin can delete this comment");
+        return ticketCommentRepository.findByTicketIdOrderByCreatedAtAsc(ticketId)
+                .stream()
+                .map(this::mapToCommentResponse)
+                .toList();
     }
 
-    ticketCommentRepository.delete(comment);
-}
+    @Override
+    public List<IncidentTicketResponse> getTicketsByAssignedTechnician(String technicianEmail) {
+        return incidentTicketRepository.findByAssignedTechnicianIgnoreCase(technicianEmail)
+                .stream()
+                .map(this::mapToListResponse)
+                .toList();
+    }
+
+    @Override
+    public TicketCommentResponse updateComment(Long commentId, UpdateTicketCommentRequest request) {
+
+        TicketComment comment = ticketCommentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
+
+        boolean isOwner =
+                comment.getAuthorName().equalsIgnoreCase(request.getEditorName()) &&
+                comment.getAuthorRole().equalsIgnoreCase(request.getEditorRole());
+
+        if (!isOwner) {
+            throw new IllegalArgumentException("Only the comment owner can edit this comment");
+        }
+
+        comment.setMessage(request.getMessage());
+
+        TicketComment updated = ticketCommentRepository.save(comment);
+
+        return mapToCommentResponse(updated);
+    }
+
+    @Override
+    public List<IncidentTicketResponse> getTicketsByUser(String email) {
+        return incidentTicketRepository.findByReportedBy(email)
+                .stream()
+                .map(this::mapToListResponse)
+                .toList();
+    }
+
+    @Override
+    public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
+
+        TicketComment comment = ticketCommentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
+
+        boolean isOwner =
+                comment.getAuthorName().equalsIgnoreCase(request.getActorName()) &&
+                comment.getAuthorRole().equalsIgnoreCase(request.getActorRole());
+
+        boolean isAdmin = "ADMIN".equalsIgnoreCase(request.getActorRole());
+
+        if (!isOwner && !isAdmin) {
+            throw new IllegalArgumentException("Only the comment owner or admin can delete this comment");
+        }
+
+        ticketCommentRepository.delete(comment);
+    }
+
     private void validateAttachments(MultipartFile[] files) {
         if (files == null) {
             return;
@@ -275,39 +315,39 @@ public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
     }
 
     private TicketCommentResponse mapToCommentResponse(TicketComment comment) {
-    return TicketCommentResponse.builder()
-            .id(comment.getId())
-            .authorName(comment.getAuthorName())
-            .authorRole(comment.getAuthorRole())
-            .message(comment.getMessage())
-            .createdAt(comment.getCreatedAt())
-            .build();
-}
+        return TicketCommentResponse.builder()
+                .id(comment.getId())
+                .authorName(comment.getAuthorName())
+                .authorRole(comment.getAuthorRole())
+                .message(comment.getMessage())
+                .createdAt(comment.getCreatedAt())
+                .build();
+    }
 
     private void saveAttachment(IncidentTicket ticket, MultipartFile file) {
-    try {
-        System.out.println("Uploading to Cloudinary: " + file.getOriginalFilename());
+        try {
+            System.out.println("Uploading to Cloudinary: " + file.getOriginalFilename());
 
-        Map uploadResult = cloudinaryService.uploadFile(file);
+            Map uploadResult = cloudinaryService.uploadFile(file);
 
-        System.out.println("Upload success: " + uploadResult.get("secure_url"));
+            System.out.println("Upload success: " + uploadResult.get("secure_url"));
 
-        TicketAttachment attachment = TicketAttachment.builder()
-                .fileName(file.getOriginalFilename())
-                .fileUrl((String) uploadResult.get("secure_url"))
-                .publicId((String) uploadResult.get("public_id"))
-                .ticket(ticket)
-                .build();
+            TicketAttachment attachment = TicketAttachment.builder()
+                    .fileName(file.getOriginalFilename())
+                    .fileUrl((String) uploadResult.get("secure_url"))
+                    .publicId((String) uploadResult.get("public_id"))
+                    .ticket(ticket)
+                    .build();
 
-        TicketAttachment savedAttachment = ticketAttachmentRepository.save(attachment);
-        ticket.getAttachments().add(savedAttachment);
-        System.out.println("Saved attachment to DB");
+            TicketAttachment savedAttachment = ticketAttachmentRepository.save(attachment);
+            ticket.getAttachments().add(savedAttachment);
+            System.out.println("Saved attachment to DB");
 
-    } catch (IOException e) {
-        e.printStackTrace();
-        throw new RuntimeException("Failed to upload attachment", e);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to upload attachment", e);
+        }
     }
-}
 
     private void validateStatusTransition(TicketStatus currentStatus, TicketStatus newStatus, UpdateTicketStatusRequest request) {
         if (currentStatus == TicketStatus.OPEN && !(newStatus == TicketStatus.IN_PROGRESS || newStatus == TicketStatus.REJECTED)) {
@@ -342,18 +382,19 @@ public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
     }
 
     private String generateTicketCode() {
-    int nextNumber = 1;
+        int nextNumber = 1;
 
-    var lastTicket = incidentTicketRepository.findTopByOrderByIdDesc();
+        var lastTicket = incidentTicketRepository.findTopByOrderByIdDesc();
 
-    if (lastTicket.isPresent() && lastTicket.get().getTicketCode() != null) {
-        String lastCode = lastTicket.get().getTicketCode(); // example: TKT-0008
-        int lastNumber = Integer.parseInt(lastCode.substring(4));
-        nextNumber = lastNumber + 1;
+        if (lastTicket.isPresent() && lastTicket.get().getTicketCode() != null) {
+            String lastCode = lastTicket.get().getTicketCode();
+            int lastNumber = Integer.parseInt(lastCode.substring(4));
+            nextNumber = lastNumber + 1;
+        }
+
+        return String.format("TKT-%04d", nextNumber);
     }
 
-    return String.format("TKT-%04d", nextNumber);
-}
     private IncidentTicketResponse mapToListResponse(IncidentTicket ticket) {
         return IncidentTicketResponse.builder()
                 .id(ticket.getId())
@@ -364,8 +405,7 @@ public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
                 .priority(ticket.getPriority())
                 .status(ticket.getStatus())
                 .location(ticket.getLocation())
-                            .resourceId(ticket.getResourceId())
-
+                .resourceId(ticket.getResourceId())
                 .resourceName(ticket.getResourceName())
                 .preferredContact(ticket.getPreferredContact())
                 .contactName(ticket.getContactName())
@@ -391,61 +431,58 @@ public void deleteComment(Long commentId, DeleteTicketCommentRequest request) {
                                         .build())
                                 .toList();
 
-long ageInMinutes = 0;
-Long resolutionTimeInMinutes = null;
-String timerLabel = "Pending";
+        long ageInMinutes = 0;
+        Long resolutionTimeInMinutes = null;
+        String timerLabel = "Pending";
 
-if (ticket.getCreatedAt() != null) {
-    ageInMinutes = java.time.Duration
-            .between(ticket.getCreatedAt(), java.time.LocalDateTime.now())
-            .toMinutes();
-}
+        if (ticket.getCreatedAt() != null) {
+            ageInMinutes = java.time.Duration
+                    .between(ticket.getCreatedAt(), java.time.LocalDateTime.now())
+                    .toMinutes();
+        }
 
-if ((ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED)
-        && ticket.getUpdatedAt() != null) {
-    resolutionTimeInMinutes = java.time.Duration
-            .between(ticket.getCreatedAt(), ticket.getUpdatedAt())
-            .toMinutes();
-}
+        if ((ticket.getStatus() == TicketStatus.RESOLVED || ticket.getStatus() == TicketStatus.CLOSED)
+                && ticket.getUpdatedAt() != null) {
+            resolutionTimeInMinutes = java.time.Duration
+                    .between(ticket.getCreatedAt(), ticket.getUpdatedAt())
+                    .toMinutes();
+        }
 
-if (ticket.getStatus() == TicketStatus.OPEN) {
-    timerLabel = "Pending";
-} else if (ticket.getStatus() == TicketStatus.IN_PROGRESS) {
-    timerLabel = "Being handled";
-} else if (ticket.getStatus() == TicketStatus.RESOLVED) {
-    timerLabel = "Resolved";
-} else if (ticket.getStatus() == TicketStatus.CLOSED) {
-    timerLabel = "Closed";
-} else if (ticket.getStatus() == TicketStatus.REJECTED) {
-    timerLabel = "Rejected";
-}
-return IncidentTicketResponse.builder()
-        .id(ticket.getId())
-        .ticketCode(ticket.getTicketCode())
-        .title(ticket.getTitle())
-        .description(ticket.getDescription())
-        .category(ticket.getCategory())
-        .priority(ticket.getPriority())
-        .status(ticket.getStatus())
-        .location(ticket.getLocation())
+        if (ticket.getStatus() == TicketStatus.OPEN) {
+            timerLabel = "Pending";
+        } else if (ticket.getStatus() == TicketStatus.IN_PROGRESS) {
+            timerLabel = "Being handled";
+        } else if (ticket.getStatus() == TicketStatus.RESOLVED) {
+            timerLabel = "Resolved";
+        } else if (ticket.getStatus() == TicketStatus.CLOSED) {
+            timerLabel = "Closed";
+        } else if (ticket.getStatus() == TicketStatus.REJECTED) {
+            timerLabel = "Rejected";
+        }
+
+        return IncidentTicketResponse.builder()
+                .id(ticket.getId())
+                .ticketCode(ticket.getTicketCode())
+                .title(ticket.getTitle())
+                .description(ticket.getDescription())
+                .category(ticket.getCategory())
+                .priority(ticket.getPriority())
+                .status(ticket.getStatus())
+                .location(ticket.getLocation())
                 .resourceId(ticket.getResourceId())
-
-        .resourceName(ticket.getResourceName())
-        .preferredContact(ticket.getPreferredContact())
-        .contactName(ticket.getContactName())
-        .reportedBy(ticket.getReportedBy())
-        .assignedTechnician(ticket.getAssignedTechnician())
-        .rejectionReason(ticket.getRejectionReason())
-        .resolutionNotes(ticket.getResolutionNotes())
-        .createdAt(ticket.getCreatedAt())
-        .updatedAt(ticket.getUpdatedAt())
-        .attachments(attachmentResponses)
-
-        // ✅ NEW FIELDS
-        .ageInMinutes(ageInMinutes)
-        .resolutionTimeInMinutes(resolutionTimeInMinutes)
-        .timerLabel(timerLabel)
-
-        .build();
+                .resourceName(ticket.getResourceName())
+                .preferredContact(ticket.getPreferredContact())
+                .contactName(ticket.getContactName())
+                .reportedBy(ticket.getReportedBy())
+                .assignedTechnician(ticket.getAssignedTechnician())
+                .rejectionReason(ticket.getRejectionReason())
+                .resolutionNotes(ticket.getResolutionNotes())
+                .createdAt(ticket.getCreatedAt())
+                .updatedAt(ticket.getUpdatedAt())
+                .attachments(attachmentResponses)
+                .ageInMinutes(ageInMinutes)
+                .resolutionTimeInMinutes(resolutionTimeInMinutes)
+                .timerLabel(timerLabel)
+                .build();
     }
 }
