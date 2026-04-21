@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../services/api";
+import NotificationBell from "../components/NotificationBell";
 
 export default function UserDashboard() {
   const [message, setMessage] = useState("");
@@ -14,6 +15,13 @@ export default function UserDashboard() {
   }, []);
 
   return (
+
+    <div>
+
+    {/* 🔔 TOP RIGHT */}
+    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <NotificationBell />
+      </div>
     <div style={{ padding: "40px" }}>
       <h2>User Dashboard</h2>
       <p>Welcome, {name}</p>
@@ -82,5 +90,6 @@ export default function UserDashboard() {
 
       </div>
     </div>
+  </div>
   );
 }
