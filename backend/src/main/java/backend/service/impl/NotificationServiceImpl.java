@@ -38,4 +38,24 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setReadStatus(true);
         notificationRepository.save(notification);
     }
+
+    @Override
+    public void deleteNotification(Long id) {
+        notificationRepository.deleteById(id);
+    }
+
+    @Override
+    public void markAllAsRead(String email) {
+        List<Notification> list = notificationRepository.findByEmailOrderByCreatedAtDesc(email);
+    
+        list.forEach(n -> n.setReadStatus(true));
+        notificationRepository.saveAll(list);
+    }
+    
+    @Override
+    public void clearAllNotifications(String email) {
+        List<Notification> list = notificationRepository.findByEmailOrderByCreatedAtDesc(email);
+        notificationRepository.deleteAll(list);
+    }
+
 }

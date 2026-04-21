@@ -1,79 +1,133 @@
-import { useEffect, useState } from "react";
-import { getNotifications, markAsRead } from "../api/notificationApi";
+import { useEffect, useState, useRef } from "react";
+import {
+  getNotifications,
+  markAsRead,
+  deleteNotification,
+  markAllAsRead,
+  clearAllNotifications,
+} from "../api/notificationApi";
+import "./NotificationBell.css";
+import { Trash2 } from "lucide-react";
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef();
 
-  // 🔥 get email from token
   const token = localStorage.getItem("token");
 
   let email = "";
   if (token) {
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
-      email = payload.sub; // or payload.email depending on your backend
+      email = payload.sub;
     } catch {}
   }
 
   const loadNotifications = async () => {
     if (!email) return;
-
-    const data = await getNotifications(email);
-    setNotifications(data);
+    try {
+      const data = await getNotifications(email);
+      setNotifications(data);
+    } catch (err) {
+      console.error("Failed to load notifications", err);
+    }
   };
 
   useEffect(() => {
     loadNotifications();
-
-    // auto refresh every 10s
     const interval = setInterval(loadNotifications, 10000);
     return () => clearInterval(interval);
   }, [email]);
 
-  const unreadCount = notifications.filter(n => !n.readStatus).length;
+  // ✅ Close when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const unreadCount = notifications.filter((n) => !n.readStatus).length;
 
   const handleMarkAsRead = async (id) => {
     await markAsRead(id);
     loadNotifications();
   };
 
+  const handleDelete = async (e, id) => {
+    e.stopPropagation(); // 🔥 prevent markAsRead
+    await deleteNotification(id);
+    loadNotifications();
+  };
+
+  const handleMarkAll = async () => {
+    await markAllAsRead(email);
+    loadNotifications();
+  };
+
+  const handleClearAll = async () => {
+    await clearAllNotifications(email);
+    loadNotifications();
+  };
+
+  const formatTime = (time) => {
+    return new Date(time).toLocaleString();
+  };
+
   return (
-    <div style={{ position: "relative" }}>
+    <div className="notification-container" ref={dropdownRef}>
       
       {/* 🔔 Bell */}
-      <button onClick={() => setOpen(!open)}>
-        🔔 {unreadCount > 0 && `(${unreadCount})`}
-      </button>
+      <div className="notification-icon" onClick={() => setOpen(!open)}>
+        🔔
+        {unreadCount > 0 && (
+          <span className="notification-badge">{unreadCount}</span>
+        )}
+      </div>
 
       {/* 📩 Dropdown */}
       {open && (
-        <div style={{
-          position: "absolute",
-          right: 0,
-          top: "40px",
-          width: "300px",
-          background: "white",
-          border: "1px solid #ddd",
-          padding: "10px",
-          zIndex: 1000
-        }}>
+        <div className="notification-dropdown">
+          
+          <div className="notification-header">
+            <h4 className="notification-title">Notifications</h4>
+
+            {notifications.length > 0 && (
+              <div className="notification-actions">
+                <button onClick={handleMarkAll}>Mark all</button>
+                <button onClick={handleClearAll}>Clear all</button>
+              </div>
+            )}
+          </div>
+
           {notifications.length === 0 ? (
-            <p>No notifications</p>
+            <p className="notification-empty">No notifications</p>
           ) : (
             notifications.map((n) => (
               <div
                 key={n.id}
-                style={{
-                  padding: "8px",
-                  marginBottom: "5px",
-                  background: n.readStatus ? "#f5f5f5" : "#e6f7ff",
-                  cursor: "pointer"
-                }}
+                className={`notification-item ${
+                  !n.readStatus ? "unread" : ""
+                }`}
                 onClick={() => handleMarkAsRead(n.id)}
               >
-                <p style={{ margin: 0 }}>{n.message}</p>
-                <small>{n.createdAt}</small>
+                <div className="notification-content">
+                  <p className="notification-message">{n.message}</p>
+                  <small className="notification-time">
+                    {formatTime(n.createdAt)}
+                  </small>
+                </div>
+
+                <button
+                  className="notification-delete-btn"
+                  onClick={(e) => handleDelete(e, n.id)}
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             ))
           )}
