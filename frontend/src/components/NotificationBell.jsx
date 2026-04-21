@@ -6,12 +6,14 @@ import {
   markAllAsRead,
   clearAllNotifications,
 } from "../api/notificationApi";
+import { updateNotificationPreference, getUser } from "../api/userApi";
 import "./NotificationBell.css";
 import { Trash2 } from "lucide-react";
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const dropdownRef = useRef();
 
   const token = localStorage.getItem("token");
@@ -24,8 +26,10 @@ export default function NotificationBell() {
     } catch {}
   }
 
+  // 🔥 Load notifications
   const loadNotifications = async () => {
-    if (!email) return;
+    if (!email || !enabled) return;
+
     try {
       const data = await getNotifications(email);
       setNotifications(data);
@@ -34,32 +38,55 @@ export default function NotificationBell() {
     }
   };
 
+  // 🔥 Load user preference
   useEffect(() => {
-    loadNotifications();
-    const interval = setInterval(loadNotifications, 10000);
-    return () => clearInterval(interval);
+    const loadPreference = async () => {
+      if (!email) return;
+
+      try {
+        const user = await getUser(email);
+        setEnabled(user.notificationsEnabled);
+      } catch (err) {
+        console.error("Failed to load preference", err);
+      }
+    };
+
+    loadPreference();
   }, [email]);
 
-  // ✅ Close when clicking outside
+  // 🔥 Auto refresh (only if enabled)
+  useEffect(() => {
+    if (!enabled) return;
+
+    loadNotifications();
+
+    const interval = setInterval(loadNotifications, 10000);
+    return () => clearInterval(interval);
+  }, [email, enabled]);
+
+  // 🔥 Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.readStatus).length;
 
+  // 🔥 Actions
   const handleMarkAsRead = async (id) => {
     await markAsRead(id);
     loadNotifications();
   };
 
   const handleDelete = async (e, id) => {
-    e.stopPropagation(); // 🔥 prevent markAsRead
+    e.stopPropagation();
     await deleteNotification(id);
     loadNotifications();
   };
@@ -74,6 +101,23 @@ export default function NotificationBell() {
     loadNotifications();
   };
 
+  const toggleNotifications = async () => {
+    const newValue = !enabled;
+
+    try {
+      await updateNotificationPreference(email, newValue);
+      setEnabled(newValue);
+
+      if (!newValue) {
+        setNotifications([]); // clear UI when disabled
+      } else {
+        loadNotifications();
+      }
+    } catch (err) {
+      console.error("Toggle failed", err);
+    }
+  };
+
   const formatTime = (time) => {
     return new Date(time).toLocaleString();
   };
@@ -84,7 +128,7 @@ export default function NotificationBell() {
       {/* 🔔 Bell */}
       <div className="notification-icon" onClick={() => setOpen(!open)}>
         🔔
-        {unreadCount > 0 && (
+        {enabled && unreadCount > 0 && (
           <span className="notification-badge">{unreadCount}</span>
         )}
       </div>
@@ -92,19 +136,31 @@ export default function NotificationBell() {
       {/* 📩 Dropdown */}
       {open && (
         <div className="notification-dropdown">
-          
+
+          {/* 🔥 Header */}
           <div className="notification-header">
             <h4 className="notification-title">Notifications</h4>
 
-            {notifications.length > 0 && (
-              <div className="notification-actions">
-                <button onClick={handleMarkAll}>Mark all</button>
-                <button onClick={handleClearAll}>Clear all</button>
-              </div>
-            )}
+            <div className="notification-actions">
+              <button onClick={toggleNotifications}>
+                {enabled ? "🔔 Disable" : "🔕 Enable"}
+              </button>
+
+              {enabled && notifications.length > 0 && (
+                <>
+                  <button onClick={handleMarkAll}>Mark all</button>
+                  <button onClick={handleClearAll}>Clear all</button>
+                </>
+              )}
+            </div>
           </div>
 
-          {notifications.length === 0 ? (
+          {/* 🔕 Disabled state */}
+          {!enabled ? (
+            <p className="notification-empty">
+              Notifications are disabled
+            </p>
+          ) : notifications.length === 0 ? (
             <p className="notification-empty">No notifications</p>
           ) : (
             notifications.map((n) => (

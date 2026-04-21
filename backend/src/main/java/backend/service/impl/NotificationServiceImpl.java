@@ -5,6 +5,8 @@ import backend.repository.NotificationRepository;
 import backend.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import backend.model.User;
+import backend.repository.UserRepository;
 
 import java.util.List;
 
@@ -13,9 +15,21 @@ import java.util.List;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void createNotification(String email, String message) {
+
+        // ✅ get user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 🚫 STOP if notifications disabled
+        if (!user.isNotificationsEnabled()) {
+            return;
+        }
+
+        // ✅ create notification (your structure unchanged)
         Notification notification = Notification.builder()
                 .email(email)
                 .message(message)
