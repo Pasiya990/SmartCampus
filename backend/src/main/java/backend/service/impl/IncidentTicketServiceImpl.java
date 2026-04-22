@@ -18,6 +18,7 @@ import backend.enums.Role;
 import backend.model.User;
 import backend.repository.UserRepository;
 import backend.service.TicketEmailService;
+import backend.service.NotificationService;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -34,6 +35,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     private final TicketCommentRepository ticketCommentRepository;
     private final UserRepository userRepository;
     private final TicketEmailService ticketEmailService;
+    private final NotificationService notificationService;
 
     @Override
     public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
@@ -56,6 +58,11 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .build();
 
         IncidentTicket savedTicket = incidentTicketRepository.save(ticket);
+
+        notificationService.createNotification(
+            request.getReportedBy(),
+            "Your ticket " + savedTicket.getTicketCode() + " has been created"
+        );
 
         if (files != null) {
             for (MultipartFile file : files) {
@@ -110,6 +117,18 @@ public IncidentTicketResponse assignTechnician(Long ticketId, String technicianE
 
     IncidentTicket updated = incidentTicketRepository.save(ticket);
 
+    // Notify technician
+    notificationService.createNotification(
+        technicianEmail,
+        "You have been assigned to ticket " + updated.getTicketCode()
+    );
+
+    // Notify user
+    notificationService.createNotification(
+        updated.getReportedBy(),
+        "Your ticket has been assigned to a technician"
+    );
+
     try {
         ticketEmailService.sendTicketAssignedEmail(
                 technicianEmail,
@@ -145,6 +164,12 @@ public IncidentTicketResponse assignTechnician(Long ticketId, String technicianE
         }
 
         IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+        notificationService.createNotification(
+            updated.getReportedBy(),
+            "Your ticket " + updated.getTicketCode() + " status changed to " + newStatus
+        );
+        
         return mapToResponse(updated);
     }
 

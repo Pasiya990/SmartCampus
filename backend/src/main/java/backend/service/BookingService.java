@@ -24,6 +24,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final QRCodeService qrCodeService;  
     private final EmailService emailService; 
+    private final NotificationService notificationService;
 
     //  Create booking 
     public BookingResponse createBooking(BookingRequest request, String email) {
@@ -72,7 +73,16 @@ public class BookingService {
             .status(BookingStatus.PENDING)
             .build();
 
-        return toResponse(bookingRepository.save(booking));
+        //return toResponse(bookingRepository.save(booking));
+        Booking saved = bookingRepository.save(booking);
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            saved.getUser().getEmail(),
+            "Your booking request for " + saved.getResource().getName() + " is submitted"
+        );
+        
+        return toResponse(saved);
     }
 
     //  Get bookings
@@ -141,6 +151,12 @@ public class BookingService {
         booking.setStatus(BookingStatus.APPROVED);
         BookingResponse response = toResponse(bookingRepository.save(booking));
 
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            booking.getUser().getEmail(),
+            "Your booking for " + booking.getResource().getName() + " has been APPROVED"
+        );
+
         try {
             String qrContent = qrCodeService.buildQRContent(response);
             byte[] qrCode = qrCodeService.generateQRCode(qrContent);
@@ -167,7 +183,16 @@ public class BookingService {
         booking.setStatus(BookingStatus.REJECTED);
         booking.setRejectionReason(reason);
 
-        return toResponse(bookingRepository.save(booking));
+        //return toResponse(bookingRepository.save(booking));
+        Booking saved = bookingRepository.save(booking);
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            saved.getUser().getEmail(),
+            "Your booking has been REJECTED. Reason: " + reason
+        );
+        
+        return toResponse(saved);
     }
 
     //  Cancel booking
@@ -198,7 +223,17 @@ public class BookingService {
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
-        return toResponse(bookingRepository.save(booking));
+        //return toResponse(bookingRepository.save(booking));
+
+        Booking saved = bookingRepository.save(booking);
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            saved.getUser().getEmail(),
+            "Your booking has been CANCELLED"
+        );
+        
+        return toResponse(saved);
     }
 
     //  Admin delete
@@ -302,7 +337,16 @@ public class BookingService {
         booking.setStatus(BookingStatus.PENDING);
         booking.setRejectionReason(null);
 
-        return toResponse(bookingRepository.save(booking));
+        //return toResponse(bookingRepository.save(booking));
+        Booking saved = bookingRepository.save(booking);
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            saved.getUser().getEmail(),
+            "Your booking has been UPDATED and is pending approval"
+        );
+        
+        return toResponse(saved);
     }
 
     // Helper

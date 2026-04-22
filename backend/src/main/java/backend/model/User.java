@@ -24,6 +24,9 @@ public class User {
 
     private String provider; // GOOGLE
 
+    @Column(nullable = false)
+    private boolean notificationsEnabled = true;
+
     // Constructors
     public User() {}
 
@@ -55,5 +58,13 @@ public class User {
     
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isNotificationsEnabled() {
+        return notificationsEnabled;
+    }
+    
+    public void setNotificationsEnabled(boolean notificationsEnabled) {
+        this.notificationsEnabled = notificationsEnabled;
     }
 }

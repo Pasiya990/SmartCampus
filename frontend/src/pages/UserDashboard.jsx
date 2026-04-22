@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../services/api";
+import NotificationBell from "../components/NotificationBell";
 
 export default function UserDashboard() {
-  const [message, setMessage] = useState("");
+  
 
   const name = localStorage.getItem("name") || "User";
 
-  useEffect(() => {
-    API.get("/user/hello")
-      .then((res) => setMessage(res.data))
-      .catch(() => setMessage("Access Denied"));
-  }, []);
+
 
   return (
+
+    <div>
+
+    {/* 🔔 TOP RIGHT */}
+    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <NotificationBell />
+      </div>
     <div style={{ padding: "40px" }}>
       <h2>User Dashboard</h2>
       <p>Welcome, {name}</p>
-      <p>{message}</p>
+      
 
       <div style={{ display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" }}>
         
@@ -82,5 +86,6 @@ export default function UserDashboard() {
 
       </div>
     </div>
+  </div>
   );
 }
