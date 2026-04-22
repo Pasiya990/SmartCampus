@@ -22,9 +22,16 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
+    private final QRCodeService qrCodeService;  
+    private final EmailService emailService; 
+    private final NotificationService notificationService;
 
     //  Create booking 
     public BookingResponse createBooking(BookingRequest request, String email) {
+
+        if (email == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+        }
 
         if (!request.getStartTime().isBefore(request.getEndTime())) {
             throw new ResponseStatusException(
@@ -66,7 +73,16 @@ public class BookingService {
             .status(BookingStatus.PENDING)
             .build();
 
-        return toResponse(bookingRepository.save(booking));
+        //return toResponse(bookingRepository.save(booking));
+        Booking saved = bookingRepository.save(booking);
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            saved.getUser().getEmail(),
+            "Your booking request for " + saved.getResource().getName() + " is submitted"
+        );
+        
+        return toResponse(saved);
     }
 
     //  Get bookings
@@ -79,6 +95,10 @@ public class BookingService {
                 ? bookingRepository.findByStatus(statusFilter)
                 : bookingRepository.findAll();
         } else {
+            if (email == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+            }
+
             User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "User not found"
@@ -90,20 +110,29 @@ public class BookingService {
         return bookings.stream().map(this::toResponse).toList();
     }
 
-    //  Get single booking
+    //  ✅ FIXED: Get single booking (QR + logged users)
     public BookingResponse getBookingById(Long bookingId, String email, boolean isAdmin) {
 
         Booking booking = getBookingOrThrow(bookingId);
 
-        if (!isAdmin) {
-            User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "User not found"
-                ));
+        // ✅ QR / Public access
+        if (email == null) {
+            return toResponse(booking);
+        }
 
-            if (!booking.getUser().getId().equals(user.getId())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
-            }
+        // ✅ Admin access
+        if (isAdmin) {
+            return toResponse(booking);
+        }
+
+        // ✅ Normal user → enforce ownership
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "User not found"
+            ));
+
+        if (!booking.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
 
         return toResponse(booking);
@@ -120,7 +149,25 @@ public class BookingService {
         }
 
         booking.setStatus(BookingStatus.APPROVED);
-        return toResponse(bookingRepository.save(booking));
+        BookingResponse response = toResponse(bookingRepository.save(booking));
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            booking.getUser().getEmail(),
+            "Your booking for " + booking.getResource().getName() + " has been APPROVED"
+        );
+
+        try {
+            String qrContent = qrCodeService.buildQRContent(response);
+            byte[] qrCode = qrCodeService.generateQRCode(qrContent);
+            emailService.sendBookingApprovedEmail(
+                booking.getUser().getEmail(), response, qrCode
+            );
+        } catch (Exception e) {
+            System.err.println("Email sending failed: " + e.getMessage());
+        }
+
+        return response;
     }
 
     //  Admin reject
@@ -136,11 +183,24 @@ public class BookingService {
         booking.setStatus(BookingStatus.REJECTED);
         booking.setRejectionReason(reason);
 
-        return toResponse(bookingRepository.save(booking));
+        //return toResponse(bookingRepository.save(booking));
+        Booking saved = bookingRepository.save(booking);
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            saved.getUser().getEmail(),
+            "Your booking has been REJECTED. Reason: " + reason
+        );
+        
+        return toResponse(saved);
     }
 
     //  Cancel booking
     public BookingResponse cancelBooking(Long bookingId, String email) {
+
+        if (email == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+        }
 
         Booking booking = getBookingOrThrow(bookingId);
 
@@ -163,7 +223,17 @@ public class BookingService {
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
-        return toResponse(bookingRepository.save(booking));
+        //return toResponse(bookingRepository.save(booking));
+
+        Booking saved = bookingRepository.save(booking);
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            saved.getUser().getEmail(),
+            "Your booking has been CANCELLED"
+        );
+        
+        return toResponse(saved);
     }
 
     //  Admin delete
@@ -178,6 +248,10 @@ public class BookingService {
 
     //  User delete own
     public void deleteOwnBooking(Long bookingId, String email) {
+
+        if (email == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+        }
 
         Booking booking = getBookingOrThrow(bookingId);
 
@@ -204,6 +278,10 @@ public class BookingService {
 
     //  Edit booking
     public BookingResponse editBooking(Long bookingId, String email, BookingRequest request) {
+
+        if (email == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Login required");
+        }
 
         Booking booking = getBookingOrThrow(bookingId);
 
@@ -259,7 +337,16 @@ public class BookingService {
         booking.setStatus(BookingStatus.PENDING);
         booking.setRejectionReason(null);
 
-        return toResponse(bookingRepository.save(booking));
+        //return toResponse(bookingRepository.save(booking));
+        Booking saved = bookingRepository.save(booking);
+
+        // 🔔 NOTIFICATION
+        notificationService.createNotification(
+            saved.getUser().getEmail(),
+            "Your booking has been UPDATED and is pending approval"
+        );
+        
+        return toResponse(saved);
     }
 
     // Helper
@@ -290,13 +377,13 @@ public class BookingService {
     public boolean isSlotAvailable(Long resourceId, String date,
                                String startTime, String endTime) {
 
-    List<Booking> conflicts = bookingRepository.findConflictingBookings(
-        resourceId,
-        LocalDate.parse(date),
-        LocalTime.parse(startTime),
-        LocalTime.parse(endTime)
-    );
+        List<Booking> conflicts = bookingRepository.findConflictingBookings(
+            resourceId,
+            LocalDate.parse(date),
+            LocalTime.parse(startTime),
+            LocalTime.parse(endTime)
+        );
 
-    return conflicts.isEmpty();
-}
+        return conflicts.isEmpty();
+    }
 }

@@ -5,6 +5,8 @@ import './Bookings.css';
 
 export default function MyBookingsPage() {
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(0);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({
     resourceId: '', date: '', startTime: '',
@@ -13,32 +15,38 @@ export default function MyBookingsPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const load = () => getMyBookings().then(r => setBookings(r.data));
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    setLoading(true);
+    getMyBookings()
+      .then(r => setBookings(r.data))
+      .catch(() => setBookings([]))
+      .finally(() => setLoading(false));
+  }, [refresh]);
 
   const handleCancel = async (id) => {
     if (!window.confirm('Cancel this booking?')) return;
-    await cancelBooking(id);
-    load();
+    try {
+      await cancelBooking(id);
+      setMessage('Booking cancelled successfully');
+      setRefresh(r => r + 1);
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to cancel booking');
+      setTimeout(() => setError(''), 3000);
+    }
   };
 
   const handleDelete = async (id) => {
-    console.log("DELETE CLICKED:", id);
-
     if (!window.confirm('Delete this booking permanently?')) return;
-
     try {
-      const res = await deleteOwnBooking(id);
-
-      console.log("STATUS:", res.status);
-      console.log("DATA:", res.data);
-
+      await deleteOwnBooking(id);
       setBookings(prev => prev.filter(b => b.id !== id));
       setMessage('Booking deleted successfully');
-
+      setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       console.error("DELETE ERROR:", err.response || err);
       setError(err.response?.data?.message || 'Failed to delete booking');
+      setTimeout(() => setError(''), 3000);
     }
   };
 
@@ -58,139 +66,150 @@ export default function MyBookingsPage() {
       });
       setMessage('Booking updated! Status reset to PENDING.');
       setEditingId(null);
-      load();
+      setRefresh(r => r + 1);
+      setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update booking');
+      setTimeout(() => setError(''), 3000);
     }
   };
 
   return (
     <div className="bk-page">
-
       {/* Header */}
       <div className="bk-header">
         <div>
           <h2 className="bk-title">My Bookings</h2>
-          <p className="bk-sub">Track and manage your bookings.</p>
+          <p className="bk-sub">Track and manage your resource bookings</p>
         </div>
       </div>
 
       {message && <div className="success">{message}</div>}
       {error && <div className="error">{error}</div>}
 
-      {bookings.length === 0 && (
-        <div className="bk-empty">You haven't made any bookings yet.</div>
-      )}
-
-      {/* Cards */}
-      {bookings.map(b => (
-        <div key={b.id} className="card">
-
-          <div className="card-top">
-            <h3 className="card-title">{b.resourceName}</h3>
-            <StatusBadge status={b.status} />
-          </div>
-
-          <p className="card-text">
-            📅 {b.date} · 🕐 {b.startTime} – {b.endTime}
-          </p>
-
-          <p className="card-meta">
-            Purpose: {b.purpose} · Attendees: {b.attendees}
-          </p>
-
-          {b.rejectionReason && (
-            <span className="card-rejection">⚠ {b.rejectionReason}</span>
-          )}
-
-          {/* Actions */}
-          <div className="card-actions">
-
-            {(b.status === 'PENDING' || b.status === 'APPROVED') && (
-              <button className="btn-cancel" onClick={() => handleCancel(b.id)}>
-                Cancel
-              </button>
-            )}
-
-            {b.status === 'PENDING' && (
-              <button className="btn-approve" onClick={() => handleEditOpen(b)}>
-                Edit
-              </button>
-            )}
-
-            {(b.status === 'CANCELLED' || b.status === 'REJECTED') && (
-              <button
-                className="btn-reject"
-                onClick={() => handleDelete(b.id)}
-              >
-                Delete
-              </button>
-            )}
-
-          </div>
+      {/* Skeleton → Empty → Cards */}
+      {loading ? (
+        <div className="skeleton-grid">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="skeleton-card" />
+          ))}
         </div>
-      ))}
+      ) : bookings.length === 0 ? (
+        <div className="bk-empty">
+          <p>📭 You haven't made any bookings yet.</p>
+          <p style={{ fontSize: '12px', marginTop: '8px', color: '#9ca3af' }}>
+            Go to Facilities & Assets to book a resource
+          </p>
+        </div>
+      ) : (
+        bookings.map(b => (
+          <div key={b.id} className="card">
+            <div className="card-top">
+              <div>
+                <h3 className="card-title">{b.resourceName}</h3>
+                <span style={{ fontSize: '11px', color: '#9ca3af' }}>#{b.id}</span> 
+              </div>
+              <StatusBadge status={b.status} />
+            </div>
+
+            <div className="card-text">
+              {b.date} · {b.startTime} – {b.endTime}
+            </div>
+
+            <div className="card-meta">
+              <span>Purpose: {b.purpose}</span>
+              <span>Attendees: {b.attendees}</span>
+            </div>
+
+            {b.rejectionReason && (
+              <div className="card-rejection">
+                {b.rejectionReason}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="card-actions">
+              {(b.status === 'PENDING' || b.status === 'APPROVED') && (
+                <button className="btn-cancel" onClick={() => handleCancel(b.id)}>
+                  Cancel
+                </button>
+              )}
+
+              {b.status === 'PENDING' && (
+                <button className="btn-approve" onClick={() => handleEditOpen(b)}>
+                  Edit
+                </button>
+              )}
+
+              {(b.status === 'CANCELLED' || b.status === 'REJECTED') && (
+                <button className="btn-reject" onClick={() => handleDelete(b.id)}>
+                  Delete
+                </button>
+              )}
+            </div>
+          </div>
+        ))
+      )}
 
       
       {editingId && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className="modal-overlay" onClick={() => setEditingId(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: '28px' }}>
+              <h3>Edit Booking</h3>
+              <p>After editing, the status will reset to PENDING for re-approval</p>
 
-            <h3>Edit Booking</h3>
-            <p>After editing, status will reset to pending.</p>
+              <input
+                type="date"
+                value={editForm.date}
+                onChange={e => setEditForm({ ...editForm, date: e.target.value })}
+                className="modal-textarea"
+                placeholder="Date"
+              />
 
-            <input
-              type="date"
-              value={editForm.date}
-              onChange={e => setEditForm({ ...editForm, date: e.target.value })}
-              className="modal-textarea"
-            />
-
-            
-            <div className="time-grid">
-              <div>
+              <div className="time-grid">
                 <input
                   type="time"
                   value={editForm.startTime}
                   onChange={e => setEditForm({ ...editForm, startTime: e.target.value })}
                   className="modal-textarea"
+                  placeholder="Start Time"
                 />
-              </div>
-              <div>
                 <input
                   type="time"
                   value={editForm.endTime}
                   onChange={e => setEditForm({ ...editForm, endTime: e.target.value })}
                   className="modal-textarea"
+                  placeholder="End Time"
                 />
               </div>
+
+              <input
+                type="text"
+                value={editForm.purpose}
+                onChange={e => setEditForm({ ...editForm, purpose: e.target.value })}
+                className="modal-textarea"
+                placeholder="Purpose"
+              />
+
+              <input
+                type="number"
+                value={editForm.attendees}
+                min="1"
+                onChange={e => setEditForm({ ...editForm, attendees: e.target.value })}
+                className="modal-textarea"
+                placeholder="Number of Attendees"
+              />
+
+              <div className="modal-actions">
+                <button className="modal-btn-confirm" onClick={handleEditSubmit}>
+                  Save Changes
+                </button>
+                <button className="modal-btn-cancel" onClick={() => setEditingId(null)}>
+                  Cancel
+                </button>
+              </div>
             </div>
-
-            <input
-              type="text"
-              value={editForm.purpose}
-              onChange={e => setEditForm({ ...editForm, purpose: e.target.value })}
-              className="modal-textarea"
-              placeholder="Purpose"
-            />
-
-            <input
-              type="number"
-              value={editForm.attendees}
-              min="1"
-              onChange={e => setEditForm({ ...editForm, attendees: e.target.value })}
-              className="modal-textarea"
-            />
-
-            <div className="modal-actions">
-              <button className="modal-btn-confirm" onClick={handleEditSubmit}>
-                Save
-              </button>
-              <button className="modal-btn-cancel" onClick={() => setEditingId(null)}>
-                Cancel
-              </button>
-            </div>
-
           </div>
         </div>
       )}

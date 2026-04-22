@@ -7,21 +7,25 @@
 body {
   margin: 0;
   font-family: 'Outfit', sans-serif;
-  background: #ebe9f6;
+  background: #e8f1ff;
 }
+
+/* ================= LAYOUT ================= */
 
 .admin-layout-page {
   min-height: 100vh;
   display: flex;
   gap: 26px;
   padding: 28px;
-  background: linear-gradient(135deg, #ebe9f6 0%, #f3f1fb 100%);
+  background: linear-gradient(135deg, #e8f1ff 0%, #f3f7ff 100%);
 }
+
+/* ================= SIDEBAR ================= */
 
 .admin-layout-sidebar {
   width: 210px;
   min-width: 210px;
-  background: linear-gradient(180deg, #4b2b81 0%, #432978 55%, #3d236e 100%);
+  background: linear-gradient(180deg, #1e3a8a 0%, #1d4ed8 55%, #1e40af 100%);
   border-radius: 0 34px 34px 0;
   padding: 22px 16px;
   color: #fff;
@@ -30,7 +34,7 @@ body {
   justify-content: space-between;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(65, 35, 117, 0.16);
+  box-shadow: 0 20px 40px rgba(30, 64, 175, 0.18);
 }
 
 .sidebar-top {
@@ -38,6 +42,7 @@ body {
   z-index: 3;
 }
 
+/* LOGO */
 .sidebar-logo {
   display: flex;
   align-items: center;
@@ -55,11 +60,10 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 .sidebar-logo h2 {
-  margin: 0 0 2px;
+  margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
 }
@@ -70,6 +74,7 @@ body {
   color: rgba(255, 255, 255, 0.76);
 }
 
+/* MENU */
 .sidebar-menu {
   display: flex;
   flex-direction: column;
@@ -92,15 +97,17 @@ body {
 }
 
 .admin-side-btn:hover {
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .admin-side-btn.active {
   background: #ffffff;
-  color: #4b2b81;
+  color: #1e3a8a;
   font-weight: 600;
   box-shadow: 0 12px 22px rgba(0, 0, 0, 0.10);
 }
+
+/* ================= DECOR ================= */
 
 .sidebar-bottom-art {
   position: absolute;
@@ -109,14 +116,11 @@ body {
   width: 220px;
   height: 220px;
   z-index: 1;
-  pointer-events: none;
 }
 
 .sidebar-bottom-art::before {
   content: "";
   position: absolute;
-  left: 0;
-  bottom: 0;
   width: 190px;
   height: 190px;
   background:
@@ -134,82 +138,124 @@ body {
   width: 150px;
   height: 170px;
   background:
-    radial-gradient(ellipse at 20% 90%, rgba(212, 244, 255, 0.95) 0 28%, transparent 30%),
-    radial-gradient(ellipse at 45% 78%, rgba(170, 211, 255, 0.85) 0 24%, transparent 26%),
-    radial-gradient(ellipse at 68% 65%, rgba(128, 158, 255, 0.70) 0 20%, transparent 22%),
-    radial-gradient(ellipse at 28% 58%, rgba(255, 183, 197, 0.45) 0 14%, transparent 16%),
-    radial-gradient(ellipse at 55% 38%, rgba(255, 255, 255, 0.16) 0 18%, transparent 20%);
-  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.10));
-  opacity: 0.95;
+    radial-gradient(ellipse at 20% 90%, rgba(147, 197, 253, 0.9) 0 28%, transparent 30%),
+    radial-gradient(ellipse at 45% 78%, rgba(96, 165, 250, 0.85) 0 24%, transparent 26%),
+    radial-gradient(ellipse at 68% 65%, rgba(59, 130, 246, 0.7) 0 20%, transparent 22%);
 }
 
+/* LEAVES */
 .sidebar-leaf {
   position: absolute;
   bottom: 0;
   border-radius: 100% 0 100% 0;
-  transform-origin: bottom left;
-  opacity: 0.9;
-  pointer-events: none;
-  z-index: 2;
 }
 
+/* blue tones */
 .leaf-1 {
-  left: 8px;
-  bottom: 6px;
   width: 95px;
   height: 150px;
-  background: linear-gradient(180deg, #d9f0ff 0%, #93c5fd 100%);
-  transform: rotate(-18deg);
+  background: linear-gradient(180deg, #dbeafe 0%, #60a5fa 100%);
 }
 
 .leaf-2 {
-  left: 52px;
-  bottom: 18px;
   width: 78px;
   height: 125px;
-  background: linear-gradient(180deg, #c7b8ff 0%, #8b5cf6 100%);
-  transform: rotate(8deg);
+  background: linear-gradient(180deg, #bfdbfe 0%, #3b82f6 100%);
 }
 
 .leaf-3 {
-  left: 88px;
-  bottom: 2px;
   width: 62px;
   height: 100px;
-  background: linear-gradient(180deg, #f9c7d2 0%, #f472b6 100%);
-  transform: rotate(22deg);
+  background: linear-gradient(180deg, #93c5fd 0%, #2563eb 100%);
 }
 
 .leaf-4 {
-  left: 28px;
-  bottom: -4px;
   width: 120px;
   height: 70px;
-  background: linear-gradient(180deg, #d8f7e4 0%, #86efac 100%);
+  background: linear-gradient(180deg, #dbeafe 0%, #38bdf8 100%);
   border-radius: 60% 40% 60% 40%;
-  transform: rotate(-8deg);
-  opacity: 0.75;
 }
+
+/* ================= MAIN ================= */
 
 .admin-layout-main {
   flex: 1;
-  background: #fbfbfd;
+  background: #ffffff;
   border-radius: 30px;
   padding: 28px 30px;
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.07);
-  min-width: 0;
 }
+
+/* ================= LOGOUT ================= */
+
+.logout-btn {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.10);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logout-btn:hover {
+  background: rgba(59, 130, 246, 0.25);
+}
+
+/* CENTER POPUP */
+.logout-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  padding: 25px 30px;
+  border-radius: 16px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.logout-toast h3 {
+  color: #1e293b;
+}
+
+.logout-toast p {
+  color: #475569;
+}
+
+/* BUTTONS */
+.logout-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-logout-confirm {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-logout-cancel {
+  background: #e5e7eb;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ================= RESPONSIVE ================= */
 
 @media (max-width: 850px) {
   .admin-layout-page {
     flex-direction: column;
-    gap: 14px;
     padding: 14px;
   }
 
   .admin-layout-sidebar {
     width: 100%;
-    min-width: 100%;
     border-radius: 24px;
   }
 

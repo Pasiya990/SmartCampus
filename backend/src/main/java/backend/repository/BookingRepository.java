@@ -22,7 +22,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         SELECT b FROM Booking b
         WHERE b.resource.id = :resourceId
         AND b.date = :date
-        AND b.status = 'APPROVED'
+        AND b.status IN (backend.model.BookingStatus.APPROVED, backend.model.BookingStatus.PENDING)
         AND (b.startTime < :endTime AND b.endTime > :startTime)
     """)
     List<Booking> findConflictingBookings(

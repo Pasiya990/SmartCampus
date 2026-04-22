@@ -6,6 +6,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import TechnicianView from "./pages/TechnicianView";
 import OAuthSuccess from "./pages/OAuthSuccess";
 import UserDashboard from "./pages/UserDashboard";
+import TechnicianDashboard from "./pages/TechnicianDashboard";
 
 import TicketCreate from "./pages/tickets/TicketCreate";
 import TicketList from "./pages/tickets/TicketList";
@@ -18,6 +19,7 @@ import AdminBookingsPage from "./pages/AdminBookingsPage";
 
 import ResourceCatalogue from "./pages/ResourceCatalogue";
 import LandingPage from "./pages/LandingPage";
+import BookingVerifyPage from './pages/BookingVerifyPage';
 
 function App() {
   return (
@@ -31,19 +33,21 @@ function App() {
 
         <Route path="/user" element={<UserDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/technician" element={<TechnicianView />} />
-
+        <Route path="/technician" element={<TechnicianDashboard />} />
         <Route path="/resources" element={<ResourceCatalogue />} />
 
         <Route path="/book" element={<BookingFormPage />} />
         <Route path="/booking/:id" element={<BookingFormPage />} />
         <Route path="/my-bookings" element={<MyBookingsPage />} />
         <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+        <Route path="/booking/verify/:id" element={<BookingVerifyPage />} />
 
         <Route path="/tickets/new" element={<TicketCreate />} />
         <Route path="/tickets" element={<TicketList />} />
         <Route path="/tickets/:id" element={<TicketDetails />} />
         <Route path="/my-tickets" element={<MyTickets />} />
+        <Route path="/technician/my-tickets" element={<TechnicianView />} />
+
       </Routes>
     </BrowserRouter>
   );

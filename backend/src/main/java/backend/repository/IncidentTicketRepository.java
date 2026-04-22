@@ -24,5 +24,7 @@ public interface IncidentTicketRepository extends JpaRepository<IncidentTicket, 
 
     List<IncidentTicket> findByAssignedTechnicianIgnoreCase(String assignedTechnician);
 
-    
+    List<IncidentTicket> findByReportedBy(String reportedBy);
+
+    boolean existsByResourceIdAndStatusIn(Long resourceId, List<TicketStatus> statuses);
 }
