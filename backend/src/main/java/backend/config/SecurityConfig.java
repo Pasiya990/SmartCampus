@@ -65,6 +65,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/resources/**")
                     .hasRole("ADMIN")
 
+                //  Allow public GET for individual booking (for QR verify page)
+                .requestMatchers(HttpMethod.GET, "/api/bookings/*").permitAll()
+
                 // Booking endpoints
                 .requestMatchers("/api/bookings/**")
                     .hasAnyRole("USER", "ADMIN")
@@ -89,7 +92,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(List.of("http://localhost:3000","http://192.168.8.155:3000"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
