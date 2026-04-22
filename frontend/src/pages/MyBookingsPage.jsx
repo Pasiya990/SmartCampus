@@ -5,6 +5,8 @@ import './Bookings.css';
 
 export default function MyBookingsPage() {
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refresh, setRefresh] = useState(0);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({
     resourceId: '', date: '', startTime: '',
@@ -13,15 +15,20 @@ export default function MyBookingsPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
-  const load = () => getMyBookings().then(r => setBookings(r.data));
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    setLoading(true);
+    getMyBookings()
+      .then(r => setBookings(r.data))
+      .catch(() => setBookings([]))
+      .finally(() => setLoading(false));
+  }, [refresh]);
 
   const handleCancel = async (id) => {
     if (!window.confirm('Cancel this booking?')) return;
     try {
       await cancelBooking(id);
       setMessage('Booking cancelled successfully');
-      load();
+      setRefresh(r => r + 1);
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to cancel booking');
@@ -31,9 +38,8 @@ export default function MyBookingsPage() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this booking permanently?')) return;
-
     try {
-      const res = await deleteOwnBooking(id);
+      await deleteOwnBooking(id);
       setBookings(prev => prev.filter(b => b.id !== id));
       setMessage('Booking deleted successfully');
       setTimeout(() => setMessage(''), 3000);
@@ -60,7 +66,7 @@ export default function MyBookingsPage() {
       });
       setMessage('Booking updated! Status reset to PENDING.');
       setEditingId(null);
-      load();
+      setRefresh(r => r + 1);
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update booking');
@@ -81,62 +87,71 @@ export default function MyBookingsPage() {
       {message && <div className="success">{message}</div>}
       {error && <div className="error">{error}</div>}
 
-      {bookings.length === 0 && (
+      {/* Skeleton → Empty → Cards */}
+      {loading ? (
+        <div className="skeleton-grid">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="skeleton-card" />
+          ))}
+        </div>
+      ) : bookings.length === 0 ? (
         <div className="bk-empty">
           <p>📭 You haven't made any bookings yet.</p>
           <p style={{ fontSize: '12px', marginTop: '8px', color: '#9ca3af' }}>
             Go to Facilities & Assets to book a resource
           </p>
         </div>
+      ) : (
+        bookings.map(b => (
+          <div key={b.id} className="card">
+            <div className="card-top">
+              <div>
+                <h3 className="card-title">{b.resourceName}</h3>
+                <span style={{ fontSize: '11px', color: '#9ca3af' }}>#{b.id}</span> 
+              </div>
+              <StatusBadge status={b.status} />
+            </div>
+
+            <div className="card-text">
+              {b.date} · {b.startTime} – {b.endTime}
+            </div>
+
+            <div className="card-meta">
+              <span>Purpose: {b.purpose}</span>
+              <span>Attendees: {b.attendees}</span>
+            </div>
+
+            {b.rejectionReason && (
+              <div className="card-rejection">
+                {b.rejectionReason}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="card-actions">
+              {(b.status === 'PENDING' || b.status === 'APPROVED') && (
+                <button className="btn-cancel" onClick={() => handleCancel(b.id)}>
+                  Cancel
+                </button>
+              )}
+
+              {b.status === 'PENDING' && (
+                <button className="btn-approve" onClick={() => handleEditOpen(b)}>
+                  Edit
+                </button>
+              )}
+
+              {(b.status === 'CANCELLED' || b.status === 'REJECTED') && (
+                <button className="btn-reject" onClick={() => handleDelete(b.id)}>
+                  Delete
+                </button>
+              )}
+            </div>
+          </div>
+        ))
       )}
 
-      {/* Booking Cards */}
-      {bookings.map(b => (
-        <div key={b.id} className="card">
-          <div className="card-top">
-            <h3 className="card-title">{b.resourceName}</h3>
-            <StatusBadge status={b.status} />
-          </div>
-
-          <div className="card-text">
-            {b.date} · {b.startTime} – {b.endTime}
-          </div>
-
-          <div className="card-meta">
-            <span>Purpose: {b.purpose}</span>
-            <span>Attendees: {b.attendees}</span>
-          </div>
-
-          {b.rejectionReason && (
-            <div className="card-rejection">
-              {b.rejectionReason}
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="card-actions">
-            {(b.status === 'PENDING' || b.status === 'APPROVED') && (
-              <button className="btn-cancel" onClick={() => handleCancel(b.id)}>
-                Cancel
-              </button>
-            )}
-
-            {b.status === 'PENDING' && (
-              <button className="btn-approve" onClick={() => handleEditOpen(b)}>
-                Edit
-              </button>
-            )}
-
-            {(b.status === 'CANCELLED' || b.status === 'REJECTED') && (
-              <button className="btn-reject" onClick={() => handleDelete(b.id)}>
-                Delete
-              </button>
-            )}
-          </div>
-        </div>
-      ))}
-
-      {/* Edit Modal */}
+      
       {editingId && (
         <div className="modal-overlay" onClick={() => setEditingId(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>

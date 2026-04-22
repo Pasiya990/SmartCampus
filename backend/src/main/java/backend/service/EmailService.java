@@ -21,10 +21,9 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setTo(toEmail);
-        helper.setSubject("✅ Booking Approved — " + booking.getResourceName());
-        helper.setText(buildEmailBody(booking), true); // true = HTML
+        helper.setSubject("Booking Approved — " + booking.getResourceName());
+        helper.setText(buildEmailBody(booking), true);
 
-        // Attach QR code as inline image
         helper.addInline("qrcode", 
             new ByteArrayResource(qrCodeBytes), "image/png");
 
@@ -34,6 +33,7 @@ public class EmailService {
     private String buildEmailBody(BookingResponse booking) {
         return """
             <h2>Your Booking is Approved!</h2>
+            <p><b>Booking ID:</b> #%d</p>
             <p><b>Resource:</b> %s</p>
             <p><b>Date:</b> %s</p>
             <p><b>Time:</b> %s – %s</p>
@@ -43,6 +43,7 @@ public class EmailService {
             <p>Show this QR code at the venue:</p>
             <img src="cid:qrcode" />
             """.formatted(
+                booking.getId(),
                 booking.getResourceName(),
                 booking.getDate(),
                 booking.getStartTime(),

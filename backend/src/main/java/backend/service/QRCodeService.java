@@ -20,16 +20,7 @@ public class QRCodeService {
         return out.toByteArray();
     }
 
-    public String buildQRContent(BookingResponse booking) {
-        return String.format(
-            "SmartCampus Booking\nID: %d\nResource: %s\nDate: %s\nTime: %s - %s\nPurpose: %s\nAttendees: %d",
-            booking.getId(),
-            booking.getResourceName(),
-            booking.getDate(),
-            booking.getStartTime(),
-            booking.getEndTime(),
-            booking.getPurpose(),
-            booking.getAttendees()
-        );
+   public String buildQRContent(BookingResponse booking) {
+        return "http://192.168.8.155:3000/booking/verify/" + booking.getId();
     }
 }
