@@ -328,3 +328,22 @@
     font-size: 2rem;
   }
 }
+
+.recharts-tooltip-label {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+.recharts-tooltip-item {
+  color: #2563eb !important;
+  font-weight: 600 !important;
+}
+
+.recharts-layer.recharts-cartesian-axis-tick text {
+  fill: #64748b;
+  font-family: "Outfit", sans-serif;
+}
+
+.recharts-rectangle {
+  filter: drop-shadow(0 8px 12px rgba(37, 99, 235, 0.12));
+}

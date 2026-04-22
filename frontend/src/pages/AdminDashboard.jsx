@@ -63,6 +63,14 @@ export default function AdminDashboard() {
 
   const pieColors = ["#1e3a8a", "#1d4ed8", "#3b82f6", "#93c5fd"];
 
+  const chartTooltipStyle = {
+    background: "rgba(255,255,255,0.98)",
+    border: "1px solid #dbeafe",
+    borderRadius: "16px",
+    boxShadow: "0 18px 34px rgba(30, 64, 175, 0.16)",
+    color: "#1e293b",
+  };
+
   return (
     <AdminLayout activeMenu="dashboard">
       <div className="admin-main-header">
@@ -149,22 +157,47 @@ export default function AdminDashboard() {
                 <p>Most frequently approved resources</p>
               </div>
 
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={overview.topResources || []}>
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart
+                  data={overview.topResources || []}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 60 }}
+                  barCategoryGap="18%"
+                >
                   <defs>
                     <linearGradient id="topResourcesGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#3b82f6" />
                       <stop offset="100%" stopColor="#1e3a8a" />
                     </linearGradient>
                   </defs>
+
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="resourceName" tick={{ fontSize: 12 }} />
-                  <YAxis />
-                  <Tooltip />
+
+                  <XAxis
+                    dataKey="resourceName"
+                    interval={0}
+                    angle={-12}
+                    textAnchor="end"
+                    height={70}
+                    tick={{ fontSize: 11, fill: "#64748b" }}
+                  />
+
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                  />
+
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={{ color: "#1e293b", fontWeight: 700 }}
+                    itemStyle={{ color: "#2563eb", fontWeight: 600 }}
+                    cursor={{ fill: "rgba(59,130,246,0.08)" }}
+                  />
+
                   <Bar
                     dataKey="bookingCount"
                     fill="url(#topResourcesGradient)"
                     radius={[12, 12, 0, 0]}
+                    maxBarSize={90}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -178,22 +211,42 @@ export default function AdminDashboard() {
                 <p>Busiest approved booking times</p>
               </div>
 
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={overview.peakHours || []}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={overview.peakHours || []}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 25 }}
+                >
                   <defs>
                     <linearGradient id="peakHoursGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#60a5fa" />
                       <stop offset="100%" stopColor="#1d4ed8" />
                     </linearGradient>
                   </defs>
+
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-                  <YAxis />
-                  <Tooltip />
+
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fontSize: 12, fill: "#64748b" }}
+                  />
+
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                  />
+
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={{ color: "#1e293b", fontWeight: 700 }}
+                    itemStyle={{ color: "#2563eb", fontWeight: 600 }}
+                    cursor={{ fill: "rgba(59,130,246,0.08)" }}
+                  />
+
                   <Bar
                     dataKey="bookingCount"
                     fill="url(#peakHoursGradient)"
                     radius={[12, 12, 0, 0]}
+                    maxBarSize={70}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -205,7 +258,7 @@ export default function AdminDashboard() {
                 <p>Overall booking workflow</p>
               </div>
 
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={statusChartData}
@@ -221,7 +274,12 @@ export default function AdminDashboard() {
                       <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={{ color: "#1e293b", fontWeight: 700 }}
+                    itemStyle={{ color: "#2563eb", fontWeight: 600 }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -264,7 +322,7 @@ export default function AdminDashboard() {
                 <p>Approved bookings by category</p>
               </div>
 
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={280}>
                 <BarChart
                   data={overview.resourceTypeUsage || []}
                   layout="vertical"
@@ -276,19 +334,34 @@ export default function AdminDashboard() {
                       <stop offset="100%" stopColor="#1d4ed8" />
                     </linearGradient>
                   </defs>
+
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <XAxis type="number" />
+
+                  <XAxis
+                    type="number"
+                    allowDecimals={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                  />
+
                   <YAxis
                     type="category"
                     dataKey="resourceType"
                     width={120}
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: 12, fill: "#64748b" }}
                   />
-                  <Tooltip />
+
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={{ color: "#1e293b", fontWeight: 700 }}
+                    itemStyle={{ color: "#2563eb", fontWeight: 600 }}
+                    cursor={{ fill: "rgba(59,130,246,0.08)" }}
+                  />
+
                   <Bar
                     dataKey="bookingCount"
                     fill="url(#resourceTypeGradient)"
                     radius={[0, 12, 12, 0]}
+                    maxBarSize={26}
                   />
                 </BarChart>
               </ResponsiveContainer>
