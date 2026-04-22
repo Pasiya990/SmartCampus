@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const BASE = 'http://localhost:8080/api/bookings';
 
-// ✅ Use JWT token instead of custom headers
+// Use JWT token instead of custom headers
 const headers = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`,
 });

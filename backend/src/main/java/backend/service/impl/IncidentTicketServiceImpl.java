@@ -20,6 +20,8 @@ import backend.service.TicketEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import backend.repository.UserRepository;
+import backend.service.NotificationService;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -37,6 +39,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     private final UserRepository userRepository;
     private final TicketEmailService ticketEmailService;
     private final ResourceService resourceService;
+    private final NotificationService notificationService;
 
     @Override
     public IncidentTicketResponse createTicket(CreateIncidentTicketRequest request, MultipartFile[] files) {
@@ -58,6 +61,11 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
                 .build();
 
         IncidentTicket savedTicket = incidentTicketRepository.save(ticket);
+
+        notificationService.createNotification(
+            request.getReportedBy(),
+            "Your ticket " + savedTicket.getTicketCode() + " has been created"
+        );
 
         if (files != null) {
             for (MultipartFile file : files) {
@@ -128,6 +136,30 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         }
 
         return mapToResponse(updated);
+    IncidentTicket updated = incidentTicketRepository.save(ticket);
+
+    // Notify technician
+    notificationService.createNotification(
+        technicianEmail,
+        "You have been assigned to ticket " + updated.getTicketCode()
+    );
+
+    // Notify user
+    notificationService.createNotification(
+        updated.getReportedBy(),
+        "Your ticket has been assigned to a technician"
+    );
+
+    try {
+        ticketEmailService.sendTicketAssignedEmail(
+                technicianEmail,
+                updated.getTicketCode(),
+                updated.getTitle(),
+                updated.getPriority().name(),
+                updated.getLocation()
+        );
+    } catch (Exception e) {
+        e.printStackTrace();
     }
 
     @Override
@@ -184,6 +216,11 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
             }
         }
 
+        notificationService.createNotification(
+            updated.getReportedBy(),
+            "Your ticket " + updated.getTicketCode() + " status changed to " + newStatus
+        );
+        
         return mapToResponse(updated);
     }
 

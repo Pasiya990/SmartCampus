@@ -19,6 +19,7 @@ import AdminBookingsPage from "./pages/AdminBookingsPage";
 
 import ResourceCatalogue from "./pages/ResourceCatalogue";
 import LandingPage from "./pages/LandingPage";
+import BookingVerifyPage from './pages/BookingVerifyPage';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
         <Route path="/booking/:id" element={<BookingFormPage />} />
         <Route path="/my-bookings" element={<MyBookingsPage />} />
         <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+        <Route path="/booking/verify/:id" element={<BookingVerifyPage />} />
 
         <Route path="/tickets/new" element={<TicketCreate />} />
         <Route path="/tickets" element={<TicketList />} />
