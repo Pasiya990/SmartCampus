@@ -5,26 +5,28 @@
 .header-left h1 {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #1f2340;
+  color: #1e293b;
   margin-bottom: 4px;
 }
 
 .header-left p {
-  color: #7b8190;
+  color: #64748b;
   font-size: 0.96rem;
 }
 
 .analytics-status-card {
   background: #ffffff;
-  border: 1px solid #edf0f5;
+  border: 1px solid #e2e8f0;
   border-radius: 18px;
   padding: 16px 18px;
   margin-bottom: 20px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
 }
 
 .analytics-status-card.error {
   border-left: 5px solid #ef4444;
   color: #dc2626;
+  background: #fff7f7;
 }
 
 .summary-grid {
@@ -38,41 +40,43 @@
   border-radius: 18px;
   padding: 18px 18px 16px;
   min-height: 96px;
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
 }
 
 .summary-card span {
   display: block;
   font-size: 0.8rem;
-  color: #5b6170;
+  color: #64748b;
   margin-bottom: 10px;
   font-weight: 500;
 }
 
 .summary-card h3 {
   font-size: 1.9rem;
-  color: #1f2937;
+  color: #0f172a;
   font-weight: 700;
+  margin: 0;
 }
 
 .soft-pink {
-  background: linear-gradient(135deg, #ffe6ea 0%, #fff4f6 100%);
-  border-left: 5px solid #ff9cae;
+  background: linear-gradient(135deg, #ffe6ea 0%, #fff7f8 100%);
+  border-left: 5px solid #ff8da1;
 }
 
 .soft-purple {
-  background: linear-gradient(135deg, #efe8ff 0%, #f8f4ff 100%);
-  border-left: 5px solid #a98df2;
+  background: linear-gradient(135deg, #efe8ff 0%, #faf7ff 100%);
+  border-left: 5px solid #9f7aea;
 }
 
 .soft-yellow {
-  background: linear-gradient(135deg, #fff2c9 0%, #fff9e9 100%);
-  border-left: 5px solid #f0c34e;
+  background: linear-gradient(135deg, #fff4cc 0%, #fffdf2 100%);
+  border-left: 5px solid #f4c542;
 }
 
 .soft-green {
-  background: linear-gradient(135deg, #dcf7e5 0%, #f0fff4 100%);
-  border-left: 5px solid #58c27d;
+  background: linear-gradient(135deg, #dcfce7 0%, #f4fff8 100%);
+  border-left: 5px solid #22c55e;
 }
 
 .analytics-grid {
@@ -84,15 +88,16 @@
 .top-layout,
 .middle-layout,
 .bottom-layout {
+  display: grid;
   grid-template-columns: 1fr 1fr;
 }
 
 .analytics-card {
   background: #ffffff;
-  border: 1px solid #edf0f5;
+  border: 1px solid #e2e8f0;
   border-radius: 22px;
   padding: 18px;
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.05);
 }
 
 .chart-card {
@@ -105,14 +110,15 @@
 
 .card-header h3 {
   font-size: 1.12rem;
-  color: #22223b;
+  color: #1e293b;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin: 0 0 4px;
 }
 
 .card-header p {
   font-size: 0.86rem;
-  color: #7b8190;
+  color: #64748b;
+  margin: 0;
 }
 
 .mini-stats-grid {
@@ -123,41 +129,42 @@
 }
 
 .mini-stat-box {
-  background: #f7f8fc;
+  background: #f8fafc;
   border-radius: 16px;
   padding: 16px;
-  border: 1px solid #eef1f6;
+  border: 1px solid #e2e8f0;
 }
 
 .mini-stat-box strong {
   display: block;
   font-size: 1.35rem;
-  color: #3a266f;
+  color: #2563eb;
   margin-bottom: 6px;
 }
 
 .mini-stat-box span {
   font-size: 0.84rem;
-  color: #6b7280;
+  color: #64748b;
 }
 
 .notification-box {
-  background: linear-gradient(135deg, #f8f7ff 0%, #f4efff 100%);
-  border: 1px solid #ece5ff;
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fbff 100%);
+  border: 1px solid #dbeafe;
   border-radius: 18px;
   padding: 16px;
 }
 
 .notification-box h4 {
   font-size: 1rem;
-  color: #3a266f;
-  margin-bottom: 8px;
+  color: #1d4ed8;
+  margin: 0 0 8px;
 }
 
 .notification-box p {
   font-size: 0.88rem;
-  color: #6b7280;
+  color: #64748b;
   line-height: 1.5;
+  margin: 0;
 }
 
 .analytics-table {
@@ -169,34 +176,36 @@
   text-align: left;
   padding: 12px 10px;
   font-size: 0.82rem;
-  color: #7b8190;
-  border-bottom: 1px solid #edf0f5;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
 }
 
 .analytics-table td {
   padding: 13px 10px;
   font-size: 0.9rem;
-  color: #374151;
-  border-bottom: 1px solid #f2f4f8;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .analytics-table tbody tr:hover {
-  background: #faf7ff;
+  background: #f8fafc;
 }
 
 .recharts-cartesian-grid line {
-  stroke: #eceef3;
+  stroke: #e2e8f0;
 }
 
 .recharts-cartesian-axis-tick-value {
-  fill: #7b8190;
+  fill: #64748b;
   font-size: 12px;
   font-family: 'Outfit', sans-serif;
 }
 
 .recharts-default-tooltip {
   border-radius: 14px !important;
-  border: none !important;
+  border: 1px solid #e2e8f0 !important;
+  background: #ffffff !important;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12) !important;
 }
 
