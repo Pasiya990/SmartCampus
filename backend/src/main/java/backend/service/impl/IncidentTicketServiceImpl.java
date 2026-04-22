@@ -20,8 +20,8 @@ import backend.service.TicketEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import backend.repository.UserRepository;
 import backend.service.NotificationService;
+
 
 import java.io.IOException;
 import java.util.Collections;
@@ -121,22 +121,8 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
             }
         }
 
+
         IncidentTicket updated = incidentTicketRepository.save(ticket);
-
-        try {
-            ticketEmailService.sendTicketAssignedEmail(
-                    technicianEmail,
-                    updated.getTicketCode(),
-                    updated.getTitle(),
-                    updated.getPriority().name(),
-                    updated.getLocation()
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return mapToResponse(updated);
-    IncidentTicket updated = incidentTicketRepository.save(ticket);
 
     // Notify technician
     notificationService.createNotification(
@@ -150,6 +136,7 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         "Your ticket has been assigned to a technician"
     );
 
+
     try {
         ticketEmailService.sendTicketAssignedEmail(
                 technicianEmail,
@@ -161,6 +148,9 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
     } catch (Exception e) {
         e.printStackTrace();
     }
+        return mapToResponse(updated);
+}
+    
 
     @Override
     public IncidentTicketResponse updateTicketStatus(Long ticketId, UpdateTicketStatusRequest request) {
