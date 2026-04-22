@@ -4,15 +4,11 @@ import API from "../services/api";
 import NotificationBell from "../components/NotificationBell";
 
 export default function UserDashboard() {
-  const [message, setMessage] = useState("");
+  
 
   const name = localStorage.getItem("name") || "User";
 
-  useEffect(() => {
-    API.get("/user/hello")
-      .then((res) => setMessage(res.data))
-      .catch(() => setMessage("Access Denied"));
-  }, []);
+
 
   return (
 
@@ -25,7 +21,7 @@ export default function UserDashboard() {
     <div style={{ padding: "40px" }}>
       <h2>User Dashboard</h2>
       <p>Welcome, {name}</p>
-      <p>{message}</p>
+      
 
       <div style={{ display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" }}>
         

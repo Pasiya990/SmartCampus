@@ -9,6 +9,7 @@ import {
 import { updateNotificationPreference, getUser } from "../api/userApi";
 import "./NotificationBell.css";
 import { Trash2 } from "lucide-react";
+import { connectSocket, disconnectSocket } from "../services/socket";
 
 export default function NotificationBell() {
   const [notifications, setNotifications] = useState([]);
@@ -54,15 +55,33 @@ export default function NotificationBell() {
     loadPreference();
   }, [email]);
 
-  // 🔥 Auto refresh (only if enabled)
+
   useEffect(() => {
-    if (!enabled) return;
+  if (!email || !enabled) return;
 
-    loadNotifications();
+  // initial load (keep this)
+  loadNotifications();
 
-    const interval = setInterval(loadNotifications, 10000);
-    return () => clearInterval(interval);
-  }, [email, enabled]);
+  // 🔥 connect websocket
+  connectSocket(email, (newMessage) => {
+    console.log("🔥 Real-time:", newMessage);
+
+    setNotifications((prev) => [
+      {
+        id: Date.now(),
+        message: newMessage,
+        readStatus: false,
+        createdAt: new Date(),
+      },
+      ...prev,
+    ]);
+  });
+
+  return () => {
+    disconnectSocket();
+  };
+}, [email, enabled]);
+
 
   // 🔥 Close dropdown when clicking outside
   useEffect(() => {

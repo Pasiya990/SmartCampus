@@ -3,6 +3,7 @@ package backend.service.impl;
 import backend.model.Notification;
 import backend.repository.NotificationRepository;
 import backend.service.NotificationService;
+import backend.service.WebSocketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import backend.model.User;
@@ -16,20 +17,18 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final WebSocketService webSocketService;
 
     @Override
     public void createNotification(String email, String message) {
 
-        // ✅ get user
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 🚫 STOP if notifications disabled
         if (!user.isNotificationsEnabled()) {
             return;
         }
 
-        // ✅ create notification (your structure unchanged)
         Notification notification = Notification.builder()
                 .email(email)
                 .message(message)
@@ -37,6 +36,9 @@ public class NotificationServiceImpl implements NotificationService {
                 .build();
 
         notificationRepository.save(notification);
+
+        // 🔥 SEND REAL-TIME
+        webSocketService.sendNotification(email, message);
     }
 
     @Override
