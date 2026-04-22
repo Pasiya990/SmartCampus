@@ -305,3 +305,23 @@
   display: block;
   margin-bottom: 1rem;
 }
+
+.filter-bar {
+  display: flex;
+  flex-wrap: nowrap;   /* 🔥 force one line */
+  gap: 12px;
+  align-items: center;
+}
+
+/* make inputs share space */
+.filter-bar .glass-input,
+.filter-bar .glass-select {
+  flex: 1;
+  min-width: 0;
+}
+
+/* buttons stay fixed size */
+.filter-bar .btn-primary,
+.filter-bar .btn-ghost {
+  flex: 0 0 auto;
+}

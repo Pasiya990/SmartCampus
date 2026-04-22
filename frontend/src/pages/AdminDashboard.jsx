@@ -61,12 +61,21 @@ export default function AdminDashboard() {
     ];
   }, [overview]);
 
-  const pieColors = ["#6d5bd0", "#f0c34e", "#58c27d", "#f28b82"];
+  const pieColors = ["#1e3a8a", "#1d4ed8", "#3b82f6", "#93c5fd"];
+
+  const chartTooltipStyle = {
+    background: "rgba(255,255,255,0.98)",
+    border: "1px solid #dbeafe",
+    borderRadius: "16px",
+    boxShadow: "0 18px 34px rgba(30, 64, 175, 0.16)",
+    color: "#1e293b",
+  };
 
   return (
     <AdminLayout activeMenu="dashboard">
       <div className="admin-main-header">
         <div className="header-left">
+          <div className="dashboard-badge">Admin Analytics</div>
           <h1>Dashboard</h1>
           <p>{message || "Campus resource insights and booking analytics"}</p>
         </div>
@@ -105,7 +114,7 @@ export default function AdminDashboard() {
           </section>
 
           <section className="analytics-grid top-layout">
-            <div className="analytics-card calendar-card">
+            <div className="analytics-card calendar-card glass-card">
               <div className="card-header">
                 <h3>Overview</h3>
                 <p>Weekly usage summary</p>
@@ -142,56 +151,122 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="analytics-card chart-card">
+            <div className="analytics-card chart-card glass-card">
               <div className="card-header">
                 <h3>Top Resources</h3>
                 <p>Most frequently approved resources</p>
               </div>
 
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={overview.topResources || []}>
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart
+                  data={overview.topResources || []}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 60 }}
+                  barCategoryGap="18%"
+                >
+                  <defs>
+                    <linearGradient id="topResourcesGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3b82f6" />
+                      <stop offset="100%" stopColor="#1e3a8a" />
+                    </linearGradient>
+                  </defs>
+
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="resourceName" tick={{ fontSize: 12 }} />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="bookingCount" fill="#6d5bd0" radius={[10, 10, 0, 0]} />
+
+                  <XAxis
+                    dataKey="resourceName"
+                    interval={0}
+                    angle={-12}
+                    textAnchor="end"
+                    height={70}
+                    tick={{ fontSize: 11, fill: "#64748b" }}
+                  />
+
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                  />
+
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={{ color: "#1e293b", fontWeight: 700 }}
+                    itemStyle={{ color: "#2563eb", fontWeight: 600 }}
+                    cursor={{ fill: "rgba(59,130,246,0.08)" }}
+                  />
+
+                  <Bar
+                    dataKey="bookingCount"
+                    fill="url(#topResourcesGradient)"
+                    radius={[12, 12, 0, 0]}
+                    maxBarSize={90}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </section>
 
           <section className="analytics-grid middle-layout">
-            <div className="analytics-card chart-card">
+            <div className="analytics-card chart-card glass-card">
               <div className="card-header">
                 <h3>Peak Booking Hours</h3>
                 <p>Busiest approved booking times</p>
               </div>
 
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={overview.peakHours || []}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={overview.peakHours || []}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 25 }}
+                >
+                  <defs>
+                    <linearGradient id="peakHoursGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#60a5fa" />
+                      <stop offset="100%" stopColor="#1d4ed8" />
+                    </linearGradient>
+                  </defs>
+
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="bookingCount" fill="#8fd3e8" radius={[10, 10, 0, 0]} />
+
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fontSize: 12, fill: "#64748b" }}
+                  />
+
+                  <YAxis
+                    allowDecimals={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                  />
+
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={{ color: "#1e293b", fontWeight: 700 }}
+                    itemStyle={{ color: "#2563eb", fontWeight: 600 }}
+                    cursor={{ fill: "rgba(59,130,246,0.08)" }}
+                  />
+
+                  <Bar
+                    dataKey="bookingCount"
+                    fill="url(#peakHoursGradient)"
+                    radius={[12, 12, 0, 0]}
+                    maxBarSize={70}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
 
-            <div className="analytics-card chart-card">
+            <div className="analytics-card chart-card glass-card">
               <div className="card-header">
                 <h3>Status Distribution</h3>
                 <p>Overall booking workflow</p>
               </div>
 
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={statusChartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
+                    innerRadius={62}
+                    outerRadius={102}
+                    paddingAngle={3}
                     dataKey="value"
                     nameKey="name"
                   >
@@ -199,14 +274,19 @@ export default function AdminDashboard() {
                       <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={{ color: "#1e293b", fontWeight: 700 }}
+                    itemStyle={{ color: "#2563eb", fontWeight: 600 }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           </section>
 
           <section className="analytics-grid bottom-layout">
-            <div className="analytics-card">
+            <div className="analytics-card glass-card">
               <div className="card-header">
                 <h3>Busiest Days</h3>
                 <p>Approved bookings by weekday</p>
@@ -236,28 +316,53 @@ export default function AdminDashboard() {
               </table>
             </div>
 
-            <div className="analytics-card">
+            <div className="analytics-card glass-card">
               <div className="card-header">
                 <h3>Resource Type Usage</h3>
                 <p>Approved bookings by category</p>
               </div>
 
-              <ResponsiveContainer width="100%" height={250}>
+              <ResponsiveContainer width="100%" height={280}>
                 <BarChart
                   data={overview.resourceTypeUsage || []}
                   layout="vertical"
                   margin={{ top: 5, right: 10, left: 25, bottom: 5 }}
                 >
+                  <defs>
+                    <linearGradient id="resourceTypeGradient" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#93c5fd" />
+                      <stop offset="100%" stopColor="#1d4ed8" />
+                    </linearGradient>
+                  </defs>
+
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                  <XAxis type="number" />
+
+                  <XAxis
+                    type="number"
+                    allowDecimals={false}
+                    tick={{ fill: "#64748b", fontSize: 12 }}
+                  />
+
                   <YAxis
                     type="category"
                     dataKey="resourceType"
                     width={120}
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: 12, fill: "#64748b" }}
                   />
-                  <Tooltip />
-                  <Bar dataKey="bookingCount" fill="#58c27d" radius={[0, 10, 10, 0]} />
+
+                  <Tooltip
+                    contentStyle={chartTooltipStyle}
+                    labelStyle={{ color: "#1e293b", fontWeight: 700 }}
+                    itemStyle={{ color: "#2563eb", fontWeight: 600 }}
+                    cursor={{ fill: "rgba(59,130,246,0.08)" }}
+                  />
+
+                  <Bar
+                    dataKey="bookingCount"
+                    fill="url(#resourceTypeGradient)"
+                    radius={[0, 12, 12, 0]}
+                    maxBarSize={26}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
