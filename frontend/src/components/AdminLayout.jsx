@@ -85,7 +85,7 @@ export default function AdminLayout({ children, activeMenu = "dashboard" }) {
             <div className="sidebar-logo">
               <div className="logo-icon">📘</div>
               <div>
-                <h2>Headstart</h2>
+                <h2>Resora</h2>
                 <p>Admin Panel</p>
               </div>
             </div>

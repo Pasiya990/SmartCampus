@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
 import heroImage from "../../assets/landing/hero-campus.jpg";
 import previewImage from "../../assets/landing/catalogue-preview.jpg";
+import { useNavigate } from "react-router-dom";
 
 export default function HeroSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="hero-section">
       <div className="hero-overlay"></div>
@@ -28,8 +31,8 @@ export default function HeroSection() {
           </p>
 
           <div className="hero-buttons">
-            <button className="btn btn-primary">Get Started</button>
-            <button className="btn btn-outline">Login</button>
+            <button className="btn btn-primary" onClick={() => navigate("/login")}>Get Started</button>
+            <button className="btn btn-outline" onClick={() => navigate("/login")}>Login</button>
           </div>
         </motion.div>
 

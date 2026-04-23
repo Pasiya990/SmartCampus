@@ -12,7 +12,7 @@ export default function Navbar() {
       transition={{ duration: 0.6 }}
     >
       <div className="logo" onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-        SmartCampus
+        Resora
       </div>
 
       <ul className="nav-links">
