@@ -1,98 +1,116 @@
-/* ===== CARD ===== */
-.timeline-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-  
-    border: 1px solid #e2e8f0;
-  
-    box-shadow:
-      0 10px 30px rgba(0,0,0,0.05),
-      0 2px 6px rgba(0,0,0,0.03);
+/* ═══════════════════════════════════════════
+   AlertsCard.css
+   ═══════════════════════════════════════════ */
+
+   .timeline-card {
+    background: #ffffff;
+    border: 1px solid #e4e9f2;
+    border-radius: 14px;
+    padding: 22px 22px 16px;
+    box-shadow: 0 2px 12px rgba(15, 30, 70, 0.05);
   }
   
-  /* ===== HEADER ===== */
   .timeline-header {
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 18px;
   }
   
   .timeline-header h3 {
-    font-size: 18px;
-    font-weight: 600;
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a2233;
+    letter-spacing: -0.2px;
   }
   
-  /* ===== TIMELINE ===== */
+  .no-alerts {
+    text-align: center;
+    color: #8a94a8;
+    font-size: 0.86rem;
+    padding: 24px 0;
+  }
+  
+  /* Timeline */
   .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     position: relative;
-    margin-left: 10px;
-    padding-left: 20px;
   }
   
-  /* vertical line */
+  /* Vertical track line */
   .timeline::before {
     content: "";
     position: absolute;
     left: 6px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #e2e8f0;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: linear-gradient(to bottom, #dde4f5 0%, transparent 100%);
   }
   
-  /* ===== ITEM ===== */
   .timeline-item {
-    position: relative;
-    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 10px 10px 0;
     cursor: pointer;
-    transition: 0.2s;
+    border-radius: 8px;
+    transition: background 0.15s;
+    position: relative;
   }
-  
   .timeline-item:hover {
-    transform: translateX(4px);
+    background: #f7f9ff;
   }
   
-  /* ===== DOT ===== */
-.timeline-dot {
-    position: absolute;
-    left: -2px;
-    top: 6px;
-  
-    width: 10px;
-    height: 10px;
-  
-    background: white; /* default = READ */
+  /* Dot */
+  .timeline-dot {
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
-  
-    border: 2px solid #cbd5f5; /* soft border */
+    background: #dde4f5;
+    border: 2px solid #c8d4f0;
+    flex-shrink: 0;
+    margin-top: 3px;
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+    z-index: 1;
   }
   
-  /* 🔥 UNREAD (blue + glow) */
   .timeline-item.unread .timeline-dot {
-    background: #2563eb;
-    border: 2px solid white;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    background: #0F62FE;
+    border-color: rgba(15, 98, 254, 0.3);
+    box-shadow: 0 0 0 4px rgba(15, 98, 254, 0.1);
   }
   
-  /* ===== CONTENT ===== */
+  /* Unread row highlight */
+  .timeline-item.unread {
+    background: rgba(15, 98, 254, 0.03);
+  }
+  .timeline-item.unread:hover {
+    background: rgba(15, 98, 254, 0.07);
+  }
+  
+  /* Content */
   .timeline-content {
-    padding-left: 14px;
+    flex: 1;
+    min-width: 0;
   }
   
   .timeline-message {
-    font-size: 14px;
-    font-weight: 500;
-    color: #0f172a;
+    margin: 0 0 3px;
+    font-size: 0.82rem;
+    color: #3a4560;
+    line-height: 1.45;
+    font-weight: 400;
+  }
+  
+  .timeline-item.unread .timeline-message {
+    font-weight: 600;
+    color: #1a2233;
   }
   
   .timeline-time {
-    font-size: 12px;
-    color: #64748b;
-  }
-  
-  /* ===== EMPTY ===== */
-  .no-alerts {
-    color: #94a3b8;
-    font-size: 14px;
+    font-size: 0.71rem;
+    color: #a0abbe;
+    font-weight: 400;
   }

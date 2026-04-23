@@ -1,58 +1,112 @@
-.hero {
-    background: linear-gradient(135deg, #4f46e5, #6366f1);
-    border-radius: 18px;
-    padding: 28px 32px;
-    color: white;
+/* ═══════════════════════════════════════════
+   DashboardHero.css
+   ═══════════════════════════════════════════ */
+
+   .hero {
+    background: linear-gradient(135deg, #0F62FE 0%, #1a3c6e 60%, #0d3380 100%);
+    border-radius: 16px;
+    padding: 36px 40px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    box-shadow: 0 12px 30px rgba(79,70,229,0.25);
+    justify-content: space-between;
+    gap: 24px;
+    color: #fff;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 8px 32px rgba(15, 98, 254, 0.22);
   }
   
-  /* glow */
+  /* decorative circle blobs */
+  .hero::before,
   .hero::after {
     content: "";
     position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 200px;
-    height: 200px;
-    background: rgba(255,255,255,0.1);
     border-radius: 50%;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .hero::before {
+    width: 340px;
+    height: 340px;
+    background: #fff;
+    top: -120px;
+    right: -80px;
+  }
+  .hero::after {
+    width: 180px;
+    height: 180px;
+    background: #fff;
+    bottom: -70px;
+    left: 30%;
   }
   
   .hero h2 {
-    font-size: 24px;
+    font-size: 1.65rem;
     font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -0.3px;
   }
   
   .hero p {
-    opacity: 0.85;
-    margin-top: 6px;
+    margin: 0;
+    font-size: 0.92rem;
+    opacity: 0.82;
+    font-weight: 400;
   }
   
-  /* stats */
   .stats {
     display: flex;
-    gap: 20px;
-    background: rgba(255,255,255,0.12);
-    padding: 12px 20px;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 12px;
-    backdrop-filter: blur(10px);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    flex-shrink: 0;
   }
   
-  .stat {
+  .stats > div {
+    padding: 18px 28px;
     text-align: center;
+    position: relative;
   }
   
-  .stat span {
+  .stats > div + div::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18%;
+    height: 64%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.25);
+  }
+  
+  .stats span {
     display: block;
-    font-size: 12px;
-    opacity: 0.8;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-bottom: 4px;
   }
   
-  .stat strong {
-    font-size: 18px;
+  .stats h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 28px 24px;
+    }
+    .stats {
+      width: 100%;
+      justify-content: space-around;
+    }
   }

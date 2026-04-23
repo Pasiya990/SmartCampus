@@ -1,34 +1,21 @@
-/* ===== ROOT ===== */
-html, body, #root {
-    height: 100%;
-    margin: 0;
-    background: #f6f8ff;
-    font-family: "Inter", sans-serif;
-    color: #0f172a;
+/* ═══════════════════════════════════════════
+   UserDashboard.css
+   ═══════════════════════════════════════════ */
+
+   .dashboard {
+    padding: 28px 32px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background-color: #f4f6fb;
+    min-height: 100vh;
   }
   
-  /* subtle gradient glow */
-  body::before {
-    content: "";
-    position: fixed;
-    top: -120px;
-    right: -120px;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(79,70,229,0.15), transparent);
-    z-index: -1;
-  }
-  
-  /* ===== MAIN ===== */
-  .dashboard {
-    padding: 32px 48px;
-  }
-  
-  /* ===== GRID ===== */
   .grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 24px;
+    grid-template-columns: 1fr 360px;
+    gap: 20px;
+    align-items: start;
   }
   
   .side {
@@ -37,16 +24,11 @@ html, body, #root {
     gap: 20px;
   }
   
-  /* ===== CARD BASE ===== */
-  .card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-    transition: 0.25s;
-  }
-  
-  .card:hover {
-    transform: translateY(-4px);
+  @media (max-width: 1024px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+    .dashboard {
+      padding: 20px 16px 40px;
+    }
   }

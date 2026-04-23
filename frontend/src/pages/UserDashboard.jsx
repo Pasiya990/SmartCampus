@@ -8,11 +8,15 @@ import QuickActions from "../components/layout/dashboard/QuickActions";
 import RecentTickets from "../components/layout/dashboard/RecentTickets";
 import UpcomingBookings from "../components/layout/dashboard/UpcomingBookings";
 import AlertsCard from "../components/layout/dashboard/AlertsCard";
-import AnalyticsCards from "../components/layout/dashboard/AnalyticsCards";
+import { resourceService } from "../services/resourceService";
+import OutOfServiceResources from "../components/layout/dashboard/OutOfServiceResources";
 
 import "./UserDashboard.css";
 
 export default function UserDashboard() {
+
+  const [outages, setOutages] = useState([]);
+
 
   const [tickets, setTickets] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -85,6 +89,18 @@ export default function UserDashboard() {
     } catch (err) {
       console.error("Dashboard fetch error:", err);
     }
+
+
+        const resourceRes = await resourceService.getAll();
+
+    const allResources = resourceRes.data || [];
+
+    // 🔥 FILTER OUT OF SERVICE
+    const unavailable = allResources.filter(
+      (r) => r.status !== "ACTIVE"
+    );
+
+    setOutages(unavailable);
   };
 
   return (
@@ -100,6 +116,7 @@ export default function UserDashboard() {
 
         <div className="side">
           <UpcomingBookings bookings={bookings} />
+          <OutOfServiceResources resources={outages} />
           <AlertsCard 
             notifications={notifications} 
             setNotifications={setNotifications}

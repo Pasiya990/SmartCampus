@@ -1,17 +1,20 @@
-.footer {
+/* ═══════════════════════════════════════════
+   Footer.css
+   ═══════════════════════════════════════════ */
+
+   .footer {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    background: #fff;
+    border-top: 1px solid #e4e9f2;
+    font-size: 0.78rem;
+    color: #8a94a8;
+  }
   
-    padding: 20px 40px;
-    margin-top: 30px;
-  
-    border-top: 1px solid #e5e7eb;
-    background: rgba(255,255,255,0.7);
-    backdrop-filter: blur(10px);
-  
-    font-size: 14px;
-    color: #64748b;
+  .footer-left {
+    font-weight: 400;
   }
   
   .footer-right {
@@ -21,9 +24,9 @@
   
   .footer-right span {
     cursor: pointer;
-    transition: 0.2s;
+    transition: color 0.15s;
   }
   
   .footer-right span:hover {
-    color: #4f46e5;
+    color: #0F62FE;
   }
