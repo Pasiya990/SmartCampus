@@ -759,3 +759,75 @@
     gap: 8px;
   }
 }
+
+.my-bookings-page .bk-filter-bar {
+  margin-bottom: 24px;
+}
+
+.my-bookings-page .bk-filter-tabs {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  background: white;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.my-bookings-page .bk-filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1.5px solid;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.my-bookings-page .bk-filter-tab:hover {
+  transform: translateY(-1px);
+  filter: brightness(0.95);
+}
+
+.my-bookings-page .filter-count {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+/* Active badge */
+.my-bookings-page .bk-filter-tab.active .filter-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* All → Blue */
+.my-bookings-page .bk-filter-tab:nth-child(1) { background: #E6F1FB; border-color: #85B7EB; color: #0C447C; }
+.my-bookings-page .bk-filter-tab:nth-child(1) .filter-count { background: #85B7EB; color: #042C53; }
+.my-bookings-page .bk-filter-tab:nth-child(1).active { background: #185FA5; border-color: #185FA5; color: #E6F1FB; }
+
+/* Upcoming → Green */
+.my-bookings-page .bk-filter-tab:nth-child(2) { background: #EAF3DE; border-color: #97C459; color: #27500A; }
+.my-bookings-page .bk-filter-tab:nth-child(2) .filter-count { background: #97C459; color: #173404; }
+.my-bookings-page .bk-filter-tab:nth-child(2).active { background: #3B6D11; border-color: #3B6D11; color: #EAF3DE; }
+
+/* Pending → Amber */
+.my-bookings-page .bk-filter-tab:nth-child(3) { background: #FAEEDA; border-color: #EF9F27; color: #633806; }
+.my-bookings-page .bk-filter-tab:nth-child(3) .filter-count { background: #EF9F27; color: #412402; }
+.my-bookings-page .bk-filter-tab:nth-child(3).active { background: #BA7517; border-color: #BA7517; color: #FAEEDA; }
+
+/* Rejected → Red */
+.my-bookings-page .bk-filter-tab:nth-child(4) { background: #FCEBEB; border-color: #F09595; color: #791F1F; }
+.my-bookings-page .bk-filter-tab:nth-child(4) .filter-count { background: #F09595; color: #501313; }
+.my-bookings-page .bk-filter-tab:nth-child(4).active { background: #A32D2D; border-color: #A32D2D; color: #FCEBEB; }
+
+/* Cancelled → Light grey */
+.my-bookings-page .bk-filter-tab:nth-child(5) { background: #F8F8F6; border-color: #D3D1C7; color: #5F5E5A; }
+.my-bookings-page .bk-filter-tab:nth-child(5) .filter-count { background: #D3D1C7; color: #444441; }
+.my-bookings-page .bk-filter-tab:nth-child(5).active { background: #888780; border-color: #888780; color: #F1EFE8; }

@@ -74,56 +74,62 @@ const TicketList = () => {
         </div>
 
         <div className="ticket-list-summary-grid">
-          <div className="ticket-list-summary-card ticket-list-summary-total">
-            <span className="ticket-list-summary-label">Total</span>
-            <span className="ticket-list-summary-value">
-              {loading ? "-" : totalTickets}
-            </span>
-          </div>
+  <div
+    className={`ticket-list-summary-card ticket-list-summary-total ${statusFilter === "" && !unassignedOnly ? "active" : ""}`}
+    onClick={() => { setStatusFilter(""); setUnassignedOnly(false); }}
+  >
+    <span className="ticket-list-summary-label">Total</span>
+    <span className="ticket-list-summary-value">{loading ? "-" : totalTickets}</span>
+  </div>
 
-          <div className="ticket-list-summary-card ticket-list-summary-open">
-            <span className="ticket-list-summary-label">Open</span>
-            <span className="ticket-list-summary-value">
-              {loading ? "-" : openCount}
-            </span>
-          </div>
+  <div
+    className={`ticket-list-summary-card ticket-list-summary-open ${statusFilter === "OPEN" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "OPEN" ? "" : "OPEN")}
+  >
+    <span className="ticket-list-summary-label">Open</span>
+    <span className="ticket-list-summary-value">{loading ? "-" : openCount}</span>
+  </div>
 
-          <div className="ticket-list-summary-card ticket-list-summary-progress">
-            <span className="ticket-list-summary-label">In Progress</span>
-            <span className="ticket-list-summary-value">
-              {loading ? "-" : inProgressCount}
-            </span>
-          </div>
+  <div
+    className={`ticket-list-summary-card ticket-list-summary-progress ${statusFilter === "IN_PROGRESS" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "IN_PROGRESS" ? "" : "IN_PROGRESS")}
+  >
+    <span className="ticket-list-summary-label">In Progress</span>
+    <span className="ticket-list-summary-value">{loading ? "-" : inProgressCount}</span>
+  </div>
 
-          <div className="ticket-list-summary-card ticket-list-summary-resolved">
-            <span className="ticket-list-summary-label">Resolved</span>
-            <span className="ticket-list-summary-value">
-              {loading ? "-" : resolvedCount}
-            </span>
-          </div>
+  <div
+    className={`ticket-list-summary-card ticket-list-summary-resolved ${statusFilter === "RESOLVED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "RESOLVED" ? "" : "RESOLVED")}
+  >
+    <span className="ticket-list-summary-label">Resolved</span>
+    <span className="ticket-list-summary-value">{loading ? "-" : resolvedCount}</span>
+  </div>
 
-          <div className="ticket-list-summary-card ticket-list-summary-rejected">
-            <span className="ticket-list-summary-label">Rejected</span>
-            <span className="ticket-list-summary-value">
-              {loading ? "-" : rejectedCount}
-            </span>
-          </div>
+  <div
+    className={`ticket-list-summary-card ticket-list-summary-rejected ${statusFilter === "REJECTED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "REJECTED" ? "" : "REJECTED")}
+  >
+    <span className="ticket-list-summary-label">Rejected</span>
+    <span className="ticket-list-summary-value">{loading ? "-" : rejectedCount}</span>
+  </div>
 
-          <div className="ticket-list-summary-card ticket-list-summary-closed">
-            <span className="ticket-list-summary-label">Closed</span>
-            <span className="ticket-list-summary-value">
-              {loading ? "-" : closedCount}
-            </span>
-          </div>
+  <div
+    className={`ticket-list-summary-card ticket-list-summary-closed ${statusFilter === "CLOSED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "CLOSED" ? "" : "CLOSED")}
+  >
+    <span className="ticket-list-summary-label">Closed</span>
+    <span className="ticket-list-summary-value">{loading ? "-" : closedCount}</span>
+  </div>
 
-          <div className="ticket-list-summary-card ticket-list-summary-unassigned">
-            <span className="ticket-list-summary-label">Unassigned</span>
-            <span className="ticket-list-summary-value">
-              {loading ? "-" : unassignedCount}
-            </span>
-          </div>
-        </div>
-
+  <div
+    className={`ticket-list-summary-card ticket-list-summary-unassigned ${unassignedOnly ? "active" : ""}`}
+    onClick={() => { setUnassignedOnly(!unassignedOnly); setStatusFilter(""); }}
+  >
+    <span className="ticket-list-summary-label">Unassigned</span>
+    <span className="ticket-list-summary-value">{loading ? "-" : unassignedCount}</span>
+  </div>
+</div>
         <div className="ticket-list-card">
           <div className="ticket-list-toolbar">
             <div className="ticket-list-toolbar-left">

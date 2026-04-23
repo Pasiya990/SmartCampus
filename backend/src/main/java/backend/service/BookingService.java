@@ -110,22 +110,22 @@ public class BookingService {
         return bookings.stream().map(this::toResponse).toList();
     }
 
-    //  ✅ FIXED: Get single booking (QR + logged users)
+    //  Get single booking (QR + logged users)
     public BookingResponse getBookingById(Long bookingId, String email, boolean isAdmin) {
 
         Booking booking = getBookingOrThrow(bookingId);
 
-        // ✅ QR / Public access
+        //  QR / Public access
         if (email == null) {
             return toResponse(booking);
         }
 
-        // ✅ Admin access
+        //  Admin access
         if (isAdmin) {
             return toResponse(booking);
         }
 
-        // ✅ Normal user → enforce ownership
+        //  Normal user → enforce ownership
         User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "User not found"

@@ -26,7 +26,7 @@ export default function AdminBookingsPage() {
   const handleApprove = async (id) => {
     try {
       await approveBooking(id);
-      setMessage('✓ Booking approved successfully');
+      setMessage(' Booking approved successfully');
       setRefresh(r => r + 1);
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
@@ -43,7 +43,7 @@ export default function AdminBookingsPage() {
     }
     try {
       await rejectBooking(rejectId, reason);
-      setMessage('✓ Booking rejected successfully');
+      setMessage(' Booking rejected successfully');
       setRejectId(null);
       setReason('');
       setRefresh(r => r + 1);
