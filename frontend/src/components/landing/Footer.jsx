@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="landing-footer">
       <h3>Smart Campus Operations Hub</h3>
       <p>
-        Efficiently managing campus resources, bookings, and maintenance in one place.
+        A smarter and easier way to book resources, report issues, and stay informed on campus.
       </p>
       <small>© 2026 SmartCampus. All rights reserved.</small>
     </footer>

@@ -1,26 +1,26 @@
 import { motion } from "framer-motion";
-import { Search, FilePenLine, ShieldCheck, Bell } from "lucide-react";
+import { Search, FilePenLine, ClipboardCheck, Bell } from "lucide-react";
 
 const steps = [
   {
     icon: <Search size={34} />,
     title: "Browse Resources",
-    desc: "Users search for available halls, labs, meeting rooms, and equipment.",
+    desc: "Explore available lecture halls, labs, meeting rooms, and equipment with their details.",
   },
   {
     icon: <FilePenLine size={34} />,
-    title: "Submit Request",
-    desc: "Users enter booking details such as date, time, purpose, and attendee count.",
+    title: "Submit a Request",
+    desc: "Create a booking request or report an issue by entering the required details in a few simple steps.",
   },
   {
-    icon: <ShieldCheck size={34} />,
-    title: "Admin Reviews",
-    desc: "Admins review the request, check availability, and approve or reject it.",
+    icon: <ClipboardCheck size={34} />,
+    title: "Staff Reviews It",
+    desc: "Your request is reviewed by the relevant staff member to ensure availability and proper handling.",
   },
   {
     icon: <Bell size={34} />,
-    title: "Get Updates",
-    desc: "Users receive notifications and track the final booking outcome.",
+    title: "Get Notified",
+    desc: "Receive status updates and track your bookings and tickets anytime through the platform.",
   },
 ];
 
@@ -34,8 +34,8 @@ export default function WorkflowSection() {
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        <p className="section-tag">System Workflow</p>
-        <h2>How the platform works</h2>
+        <p className="section-tag">How It Works</p>
+        <h2>A smooth step-by-step experience for users</h2>
       </motion.div>
 
       <div className="workflow-line"></div>

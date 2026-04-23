@@ -2,29 +2,29 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import catalogueImage from "../../assets/landing/catalogue-preview.jpg";
 import bookingImage from "../../assets/landing/booking-preview.jpg";
+import ticketImage from "../../assets/landing/ticket-preview.jpg";
 import notificationImage from "../../assets/landing/notification-preview.jpg";
-import dashboardImage from "../../assets/landing/dashboard-preview.jpg";
 
 const slides = [
   {
-    image: dashboardImage,
-    title: "Powerful Admin Dashboard",
-    desc: "Monitor bookings, resources, ticket activity, and system performance from one central place.",
-  },
-  {
     image: catalogueImage,
-    title: "Smart Resource Catalogue",
-    desc: "View all campus facilities and equipment with search, filters, capacity, and location details.",
+    title: "Explore Campus Resources",
+    desc: "Browse available halls, labs, rooms, and equipment with clear information about capacity, location, and availability.",
   },
   {
     image: bookingImage,
-    title: "Simple Booking Experience",
-    desc: "Users can request resources quickly with date, purpose, attendees, and conflict-aware scheduling.",
+    title: "Submit Bookings Easily",
+    desc: "Request a resource in just a few steps by entering the date, time, purpose, and attendee details.",
+  },
+  {
+    image: ticketImage,
+    title: "Report Issues Quickly",
+    desc: "Raise maintenance or incident tickets with descriptions, contact details, and evidence images when necessary.",
   },
   {
     image: notificationImage,
-    title: "Real-Time Notifications",
-    desc: "Stay informed about approval decisions, status changes, and important updates instantly.",
+    title: "Stay Updated Instantly",
+    desc: "Track approvals, ticket progress, and notifications without missing any important update.",
   },
 ];
 
@@ -49,7 +49,7 @@ export default function PreviewSection() {
         transition={{ duration: 0.6 }}
       >
         <p className="section-tag">System Preview</p>
-        <h2>See the platform in action</h2>
+        <h2>Designed for everyday users</h2>
       </motion.div>
 
       <div className="preview-wrapper">
