@@ -1,7 +1,8 @@
 :root {
-  --primary: #720e9e;
-  --primary-dark: #5a0a7e;
-  --primary-light: #f3e8ff;
+  --primary: #1d4ed8;
+  --primary-dark: #1e40af;
+  --primary-light: #eff6ff;
+
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
   --gray-200: #e5e7eb;
@@ -12,8 +13,9 @@
   --gray-700: #374151;
   --gray-800: #1f2937;
   --gray-900: #111827;
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 6px 12px -2px rgb(0 0 0 / 0.1);
 }
 
 * {
@@ -89,11 +91,12 @@
 
 /* Selected Resource Display */
 .bf-selected-resource {
-  background: var(--primary-light);
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1px solid #93c5fd;
   padding: 16px;
   border-radius: 12px;
   margin-bottom: 24px;
-  border: 1px solid #e9d5ff;
+  
 }
 
 .bf-resource-name {
@@ -200,7 +203,7 @@
 .bf-btn {
   width: 100%;
   padding: 12px 16px;
-  background: var(--primary);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   border: none;
   border-radius: 8px;
@@ -213,7 +216,7 @@
 }
 
 .bf-btn:hover {
-  background: var(--primary-dark);
+  background: linear-gradient(135deg, #1e40af, #1e3a8a);
   transform: translateY(-1px);
 }
 
