@@ -21,6 +21,8 @@ import ResourceCatalogue from "./pages/ResourceCatalogue";
 import LandingPage from "./pages/LandingPage";
 import BookingVerifyPage from './pages/BookingVerifyPage';
 
+import UserLayout from "./components/layout/UserLayout";
+
 function App() {
   return (
     <BrowserRouter>
@@ -31,7 +33,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/oauth-success" element={<OAuthSuccess />} />
 
-        <Route path="/user" element={<UserDashboard />} />
+              <Route path="/user" element={<UserLayout />}>
+        <Route index element={<UserDashboard />} />
+      </Route>
+
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/technician" element={<TechnicianDashboard />} />
         <Route path="/resources" element={<ResourceCatalogue />} />

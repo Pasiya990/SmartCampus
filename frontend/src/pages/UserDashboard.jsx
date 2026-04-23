@@ -1,91 +1,109 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import API from "../services/api";
-import NotificationBell from "../components/NotificationBell";
+import { getNotifications } from "../api/notificationApi";
+
+import DashboardHero from "../components/layout/dashboard/DashboardHero";
+import QuickActions from "../components/layout/dashboard/QuickActions";
+import RecentTickets from "../components/layout/dashboard/RecentTickets";
+import UpcomingBookings from "../components/layout/dashboard/UpcomingBookings";
+import AlertsCard from "../components/layout/dashboard/AlertsCard";
+
+import "./UserDashboard.css";
 
 export default function UserDashboard() {
-  
+
+  const [tickets, setTickets] = useState([]);
+  const [bookings, setBookings] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+
+  const [stats, setStats] = useState({
+    active: 0,
+    pending: 0,
+    bookings: 0
+  });
+
+  // ✅ decode inside component
+  const token = localStorage.getItem("token");
+
+  let email = "";
+  if (token) {
+    const decoded = jwtDecode(token);
+    email = decoded.sub;
+  }
 
   const name = localStorage.getItem("name") || "User";
 
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
+  const fetchDashboardData = async () => {
+    try {
+      const ticketRes = await API.get("/api/tickets/my-tickets");
+      const bookingRes = await API.get("/api/bookings");
+
+      const ticketData = ticketRes.data || [];
+      const allBookings = bookingRes.data || [];
+
+      // 📅 today
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // ✅ filter bookings
+      const filteredBookings = allBookings
+        .filter((b) => {
+          const status = b.status?.toLowerCase();
+          const bookingDate = new Date(b.date);
+
+          return (
+            (status === "pending" || status === "approved") &&
+            bookingDate >= today
+          );
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      // 🔔 notifications
+      const notiData = await getNotifications(email);
+
+      setTickets(ticketData);
+      setBookings(filteredBookings);
+      setNotifications(notiData || []);
+
+      const active = ticketData.length;
+      const pending = ticketData.filter(
+        (t) => t.status?.toLowerCase() === "pending"
+      ).length;
+
+      setStats({
+        active,
+        pending,
+        bookings: filteredBookings.length
+      });
+
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
+    }
+  };
 
   return (
+    <div className="dashboard">
 
-    <div>
+      <DashboardHero name={name} stats={stats} />
 
-    {/* 🔔 TOP RIGHT */}
-    <div style={{ display: "flex", justifyContent: "flex-end" }}>
-      <NotificationBell />
-      </div>
-    <div style={{ padding: "40px" }}>
-      <h2>User Dashboard</h2>
-      <p>Welcome, {name}</p>
-      
+      <QuickActions />
 
-      <div style={{ display: "flex", gap: "12px", marginTop: "20px", flexWrap: "wrap" }}>
-        
-        <Link
-          to="/tickets/new"
-          style={{
-            backgroundColor: "#720e9e",
-            color: "#ffffff",
-            padding: "10px 16px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "600",
-          }}
-        >
-          + Add New Ticket
-        </Link>
+      <div className="grid">
 
-        <Link
-          to="/my-tickets"
-          style={{
-            backgroundColor: "#ffffff",
-            color: "#720e9e",
-            padding: "10px 16px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "600",
-            border: "1px solid #720e9e",
-          }}
-        >
-          View My Tickets
-        </Link>
+        <RecentTickets tickets={tickets} />
 
-        <Link
-          to="/my-bookings"
-          style={{
-            backgroundColor: "#720e9e",
-            color: "#ffffff",
-            padding: "10px 16px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "600",
-          }}
-        >
-          My Bookings
-        </Link>
-
-        {/* ✅ NEW: Resource Catalogue */}
-        <Link
-          to="/resources"
-          style={{
-            backgroundColor: "#ffffff",
-            color: "#720e9e",
-            padding: "10px 16px",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "600",
-            border: "1px solid #720e9e",
-          }}
-        >
-          View Resources
-        </Link>
+        <div className="side">
+          <UpcomingBookings bookings={bookings} />
+          <AlertsCard notifications={notifications} />
+        </div>
 
       </div>
+
     </div>
-  </div>
   );
 }
