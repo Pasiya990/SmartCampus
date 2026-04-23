@@ -6,19 +6,6 @@ import toast from "react-hot-toast";
 import "./ResourceCatalogue.css";
 import AdminLayout from "../components/AdminLayout";
 
-const TYPE_ICONS = {
-  LECTURE_HALL: "🏛️",
-  LAB: "🔬",
-  MEETING_ROOM: "🗓️",
-  EQUIPMENT: "🎥",
-  SMART_RESOURCE: "💡",
-  OUTDOOR_EVENT_SPACE: "🌿",
-  AUDITORIUM_STAGE: "🎤",
-  LIBRARY_STUDY_AREA: "📚",
-  PODCAST_RECORDING_ROOM: "🎙️",
-  MEDIA_PRODUCTION_STUDIO: "🎬",
-};
-
 export default function ResourceCatalogue() {
   const navigate = useNavigate();
 
@@ -279,10 +266,6 @@ export default function ResourceCatalogue() {
                         />
                       )}
 
-                      <div className="resource-icon">
-                        {TYPE_ICONS[r.type] || "🏢"}
-                      </div>
-
                       <div className="resource-header">
                         <div>
                           <h3 className="resource-name">{r.name}</h3>
@@ -325,38 +308,34 @@ export default function ResourceCatalogue() {
                         {isAdmin && (
                           <>
                             <button
-                              className="btn-icon"
+                              className="btn-text"
                               onClick={() => setModal({ open: true, resource: r })}
-                              title="Edit"
                             >
-                              ✏️
+                              Edit
                             </button>
 
                             <button
-                              className="btn-icon"
+                              className="btn-text"
                               onClick={() => handleStatusToggle(r)}
-                              title="Toggle status"
                             >
-                              {r.status === "ACTIVE" ? "🔴" : "🟢"}
+                              {r.status === "ACTIVE" ? "Deactivate" : "Activate"}
                             </button>
 
                             <button
-                              className="btn-icon danger"
+                              className="btn-text danger"
                               onClick={() => handleDelete(r.id)}
-                              title="Delete"
                             >
-                              🗑️
+                              Delete
                             </button>
                           </>
                         )}
 
                         {isUser && (
                           <button
-                            className="btn-icon"
+                            className="btn-text primary"
                             onClick={() => handleBook(r)}
-                            title="Book"
                           >
-                            📅
+                            Book
                           </button>
                         )}
                       </div>
