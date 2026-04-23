@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { getTicketsByAssignedTechnician } from "../api/ticketApi";
 import TechnicianLayout from "../components/TechnicianLayout";
 import "./TechnicianDashboard.css";
@@ -24,7 +25,7 @@ export default function TechnicianDashboard() {
     const fetchAssignedTickets = async () => {
       try {
         const data = await getTicketsByAssignedTechnician();
-        setTickets(data);
+        setTickets(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching technician tickets:", error);
         setErrorMessage("Failed to load technician dashboard.");
@@ -37,15 +38,20 @@ export default function TechnicianDashboard() {
   }, []);
 
   const analytics = useMemo(() => {
-    const total = tickets.length;
-    const open = tickets.filter((t) => t.status === "OPEN").length;
-    const inProgress = tickets.filter((t) => t.status === "IN_PROGRESS").length;
-    const resolved = tickets.filter((t) => t.status === "RESOLVED").length;
-    const closed = tickets.filter((t) => t.status === "CLOSED").length;
+    const safeTickets = Array.isArray(tickets) ? tickets : [];
 
-    const high = tickets.filter((t) => t.priority === "HIGH").length;
-    const medium = tickets.filter((t) => t.priority === "MEDIUM").length;
-    const low = tickets.filter((t) => t.priority === "LOW").length;
+    const total = safeTickets.length;
+
+    const open = safeTickets.filter((t) => t.status === "OPEN").length;
+    const inProgress = safeTickets.filter(
+      (t) => t.status === "IN_PROGRESS"
+    ).length;
+    const resolved = safeTickets.filter((t) => t.status === "RESOLVED").length;
+    const closed = safeTickets.filter((t) => t.status === "CLOSED").length;
+
+    const high = safeTickets.filter((t) => t.priority === "HIGH").length;
+    const medium = safeTickets.filter((t) => t.priority === "MEDIUM").length;
+    const low = safeTickets.filter((t) => t.priority === "LOW").length;
 
     const priorityItems = [
       { label: "High", value: high },
@@ -56,7 +62,7 @@ export default function TechnicianDashboard() {
     const maxPriority = Math.max(...priorityItems.map((item) => item.value), 1);
 
     const totalStatus = open + inProgress + resolved + closed;
-    const safeTotalStatus = totalStatus === 0 ? 1 : totalStatus;
+    const safeTotalStatus = totalStatus || 1;
 
     const openPercent = (open / safeTotalStatus) * 100;
     const inProgressPercent = (inProgress / safeTotalStatus) * 100;
@@ -67,10 +73,55 @@ export default function TechnicianDashboard() {
       background: `conic-gradient(
         #7c67df 0% ${openPercent}%,
         #5bc07a ${openPercent}% ${openPercent + inProgressPercent}%,
-        #f08a80 ${openPercent + inProgressPercent}% ${openPercent + inProgressPercent + resolvedPercent}%,
+        #f08a80 ${openPercent + inProgressPercent}% ${
+        openPercent + inProgressPercent + resolvedPercent
+      }%,
         #d7dbe6 ${openPercent + inProgressPercent + resolvedPercent}% 100%
       )`,
     };
+
+    const recentTickets = [...safeTickets]
+      .sort((a, b) => {
+        const dateA = new Date(
+          a.updatedAt || a.createdAt || a.reportedAt || 0
+        ).getTime();
+        const dateB = new Date(
+          b.updatedAt || b.createdAt || b.reportedAt || 0
+        ).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 5);
+
+    const statusLegend = [
+      {
+        label: "Open",
+        value: open,
+        percent: Math.round((open / safeTotalStatus) * 100),
+        className: "techdash-dot-open",
+      },
+      {
+        label: "In Progress",
+        value: inProgress,
+        percent: Math.round((inProgress / safeTotalStatus) * 100),
+        className: "techdash-dot-progress",
+      },
+      {
+        label: "Resolved",
+        value: resolved,
+        percent: Math.round((resolved / safeTotalStatus) * 100),
+        className: "techdash-dot-resolved",
+      },
+      {
+        label: "Closed",
+        value: closed,
+        percent: Math.round((closed / safeTotalStatus) * 100),
+        className: "techdash-dot-closed",
+      },
+    ];
+
+    const latestHighPriority = recentTickets.filter(
+      (ticket) => ticket.priority === "HIGH"
+    ).length;
 
     return {
       total,
@@ -85,6 +136,9 @@ export default function TechnicianDashboard() {
       maxPriority,
       totalStatus,
       doughnutStyle,
+      recentTickets,
+      statusLegend,
+      latestHighPriority,
     };
   }, [tickets]);
 
@@ -110,7 +164,9 @@ export default function TechnicianDashboard() {
         <div className="techdash-header">
           <div>
             <h1 className="techdash-title">Dashboard</h1>
-            <p className="techdash-subtitle">Hello Technician</p>
+            <p className="techdash-subtitle">
+              Assigned ticket analytics and latest activity
+            </p>
           </div>
         </div>
 
@@ -146,7 +202,9 @@ export default function TechnicianDashboard() {
         <div className="techdash-grid-two">
           <div className="techdash-panel">
             <h3>Overview</h3>
-            <p className="techdash-panel-subtext">Ticket handling summary</p>
+            <p className="techdash-panel-subtext">
+              Summary based only on tickets assigned to you
+            </p>
 
             <div className="techdash-mini-grid">
               <div className="techdash-mini-card">
@@ -173,17 +231,19 @@ export default function TechnicianDashboard() {
             <div className="techdash-insight-card">
               <h4>Latest Insight</h4>
               <p>
-                You currently have {analytics.total} assigned ticket(s), with{" "}
-                {analytics.inProgress} ticket(s) actively in progress and{" "}
-                {analytics.high} high priority ticket(s) that may need quick
-                attention.
+                You currently have <strong>{analytics.total}</strong> assigned
+                ticket(s). Out of them,{" "}
+                <strong>{analytics.inProgress}</strong> are in progress and{" "}
+                <strong>{analytics.high}</strong> are high priority.
               </p>
             </div>
           </div>
 
           <div className="techdash-panel">
             <h3>Status Breakdown</h3>
-            <p className="techdash-panel-subtext">Assigned tickets by status</p>
+            <p className="techdash-panel-subtext">
+              Distribution of your assigned tickets by status
+            </p>
 
             <div className="techdash-doughnut-wrap">
               <div
@@ -197,29 +257,15 @@ export default function TechnicianDashboard() {
               </div>
 
               <div className="techdash-doughnut-legend">
-                <div className="techdash-legend-item">
-                  <span className="techdash-legend-dot techdash-dot-open"></span>
-                  <span>Open</span>
-                  <strong>{analytics.open}</strong>
-                </div>
-
-                <div className="techdash-legend-item">
-                  <span className="techdash-legend-dot techdash-dot-progress"></span>
-                  <span>In Progress</span>
-                  <strong>{analytics.inProgress}</strong>
-                </div>
-
-                <div className="techdash-legend-item">
-                  <span className="techdash-legend-dot techdash-dot-resolved"></span>
-                  <span>Resolved</span>
-                  <strong>{analytics.resolved}</strong>
-                </div>
-
-                <div className="techdash-legend-item">
-                  <span className="techdash-legend-dot techdash-dot-closed"></span>
-                  <span>Closed</span>
-                  <strong>{analytics.closed}</strong>
-                </div>
+                {analytics.statusLegend.map((item) => (
+                  <div key={item.label} className="techdash-legend-item">
+                    <span className={`techdash-legend-dot ${item.className}`}></span>
+                    <span className="techdash-legend-label">{item.label}</span>
+                    <span className="techdash-legend-meta">
+                      {item.value} ({item.percent}%)
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -228,7 +274,9 @@ export default function TechnicianDashboard() {
         <div className="techdash-grid-two">
           <div className="techdash-panel">
             <h3>Priority Distribution</h3>
-            <p className="techdash-panel-subtext">Assigned tickets by priority</p>
+            <p className="techdash-panel-subtext">
+              Assigned tickets by priority
+            </p>
 
             <div className="techdash-bar-list">
               {analytics.priorityItems.map((item) => (
@@ -252,18 +300,31 @@ export default function TechnicianDashboard() {
           </div>
 
           <div className="techdash-panel">
-            <h3>Recent Assigned Tickets</h3>
-            <p className="techdash-panel-subtext">Latest assigned incidents</p>
+            <div className="techdash-panel-head">
+              <div>
+                <h3>Recent Assigned Tickets</h3>
+                <p className="techdash-panel-subtext">
+                  Latest updated tickets assigned to you
+                </p>
+              </div>
+            </div>
 
-            {tickets.length === 0 ? (
+            {analytics.recentTickets.length === 0 ? (
               <p className="techdash-empty">No assigned tickets found.</p>
             ) : (
               <div className="techdash-recent-list">
-                {tickets.slice(0, 5).map((ticket) => (
-                  <div key={ticket.id} className="techdash-recent-item">
-                    <div>
+                {analytics.recentTickets.map((ticket) => (
+                  <Link
+                    key={ticket.id}
+                    to={`/tickets/${ticket.id}`}
+                    className="techdash-recent-item techdash-recent-link"
+                  >
+                    <div className="techdash-recent-main">
                       <h4>{ticket.title}</h4>
                       <p>{ticket.ticketCode}</p>
+                      <small>
+                        {ticket.category} • {ticket.location}
+                      </small>
                     </div>
 
                     <div className="techdash-recent-right">
@@ -275,10 +336,10 @@ export default function TechnicianDashboard() {
                       <span
                         className={`techdash-badge techdash-status-${ticket.status?.toLowerCase()}`}
                       >
-                        {ticket.status}
+                        {ticket.status?.replace("_", " ")}
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
