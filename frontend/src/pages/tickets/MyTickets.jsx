@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getMyTickets } from "../../api/ticketApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./MyTickets.css";
 
 const MyTickets = () => {
@@ -10,6 +10,8 @@ const MyTickets = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -53,7 +55,7 @@ const MyTickets = () => {
   const closedCount = tickets.filter((ticket) => ticket.status === "CLOSED").length;
 
   if (loading) {
-    return <p className="my-tickets-loading">Loading your tickets...</p>;
+    return null;
   }
 
   if (errorMessage) {
@@ -63,45 +65,77 @@ const MyTickets = () => {
   return (
     <div className="my-tickets-page">
       <div className="my-tickets-header">
-        <div>
-          <h2 className="my-tickets-title">My Tickets</h2>
-          <p className="my-tickets-subtitle">
-            Track incidents you have reported
-          </p>
+        <div className="my-tickets-header-left">
+          <button
+            className="my-tickets-back-btn"
+            onClick={() => navigate(-1)}
+          >
+            &#8592; Back
+          </button>
+          <div>
+            <h2 className="my-tickets-title">My Tickets</h2>
+            <p className="my-tickets-subtitle">
+              Track incidents you have reported
+            </p>
+          </div>
         </div>
+        <button
+          className="my-tickets-new-btn"
+          onClick={() => navigate("/tickets/new")}
+        >
+          + New Ticket
+        </button>
       </div>
 
       <div className="my-tickets-summary-grid">
-        <div className="my-tickets-summary-card my-tickets-summary-total">
-          <span className="my-tickets-summary-label">Total</span>
-          <span className="my-tickets-summary-value">{totalTickets}</span>
-        </div>
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-total ${statusFilter === "" ? "active" : ""}`}
+    onClick={() => setStatusFilter("")}
+  >
+    <span className="my-tickets-summary-bubble">{totalTickets}</span>
+    <span className="my-tickets-summary-label">Total</span>
+  </div>
 
-        <div className="my-tickets-summary-card my-tickets-summary-open">
-          <span className="my-tickets-summary-label">Open</span>
-          <span className="my-tickets-summary-value">{openCount}</span>
-        </div>
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-open ${statusFilter === "OPEN" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "OPEN" ? "" : "OPEN")}
+  >
+    <span className="my-tickets-summary-bubble">{openCount}</span>
+    <span className="my-tickets-summary-label">Open</span>
+  </div>
 
-        <div className="my-tickets-summary-card my-tickets-summary-progress">
-          <span className="my-tickets-summary-label">In Progress</span>
-          <span className="my-tickets-summary-value">{inProgressCount}</span>
-        </div>
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-progress ${statusFilter === "IN_PROGRESS" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "IN_PROGRESS" ? "" : "IN_PROGRESS")}
+  >
+    <span className="my-tickets-summary-bubble">{inProgressCount}</span>
+    <span className="my-tickets-summary-label">In Progress</span>
+  </div>
 
-        <div className="my-tickets-summary-card my-tickets-summary-resolved">
-          <span className="my-tickets-summary-label">Resolved</span>
-          <span className="my-tickets-summary-value">{resolvedCount}</span>
-        </div>
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-resolved ${statusFilter === "RESOLVED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "RESOLVED" ? "" : "RESOLVED")}
+  >
+    <span className="my-tickets-summary-bubble">{resolvedCount}</span>
+    <span className="my-tickets-summary-label">Resolved</span>
+  </div>
 
-        <div className="my-tickets-summary-card my-tickets-summary-rejected">
-          <span className="my-tickets-summary-label">Rejected</span>
-          <span className="my-tickets-summary-value">{rejectedCount}</span>
-        </div>
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-rejected ${statusFilter === "REJECTED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "REJECTED" ? "" : "REJECTED")}
+  >
+    <span className="my-tickets-summary-bubble">{rejectedCount}</span>
+    <span className="my-tickets-summary-label">Rejected</span>
+  </div>
 
-        <div className="my-tickets-summary-card my-tickets-summary-closed">
-          <span className="my-tickets-summary-label">Closed</span>
-          <span className="my-tickets-summary-value">{closedCount}</span>
-        </div>
-      </div>
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-closed ${statusFilter === "CLOSED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "CLOSED" ? "" : "CLOSED")}
+  >
+    <span className="my-tickets-summary-bubble">{closedCount}</span>
+    <span className="my-tickets-summary-label">Closed</span>
+  </div>
+</div>
 
       <div className="my-tickets-card">
         <div className="my-tickets-toolbar">
@@ -143,7 +177,8 @@ const MyTickets = () => {
 
         <div className="my-tickets-results-row">
           <span className="my-tickets-results-text">
-            Showing <strong>{filteredTickets.length}</strong> ticket(s)
+            Showing <strong>{filteredTickets.length}</strong>{" "}
+            {filteredTickets.length === 1 ? "ticket" : "tickets"}
           </span>
         </div>
 
@@ -152,6 +187,15 @@ const MyTickets = () => {
         ) : (
           <div className="my-tickets-table-wrapper">
             <table className="my-tickets-table">
+              <colgroup>
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+              </colgroup>
               <thead>
                 <tr>
                   <th>Ticket Code</th>
@@ -183,7 +227,7 @@ const MyTickets = () => {
                         {ticket.status}
                       </span>
                     </td>
-                    <td>{ticket.location}</td>
+                    <td className="my-tickets-location-cell">{ticket.location}</td>
                     <td>
                       <Link
                         to={`/tickets/${ticket.id}`}
