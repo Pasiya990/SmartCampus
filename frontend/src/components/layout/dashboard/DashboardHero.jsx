@@ -1,3 +1,5 @@
+import "./DashboardHero.css";
+
 export default function DashboardHero({ name, stats }) {
     return (
       <div className="hero">

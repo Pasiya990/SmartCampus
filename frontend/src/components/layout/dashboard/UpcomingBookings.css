@@ -1,0 +1,106 @@
+/* ===== CARD ===== */
+.bookings-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+  
+    border: 1px solid #e2e8f0;
+  
+    box-shadow:
+      0 10px 30px rgba(0,0,0,0.05),
+      0 2px 6px rgba(0,0,0,0.03);
+  
+    transition: 0.25s;
+  }
+  
+  .bookings-card:hover {
+    transform: translateY(-3px);
+  }
+  
+  /* ===== HEADER ===== */
+  .bookings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+  
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .bookings-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .bookings-header a {
+    color: #6366f1;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  
+  /* ===== ITEM ===== */
+  .booking-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  
+    padding: 12px 8px;
+    border-radius: 12px;
+  
+    transition: 0.2s;
+    cursor: pointer;
+  }
+  
+  .booking-item:hover {
+    background: #f8fafc;
+  }
+  
+  /* ===== DATE BOX ===== */
+  .booking-date {
+    width: 50px;
+    height: 50px;
+  
+    border-radius: 12px;
+  
+    background: #eef2ff;
+  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  
+    flex-shrink: 0;
+  }
+  
+  .booking-date .month {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6366f1;
+  }
+  
+  .booking-date .day {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  
+  /* ===== DETAILS ===== */
+  .booking-details h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  
+  .booking-details p {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  
+  /* ===== EMPTY ===== */
+  .empty {
+    color: #94a3b8;
+    font-size: 14px;
+  }

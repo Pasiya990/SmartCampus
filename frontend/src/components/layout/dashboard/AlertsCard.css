@@ -1,0 +1,98 @@
+/* ===== CARD ===== */
+.timeline-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+  
+    border: 1px solid #e2e8f0;
+  
+    box-shadow:
+      0 10px 30px rgba(0,0,0,0.05),
+      0 2px 6px rgba(0,0,0,0.03);
+  }
+  
+  /* ===== HEADER ===== */
+  .timeline-header {
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .timeline-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  /* ===== TIMELINE ===== */
+  .timeline {
+    position: relative;
+    margin-left: 10px;
+    padding-left: 20px;
+  }
+  
+  /* vertical line */
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+  }
+  
+  /* ===== ITEM ===== */
+  .timeline-item {
+    position: relative;
+    margin-bottom: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  
+  .timeline-item:hover {
+    transform: translateX(4px);
+  }
+  
+  /* ===== DOT ===== */
+.timeline-dot {
+    position: absolute;
+    left: -2px;
+    top: 6px;
+  
+    width: 10px;
+    height: 10px;
+  
+    background: white; /* default = READ */
+    border-radius: 50%;
+  
+    border: 2px solid #cbd5f5; /* soft border */
+  }
+  
+  /* 🔥 UNREAD (blue + glow) */
+  .timeline-item.unread .timeline-dot {
+    background: #2563eb;
+    border: 2px solid white;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  }
+  
+  /* ===== CONTENT ===== */
+  .timeline-content {
+    padding-left: 14px;
+  }
+  
+  .timeline-message {
+    font-size: 14px;
+    font-weight: 500;
+    color: #0f172a;
+  }
+  
+  .timeline-time {
+    font-size: 12px;
+    color: #64748b;
+  }
+  
+  /* ===== EMPTY ===== */
+  .no-alerts {
+    color: #94a3b8;
+    font-size: 14px;
+  }

@@ -1,6 +1,7 @@
 // components/layout/Topbar.jsx
 import { Link, useLocation } from "react-router-dom";
 import NotificationBell from "../NotificationBell";
+import "./Topbar.css";
 
 export default function Topbar() {
   const location = useLocation();

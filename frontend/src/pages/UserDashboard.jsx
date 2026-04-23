@@ -8,6 +8,7 @@ import QuickActions from "../components/layout/dashboard/QuickActions";
 import RecentTickets from "../components/layout/dashboard/RecentTickets";
 import UpcomingBookings from "../components/layout/dashboard/UpcomingBookings";
 import AlertsCard from "../components/layout/dashboard/AlertsCard";
+import AnalyticsCards from "../components/layout/dashboard/AnalyticsCards";
 
 import "./UserDashboard.css";
 
@@ -99,9 +100,12 @@ export default function UserDashboard() {
 
         <div className="side">
           <UpcomingBookings bookings={bookings} />
-          <AlertsCard notifications={notifications} />
+          <AlertsCard 
+            notifications={notifications} 
+            setNotifications={setNotifications}
+          />
         </div>
-
+        
       </div>
 
     </div>
