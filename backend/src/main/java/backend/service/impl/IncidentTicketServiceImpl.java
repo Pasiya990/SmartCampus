@@ -252,13 +252,13 @@ public class IncidentTicketServiceImpl implements IncidentTicketService {
         boolean commenterIsOwner = request.getAuthorEmail() != null &&
         ticket.getReportedBy().equalsIgnoreCase(request.getAuthorEmail());
 
-            if (!commenterIsOwner) {
-                notificationService.createNotification(
-                    ticket.getReportedBy(),
-                    "A new comment was added to your ticket " + ticket.getTicketCode()
-                        + " by " + request.getAuthorRole()
-                );
-            }
+        if (!commenterIsOwner) {
+            notificationService.createNotification(
+                ticket.getReportedBy(),
+                "A new comment was added to your ticket " + ticket.getTicketCode()
+                    + " by " + request.getAuthorRole()
+            );
+        }
 
         return mapToCommentResponse(savedComment);
     }

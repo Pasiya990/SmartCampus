@@ -35,23 +35,23 @@ function App() {
 
         <Route element={<UserLayout />}>
 
-<Route path="/user" element={<UserDashboard />} />
+          <Route path="/user" element={<UserDashboard />} />
 
-<Route path="/resources" element={<ResourceCatalogue />} />
+          <Route path="/resources" element={<ResourceCatalogue />} />
 
-<Route path="/my-bookings" element={<MyBookingsPage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
 
-<Route path="/my-tickets" element={<MyTickets />} />
+          <Route path="/my-tickets" element={<MyTickets />} />
 
-<Route path="/tickets/new" element={<TicketCreate />} />
+          <Route path="/tickets/new" element={<TicketCreate />} />
 
-<Route path="/tickets/:id" element={<TicketDetails />} />
+          <Route path="/tickets/:id" element={<TicketDetails />} />
 
-<Route path="/book" element={<BookingFormPage />} />
-<Route path="/booking/:id" element={<BookingFormPage />} />
-<Route path="/booking/verify/:id" element={<BookingVerifyPage />} />
+          <Route path="/book" element={<BookingFormPage />} />
+          <Route path="/booking/:id" element={<BookingFormPage />} />
+          <Route path="/booking/verify/:id" element={<BookingVerifyPage />} />
 
-</Route>
+        </Route>
 
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/technician" element={<TechnicianDashboard />} />
