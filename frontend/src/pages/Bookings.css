@@ -568,6 +568,7 @@
   box-shadow: var(--shadow-lg);
   animation: slideUp 0.3s ease;
   overflow: hidden;
+  padding: 24px;
 }
 
 @keyframes slideUp {
@@ -624,7 +625,7 @@
 .modal-btn-confirm {
   flex: 1;
   padding: 12px;
-  background: var(--primary);
+  background: #2563eb;
   color: white;
   border: none;
   border-radius: 10px;
@@ -636,7 +637,7 @@
 }
 
 .modal-btn-confirm:hover {
-  background: var(--primary-dark);
+  background: #1e40af;
   transform: translateY(-1px);
 }
 
@@ -805,6 +806,84 @@
 .my-bookings-page .bk-filter-tab.active .filter-count {
   background: rgba(255, 255, 255, 0.2);
   color: white;
+}
+
+.btn-edit {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-edit:hover {
+  background: #1e40af;
+}
+
+/* Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+/* Labels */
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+}
+
+/* Inputs */
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--gray-300);
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--gray-50);
+  color: var(--gray-900);
+  transition: all 0.2s ease;
+}
+
+/* Focus effect (matches your theme) */
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(114, 14, 158, 0.15);
+}
+
+/* Two-column layout for time */
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.btn-delete {
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-delete:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* All → Blue */

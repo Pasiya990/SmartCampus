@@ -119,13 +119,14 @@ public class BookingController {
     }
 
    
-    @DeleteMapping("/{id}/own")
-    public ResponseEntity<Void> deleteOwnBooking(
-            @PathVariable Long id,
-            Authentication auth
-    ) {
+   @DeleteMapping("/{id}/own")
+        public ResponseEntity<Void> deleteOwnBooking(
+                @PathVariable Long id,
+                Authentication auth
+        ) {
+        bookingService.deleteOwnBooking(id, getEmail(auth));
         return ResponseEntity.noContent().build();
-    }
+        }
 
   
     @PutMapping("/{id}/edit")
