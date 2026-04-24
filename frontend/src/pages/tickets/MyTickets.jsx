@@ -262,7 +262,9 @@ const MyTickets = () => {
               </tbody>
             </table>
           </div>
+        )}
         </div>
+      </div>
   );
 };
 
