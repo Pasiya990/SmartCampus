@@ -18,4 +18,7 @@ public class AddTicketCommentRequest {
 
     @NotBlank(message = "Message is required")
     private String message;
+
+    // ✅ Added — needed to identify if commenter is the ticket owner
+    private String authorEmail;
 }
