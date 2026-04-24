@@ -3,6 +3,7 @@ import { getMyTickets } from "../../api/ticketApi";
 import { Link, useNavigate } from "react-router-dom";
 import "./MyTickets.css";
 
+
 const MyTickets = () => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -162,16 +163,36 @@ const MyTickets = () => {
             </select>
           </div>
 
-          <div className="my-tickets-toolbar-right">
-            <button
-              className="my-tickets-clear-btn"
-              onClick={() => {
-                setSearchTerm("");
-                setStatusFilter("");
-              }}
-            >
-              Clear Filters
-            </button>
+          <div className="my-tickets-summary-grid">
+            <div className="my-tickets-summary-card my-tickets-summary-total">
+              <span className="my-tickets-summary-label">Total</span>
+              <span className="my-tickets-summary-value">{totalTickets}</span>
+            </div>
+
+            <div className="my-tickets-summary-card my-tickets-summary-open">
+              <span className="my-tickets-summary-label">Open</span>
+              <span className="my-tickets-summary-value">{openCount}</span>
+            </div>
+
+            <div className="my-tickets-summary-card my-tickets-summary-progress">
+              <span className="my-tickets-summary-label">In Progress</span>
+              <span className="my-tickets-summary-value">{inProgressCount}</span>
+            </div>
+
+            <div className="my-tickets-summary-card my-tickets-summary-resolved">
+              <span className="my-tickets-summary-label">Resolved</span>
+              <span className="my-tickets-summary-value">{resolvedCount}</span>
+            </div>
+
+            <div className="my-tickets-summary-card my-tickets-summary-rejected">
+              <span className="my-tickets-summary-label">Rejected</span>
+              <span className="my-tickets-summary-value">{rejectedCount}</span>
+            </div>
+
+            <div className="my-tickets-summary-card my-tickets-summary-closed">
+              <span className="my-tickets-summary-label">Closed</span>
+              <span className="my-tickets-summary-value">{closedCount}</span>
+            </div>
           </div>
         </div>
 
@@ -241,9 +262,7 @@ const MyTickets = () => {
               </tbody>
             </table>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
   );
 };
 

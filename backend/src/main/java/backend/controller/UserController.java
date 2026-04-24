@@ -2,7 +2,7 @@ package backend.controller;
 
 
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.core.Authentication;
 import backend.dto.NotificationPreferenceRequest;
 import backend.model.User;
 import backend.repository.UserRepository;
@@ -17,6 +17,20 @@ public class UserController {
 
     private final UserService userService;
     private final UserRepository userRepository;
+
+
+    @GetMapping("/me")
+    public User getCurrentUser(Authentication authentication) {
+
+        if (authentication == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        String email = authentication.getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 
     // ✅ GET USER
     @GetMapping("/{email}")
@@ -33,4 +47,7 @@ public class UserController {
     ) {
         userService.updateNotificationPreference(email, request.isEnabled());
     }
+
+    
+    
 }

@@ -1,0 +1,32 @@
+/* ═══════════════════════════════════════════
+   Footer.css
+   ═══════════════════════════════════════════ */
+
+   .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    background: #fff;
+    border-top: 1px solid #e4e9f2;
+    font-size: 0.78rem;
+    color: #8a94a8;
+  }
+  
+  .footer-left {
+    font-weight: 400;
+  }
+  
+  .footer-right {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .footer-right span {
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  
+  .footer-right span:hover {
+    color: #0F62FE;
+  }

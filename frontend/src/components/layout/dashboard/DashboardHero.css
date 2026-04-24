@@ -1,0 +1,112 @@
+/* ═══════════════════════════════════════════
+   DashboardHero.css
+   ═══════════════════════════════════════════ */
+
+   .hero {
+    background: linear-gradient(135deg, #0F62FE 0%, #1a3c6e 60%, #0d3380 100%);
+    border-radius: 16px;
+    padding: 36px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(15, 98, 254, 0.22);
+  }
+  
+  /* decorative circle blobs */
+  .hero::before,
+  .hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  .hero::before {
+    width: 340px;
+    height: 340px;
+    background: #fff;
+    top: -120px;
+    right: -80px;
+  }
+  .hero::after {
+    width: 180px;
+    height: 180px;
+    background: #fff;
+    bottom: -70px;
+    left: 30%;
+  }
+  
+  .hero h2 {
+    font-size: 1.65rem;
+    font-weight: 700;
+    margin: 0 0 6px;
+    letter-spacing: -0.3px;
+  }
+  
+  .hero p {
+    margin: 0;
+    font-size: 0.92rem;
+    opacity: 0.82;
+    font-weight: 400;
+  }
+  
+  .stats {
+    display: flex;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    flex-shrink: 0;
+  }
+  
+  .stats > div {
+    padding: 18px 28px;
+    text-align: center;
+    position: relative;
+  }
+  
+  .stats > div + div::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18%;
+    height: 64%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.25);
+  }
+  
+  .stats span {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-bottom: 4px;
+  }
+  
+  .stats h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 28px 24px;
+    }
+    .stats {
+      width: 100%;
+      justify-content: space-around;
+    }
+  }

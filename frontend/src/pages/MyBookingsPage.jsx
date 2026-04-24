@@ -185,18 +185,16 @@ export default function MyBookingsPage() {
               <StatusBadge status={b.status} />
             </div>
 
-            <div className="card-text">
-              {b.date} · {b.startTime} – {b.endTime}
-            </div>
+        {message && <div className="success">{message}</div>}
+        {error && <div className="error">{error}</div>}
 
             <div className="card-meta">
               <span>🎯 {b.purpose}</span>
               <span>👥 {b.attendees}</span>
             </div>
 
-            {b.rejectionReason && (
-              <div className="card-rejection">
-                {b.rejectionReason}
+              <div className="card-text">
+                {b.date} · {b.startTime} – {b.endTime}
               </div>
             )}
 
@@ -208,16 +206,15 @@ export default function MyBookingsPage() {
                 </button>
               )}
 
-              {b.status === 'PENDING' && (
-                <button className="btn-approve" onClick={() => handleEditOpen(b)}>
-                  Edit
-                </button>
-              )}
+              <div className="card-meta">
+                <span>Purpose: {b.purpose}</span>
+                <span>Attendees: {b.attendees}</span>
+              </div>
 
-              {(b.status === 'CANCELLED' || b.status === 'REJECTED') && (
-                <button className="btn-reject" onClick={() => handleDelete(b.id)}>
-                  Delete
-                </button>
+              {b.rejectionReason && (
+                <div className="card-rejection">
+                  {b.rejectionReason}
+                </div>
               )}
 
             </div>

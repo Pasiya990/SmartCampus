@@ -1,0 +1,116 @@
+/* ═══════════════════════════════════════════
+   AlertsCard.css
+   ═══════════════════════════════════════════ */
+
+   .timeline-card {
+    background: #ffffff;
+    border: 1px solid #e4e9f2;
+    border-radius: 14px;
+    padding: 22px 22px 16px;
+    box-shadow: 0 2px 12px rgba(15, 30, 70, 0.05);
+  }
+  
+  .timeline-header {
+    margin-bottom: 18px;
+  }
+  
+  .timeline-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a2233;
+    letter-spacing: -0.2px;
+  }
+  
+  .no-alerts {
+    text-align: center;
+    color: #8a94a8;
+    font-size: 0.86rem;
+    padding: 24px 0;
+  }
+  
+  /* Timeline */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+  
+  /* Vertical track line */
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: linear-gradient(to bottom, #dde4f5 0%, transparent 100%);
+  }
+  
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 10px 10px 10px 0;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .timeline-item:hover {
+    background: #f7f9ff;
+  }
+  
+  /* Dot */
+  .timeline-dot {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #dde4f5;
+    border: 2px solid #c8d4f0;
+    flex-shrink: 0;
+    margin-top: 3px;
+    transition: background 0.2s, border-color 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .timeline-item.unread .timeline-dot {
+    background: #0F62FE;
+    border-color: rgba(15, 98, 254, 0.3);
+    box-shadow: 0 0 0 4px rgba(15, 98, 254, 0.1);
+  }
+  
+  /* Unread row highlight */
+  .timeline-item.unread {
+    background: rgba(15, 98, 254, 0.03);
+  }
+  .timeline-item.unread:hover {
+    background: rgba(15, 98, 254, 0.07);
+  }
+  
+  /* Content */
+  .timeline-content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .timeline-message {
+    margin: 0 0 3px;
+    font-size: 0.82rem;
+    color: #3a4560;
+    line-height: 1.45;
+    font-weight: 400;
+  }
+  
+  .timeline-item.unread .timeline-message {
+    font-weight: 600;
+    color: #1a2233;
+  }
+  
+  .timeline-time {
+    font-size: 0.71rem;
+    color: #a0abbe;
+    font-weight: 400;
+  }

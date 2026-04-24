@@ -8,7 +8,7 @@ import {
 } from "../api/notificationApi";
 import { updateNotificationPreference, getUser } from "../api/userApi";
 import "./NotificationBell.css";
-import { Trash2 } from "lucide-react";
+import { Trash2, Bell, BellOff } from "lucide-react";
 import { connectSocket, disconnectSocket } from "../services/socket";
 
 export default function NotificationBell() {
@@ -18,7 +18,6 @@ export default function NotificationBell() {
   const dropdownRef = useRef();
 
   const token = localStorage.getItem("token");
-
   let email = "";
   if (token) {
     try {
@@ -27,10 +26,8 @@ export default function NotificationBell() {
     } catch {}
   }
 
-  // 🔥 Load notifications
   const loadNotifications = async () => {
     if (!email || !enabled) return;
-
     try {
       const data = await getNotifications(email);
       setNotifications(data);
@@ -39,11 +36,9 @@ export default function NotificationBell() {
     }
   };
 
-  // 🔥 Load user preference
   useEffect(() => {
     const loadPreference = async () => {
       if (!email) return;
-
       try {
         const user = await getUser(email);
         setEnabled(user.notificationsEnabled);
@@ -51,54 +46,38 @@ export default function NotificationBell() {
         console.error("Failed to load preference", err);
       }
     };
-
     loadPreference();
   }, [email]);
 
-
   useEffect(() => {
-  if (!email || !enabled) return;
+    if (!email || !enabled) return;
+    loadNotifications();
+    connectSocket(email, (newMessage) => {
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          message: newMessage,
+          readStatus: false,
+          createdAt: new Date(),
+        },
+        ...prev,
+      ]);
+    });
+    return () => disconnectSocket();
+  }, [email, enabled]);
 
-  // initial load (keep this)
-  loadNotifications();
-
-  // 🔥 connect websocket
-  connectSocket(email, (newMessage) => {
-    console.log("🔥 Real-time:", newMessage);
-
-    setNotifications((prev) => [
-      {
-        id: Date.now(),
-        message: newMessage,
-        readStatus: false,
-        createdAt: new Date(),
-      },
-      ...prev,
-    ]);
-  });
-
-  return () => {
-    disconnectSocket();
-  };
-}, [email, enabled]);
-
-
-  // 🔥 Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const unreadCount = notifications.filter((n) => !n.readStatus).length;
 
-  // 🔥 Actions
   const handleMarkAsRead = async (id) => {
     await markAsRead(id);
     loadNotifications();
@@ -122,90 +101,102 @@ export default function NotificationBell() {
 
   const toggleNotifications = async () => {
     const newValue = !enabled;
-
     try {
       await updateNotificationPreference(email, newValue);
       setEnabled(newValue);
-
-      if (!newValue) {
-        setNotifications([]); // clear UI when disabled
-      } else {
-        loadNotifications();
-      }
+      if (!newValue) setNotifications([]);
+      else loadNotifications();
     } catch (err) {
       console.error("Toggle failed", err);
     }
   };
 
-  const formatTime = (time) => {
-    return new Date(time).toLocaleString();
-  };
+  const formatTime = (time) => new Date(time).toLocaleString();
 
   return (
     <div className="notification-container" ref={dropdownRef}>
-      
-      {/* 🔔 Bell */}
+
+      {/* BELL BUTTON */}
       <div className="notification-icon" onClick={() => setOpen(!open)}>
-        🔔
+        <Bell size={17} />
         {enabled && unreadCount > 0 && (
           <span className="notification-badge">{unreadCount}</span>
         )}
       </div>
 
-      {/* 📩 Dropdown */}
+      {/* DROPDOWN */}
       {open && (
         <div className="notification-dropdown">
 
-          {/* 🔥 Header */}
+          {/* HEADER */}
           <div className="notification-header">
-            <h4 className="notification-title">Notifications</h4>
+            <h4 className="notification-title">
+              Notifications
+              {enabled && unreadCount > 0 && (
+                <span style={{
+                  marginLeft: 8,
+                  fontSize: "0.68rem",
+                  background: "rgba(15,98,254,0.1)",
+                  color: "#0F62FE",
+                  borderRadius: 20,
+                  padding: "2px 8px",
+                  fontWeight: 600,
+                }}>
+                  {unreadCount} new
+                </span>
+              )}
+            </h4>
 
             <div className="notification-actions">
               <button onClick={toggleNotifications}>
-                {enabled ? "🔔 Disable" : "🔕 Enable"}
+                {enabled
+                  ? <><BellOff size={11} style={{marginRight:4, verticalAlign:"middle"}}/>Mute</>
+                  : <><Bell size={11} style={{marginRight:4, verticalAlign:"middle"}}/>Unmute</>
+                }
               </button>
-
               {enabled && notifications.length > 0 && (
                 <>
-                  <button onClick={handleMarkAll}>Mark all</button>
+                  <button onClick={handleMarkAll}>Mark all read</button>
                   <button onClick={handleClearAll}>Clear all</button>
                 </>
               )}
             </div>
           </div>
 
-          {/* 🔕 Disabled state */}
+          {/* BODY */}
           {!enabled ? (
-            <p className="notification-empty">
-              Notifications are disabled
-            </p>
+            <p className="notification-empty">🔕 Notifications are muted</p>
           ) : notifications.length === 0 ? (
-            <p className="notification-empty">No notifications</p>
+            <p className="notification-empty">You're all caught up 🎉</p>
           ) : (
-            notifications.map((n) => (
-              <div
-                key={n.id}
-                className={`notification-item ${
-                  !n.readStatus ? "unread" : ""
-                }`}
-                onClick={() => handleMarkAsRead(n.id)}
-              >
-                <div className="notification-content">
-                  <p className="notification-message">{n.message}</p>
-                  <small className="notification-time">
-                    {formatTime(n.createdAt)}
-                  </small>
-                </div>
-
-                <button
-                  className="notification-delete-btn"
-                  onClick={(e) => handleDelete(e, n.id)}
+            <div className="notification-list">
+              {notifications.map((n) => (
+                <div
+                  key={n.id}
+                  className={`notification-item ${!n.readStatus ? "unread" : ""}`}
+                  onClick={() => handleMarkAsRead(n.id)}
                 >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ))
+                  {/* DOT */}
+                  <div className="notification-dot" />
+
+                  {/* CONTENT */}
+                  <div className="notification-content">
+                    <p className="notification-message">{n.message}</p>
+                    <small className="notification-time">{formatTime(n.createdAt)}</small>
+                  </div>
+
+                  {/* DELETE */}
+                  <button
+                    className="notification-delete-btn"
+                    onClick={(e) => handleDelete(e, n.id)}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
+
         </div>
       )}
     </div>
