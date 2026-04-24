@@ -6,19 +6,6 @@ import toast from "react-hot-toast";
 import "./ResourceCatalogue.css";
 import AdminLayout from "../components/AdminLayout";
 
-const TYPE_ICONS = {
-  LECTURE_HALL: "🏛️",
-  LAB: "🔬",
-  MEETING_ROOM: "🗓️",
-  EQUIPMENT: "🎥",
-  SMART_RESOURCE: "💡",
-  OUTDOOR_EVENT_SPACE: "🌿",
-  AUDITORIUM_STAGE: "🎤",
-  LIBRARY_STUDY_AREA: "📚",
-  PODCAST_RECORDING_ROOM: "🎙️",
-  MEDIA_PRODUCTION_STUDIO: "🎬",
-};
-
 export default function ResourceCatalogue() {
   const navigate = useNavigate();
 
@@ -161,203 +148,205 @@ export default function ResourceCatalogue() {
   };
 
   const handleBook = (resource) => {
-  if (resource.status !== 'ACTIVE') {
-    toast.error('This resource is currently out of service');
-    return;
-  }
+    if (resource.status !== "ACTIVE") {
+      toast.error("This resource is currently out of service");
+      return;
+    }
 
-  navigate(`/booking/${resource.id}`, {
-    state: {
-      resource: resource, // ✅ pass the full object, not just id/name
-    },
-  });
-};
+    navigate(`/booking/${resource.id}`, {
+      state: {
+        resource: resource,
+      },
+    });
+  };
 
   return (
+    <>
+      <AdminLayout activeMenu="resources">
+        <div className="resource-page">
+          <div className="catalogue-page">
+            <div className="page-backdrop" />
 
-
-
-    <AdminLayout activeMenu="resources">
-    <div className="resource-page">
-    <div className="catalogue-page">
-      <div className="page-backdrop" />
-
-      <div className="catalogue-inner">
-        <div className="page-header">
-          <div>
-            <h1 className="page-title">Facilities &amp; Assets</h1>
-            <p className="page-sub">Smart Campus Operations Hub</p>
-          </div>
-
-          {isAdmin && (
-            <button
-              className="btn-primary"
-              onClick={() => setModal({ open: true, resource: null })}
-            >
-              + Add Resource
-            </button>
-          )}
-        </div>
-
-        <div className="glass-card filter-bar">
-          <input
-            className="glass-input"
-            placeholder="Search by location or building..."
-            value={search.keyword}
-            onChange={(e) =>
-              setSearch((prev) => ({ ...prev, keyword: e.target.value }))
-            }
-          />
-
-          <select
-            className="glass-select"
-            value={search.type}
-            onChange={(e) =>
-              setSearch((prev) => ({ ...prev, type: e.target.value }))
-            }
-          >
-            <option value="">All types</option>
-            {types.map((t) => (
-              <option key={t} value={t}>
-                {t.replaceAll("_", " ")}
-              </option>
-            ))}
-          </select>
-
-          <input
-            className="glass-input"
-            type="number"
-            placeholder="Min capacity"
-            value={search.minCapacity}
-            onChange={(e) =>
-              setSearch((prev) => ({ ...prev, minCapacity: e.target.value }))
-            }
-          />
-
-          <button className="btn-primary" onClick={handleSearch}>
-            Search
-          </button>
-
-          <button className="btn-ghost" onClick={handleClear}>
-            Clear
-          </button>
-        </div>
-
-        {pageError && (
-          <div style={{ marginBottom: "16px", color: "#dc2626", fontWeight: 600 }}>
-            {pageError}
-          </div>
-        )}
-
-        {loading ? (
-          <div className="loading-grid">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="skeleton-card" />
-            ))}
-          </div>
-        ) : resources.length === 0 ? (
-          <div className="empty-state">
-            <span>📭</span>
-            <p>No resources found. Try adjusting your filters.</p>
-          </div>
-        ) : (
-          <div className="resource-grid">
-            {resources.map((r) => (
-              <div key={r.id} className="glass-card resource-card">
-                {r.imageUrl && (
-                  <img
-                    src={r.imageUrl}
-                    alt={r.name}
-                    className="resource-image"
-                  />
-                )}
-
-                <div className="resource-icon">
-                  {TYPE_ICONS[r.type] || "🏢"}
+            <div className="catalogue-inner">
+              <div className="page-header">
+                <div>
+                  <h1 className="page-title">Facilities &amp; Assets</h1>
+                  <p className="page-sub">Smart Campus Operations Hub</p>
                 </div>
 
-                <div className="resource-header">
-                  <div>
-                    <h3 className="resource-name">{r.name}</h3>
-                    <p className="resource-type">
-                      {r.type?.replaceAll("_", " ")}
-                    </p>
-                  </div>
-
-                  <span
-                    className={`status-badge ${
-                      r.status === "ACTIVE" ? "active" : "inactive"
-                    }`}
+                {isAdmin && (
+                  <button
+                    className="btn-primary"
+                    onClick={() => setModal({ open: true, resource: null })}
                   >
-                    {r.status === "ACTIVE" ? "Active" : "Out of Service"}
-                  </span>
-                </div>
-
-                <div className="resource-meta">
-                  {r.location && (
-                    <span>
-                      📍 {r.location}
-                      {r.building ? `, ${r.building}` : ""}
-                    </span>
-                  )}
-
-                  {r.capacity && <span>👥 Capacity: {r.capacity}</span>}
-
-                  {r.availabilityStart && (
-                    <span>
-                      🕐 {r.availabilityStart} – {r.availabilityEnd}
-                    </span>
-                  )}
-                </div>
-
-                {r.description && (
-                  <p className="resource-desc">{r.description}</p>
+                    + Add Resource
+                  </button>
                 )}
-
-                <div className="resource-actions">
-                  {isAdmin && (
-                    <>
-                      <button
-                        className="btn-icon"
-                        onClick={() => setModal({ open: true, resource: r })}
-                        title="Edit"
-                      >
-                        ✏️
-                      </button>
-
-                      <button
-                        className="btn-icon"
-                        onClick={() => handleStatusToggle(r)}
-                        title="Toggle status"
-                      >
-                        {r.status === "ACTIVE" ? "🔴" : "🟢"}
-                      </button>
-
-                      <button
-                        className="btn-icon danger"
-                        onClick={() => handleDelete(r.id)}
-                        title="Delete"
-                      >
-                        🗑️
-                      </button>
-                    </>
-                  )}
-
-                  {isUser && (
-                    <button
-                      className="btn-icon"
-                      onClick={() => handleBook(r)}
-                      title="Book"
-                    >
-                      📅
-                    </button>
-                  )}
-                </div>
               </div>
-            ))}
+
+              <div className="glass-card filter-bar">
+                <input
+                  className="glass-input"
+                  placeholder="Search by location or building..."
+                  value={search.keyword}
+                  onChange={(e) =>
+                    setSearch((prev) => ({ ...prev, keyword: e.target.value }))
+                  }
+                />
+
+                <select
+                  className="glass-select"
+                  value={search.type}
+                  onChange={(e) =>
+                    setSearch((prev) => ({ ...prev, type: e.target.value }))
+                  }
+                >
+                  <option value="">All types</option>
+                  {types.map((t) => (
+                    <option key={t} value={t}>
+                      {t.replaceAll("_", " ")}
+                    </option>
+                  ))}
+                </select>
+
+                <input
+                  className="glass-input"
+                  type="number"
+                  placeholder="Min capacity"
+                  value={search.minCapacity}
+                  onChange={(e) =>
+                    setSearch((prev) => ({
+                      ...prev,
+                      minCapacity: e.target.value,
+                    }))
+                  }
+                />
+
+                <button className="btn-primary" onClick={handleSearch}>
+                  Search
+                </button>
+
+                <button className="btn-ghost" onClick={handleClear}>
+                  Clear
+                </button>
+              </div>
+
+              {pageError && (
+                <div
+                  style={{
+                    marginBottom: "16px",
+                    color: "#dc2626",
+                    fontWeight: 600,
+                  }}
+                >
+                  {pageError}
+                </div>
+              )}
+
+              {loading ? (
+                <div className="loading-grid">
+                  {[...Array(6)].map((_, i) => (
+                    <div key={i} className="skeleton-card" />
+                  ))}
+                </div>
+              ) : resources.length === 0 ? (
+                <div className="empty-state">
+                  <span>📭</span>
+                  <p>No resources found. Try adjusting your filters.</p>
+                </div>
+              ) : (
+                <div className="resource-grid">
+                  {resources.map((r) => (
+                    <div key={r.id} className="glass-card resource-card">
+                      {r.imageUrl && (
+                        <img
+                          src={r.imageUrl}
+                          alt={r.name}
+                          className="resource-image"
+                        />
+                      )}
+
+                      <div className="resource-header">
+                        <div>
+                          <h3 className="resource-name">{r.name}</h3>
+                          <p className="resource-type">
+                            {r.type?.replaceAll("_", " ")}
+                          </p>
+                        </div>
+
+                        <span
+                          className={`status-badge ${
+                            r.status === "ACTIVE" ? "active" : "inactive"
+                          }`}
+                        >
+                          {r.status === "ACTIVE" ? "Active" : "Out of Service"}
+                        </span>
+                      </div>
+
+                      <div className="resource-meta">
+                        {r.location && (
+                          <span>
+                            📍 {r.location}
+                            {r.building ? `, ${r.building}` : ""}
+                          </span>
+                        )}
+
+                        {r.capacity && <span>👥 Capacity: {r.capacity}</span>}
+
+                        {r.availabilityStart && (
+                          <span>
+                            🕐 {r.availabilityStart} – {r.availabilityEnd}
+                          </span>
+                        )}
+                      </div>
+
+                      {r.description && (
+                        <p className="resource-desc">{r.description}</p>
+                      )}
+
+                      <div className="resource-actions">
+                        {isAdmin && (
+                          <>
+                            <button
+                              className="btn-text"
+                              onClick={() => setModal({ open: true, resource: r })}
+                            >
+                              Edit
+                            </button>
+
+                            <button
+                              className="btn-text"
+                              onClick={() => handleStatusToggle(r)}
+                            >
+                              {r.status === "ACTIVE" ? "Deactivate" : "Activate"}
+                            </button>
+
+                            <button
+                              className="btn-text danger"
+                              onClick={() => handleDelete(r.id)}
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+
+                        {isUser && (
+                          <button
+                            className="btn-text primary"
+                            onClick={() => handleBook(r)}
+                          >
+                            Book
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      </AdminLayout>
 
       {isAdmin && modal.open && (
         <ResourceModal
@@ -370,9 +359,6 @@ export default function ResourceCatalogue() {
           }}
         />
       )}
-    </div>
-     </div>
-  </AdminLayout>
-
+    </>
   );
 }

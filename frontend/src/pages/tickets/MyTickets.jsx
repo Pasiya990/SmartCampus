@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getMyTickets } from "../../api/ticketApi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./MyTickets.css";
 
 
@@ -11,6 +11,8 @@ const MyTickets = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -54,7 +56,7 @@ const MyTickets = () => {
   const closedCount = tickets.filter((ticket) => ticket.status === "CLOSED").length;
 
   if (loading) {
-    return <p className="my-tickets-loading">Loading your tickets...</p>;
+    return null;
   }
 
   if (errorMessage) {
@@ -62,16 +64,103 @@ const MyTickets = () => {
   }
 
   return (
+    <div className="my-tickets-page">
+      <div className="my-tickets-header">
+        <div className="my-tickets-header-left">
+          <button
+            className="my-tickets-back-btn"
+            onClick={() => navigate(-1)}
+          >
+            &#8592; Back
+          </button>
+          <div>
+            <h2 className="my-tickets-title">My Tickets</h2>
+            <p className="my-tickets-subtitle">
+              Track incidents you have reported
+            </p>
+          </div>
+        </div>
+        <button
+          className="my-tickets-new-btn"
+          onClick={() => navigate("/tickets/new")}
+        >
+          + New Ticket
+        </button>
+      </div>
 
+      <div className="my-tickets-summary-grid">
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-total ${statusFilter === "" ? "active" : ""}`}
+    onClick={() => setStatusFilter("")}
+  >
+    <span className="my-tickets-summary-bubble">{totalTickets}</span>
+    <span className="my-tickets-summary-label">Total</span>
+  </div>
 
-        <div className="my-tickets-page">
-          <div className="my-tickets-header">
-            <div>
-              <h2 className="my-tickets-title">My Tickets</h2>
-              <p className="my-tickets-subtitle">
-                Track incidents you have reported
-              </p>
-            </div>
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-open ${statusFilter === "OPEN" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "OPEN" ? "" : "OPEN")}
+  >
+    <span className="my-tickets-summary-bubble">{openCount}</span>
+    <span className="my-tickets-summary-label">Open</span>
+  </div>
+
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-progress ${statusFilter === "IN_PROGRESS" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "IN_PROGRESS" ? "" : "IN_PROGRESS")}
+  >
+    <span className="my-tickets-summary-bubble">{inProgressCount}</span>
+    <span className="my-tickets-summary-label">In Progress</span>
+  </div>
+
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-resolved ${statusFilter === "RESOLVED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "RESOLVED" ? "" : "RESOLVED")}
+  >
+    <span className="my-tickets-summary-bubble">{resolvedCount}</span>
+    <span className="my-tickets-summary-label">Resolved</span>
+  </div>
+
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-rejected ${statusFilter === "REJECTED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "REJECTED" ? "" : "REJECTED")}
+  >
+    <span className="my-tickets-summary-bubble">{rejectedCount}</span>
+    <span className="my-tickets-summary-label">Rejected</span>
+  </div>
+
+  <div
+    className={`my-tickets-summary-pill my-tickets-summary-closed ${statusFilter === "CLOSED" ? "active" : ""}`}
+    onClick={() => setStatusFilter(statusFilter === "CLOSED" ? "" : "CLOSED")}
+  >
+    <span className="my-tickets-summary-bubble">{closedCount}</span>
+    <span className="my-tickets-summary-label">Closed</span>
+  </div>
+</div>
+
+      <div className="my-tickets-card">
+        <div className="my-tickets-toolbar">
+          <div className="my-tickets-toolbar-left">
+            <input
+              type="text"
+              placeholder="Search by title or ticket code"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="my-tickets-search"
+            />
+
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="my-tickets-select"
+            >
+              <option value="">All Statuses</option>
+              <option value="OPEN">OPEN</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+              <option value="REJECTED">REJECTED</option>
+              <option value="CLOSED">CLOSED</option>
+            </select>
           </div>
 
           <div className="my-tickets-summary-grid">
@@ -105,102 +194,73 @@ const MyTickets = () => {
               <span className="my-tickets-summary-value">{closedCount}</span>
             </div>
           </div>
+        </div>
 
-          <div className="my-tickets-card">
-            <div className="my-tickets-toolbar">
-              <div className="my-tickets-toolbar-left">
-                <input
-                  type="text"
-                  placeholder="Search by title or ticket code"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="my-tickets-search"
-                />
+        <div className="my-tickets-results-row">
+          <span className="my-tickets-results-text">
+            Showing <strong>{filteredTickets.length}</strong>{" "}
+            {filteredTickets.length === 1 ? "ticket" : "tickets"}
+          </span>
+        </div>
 
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="my-tickets-select"
-                >
-                  <option value="">All Statuses</option>
-                  <option value="OPEN">OPEN</option>
-                  <option value="IN_PROGRESS">IN_PROGRESS</option>
-                  <option value="RESOLVED">RESOLVED</option>
-                  <option value="REJECTED">REJECTED</option>
-                  <option value="CLOSED">CLOSED</option>
-                </select>
-              </div>
-
-              <div className="my-tickets-toolbar-right">
-                <button
-                  className="my-tickets-clear-btn"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setStatusFilter("");
-                  }}
-                >
-                  Clear Filters
-                </button>
-              </div>
-            </div>
-
-            <div className="my-tickets-results-row">
-              <span className="my-tickets-results-text">
-                Showing <strong>{filteredTickets.length}</strong> ticket(s)
-              </span>
-            </div>
-
-            {filteredTickets.length === 0 ? (
-              <p className="my-tickets-empty">No tickets found for your account.</p>
-            ) : (
-              <div className="my-tickets-table-wrapper">
-                <table className="my-tickets-table">
-                  <thead>
-                    <tr>
-                      <th>Ticket Code</th>
-                      <th>Title</th>
-                      <th>Category</th>
-                      <th>Priority</th>
-                      <th>Status</th>
-                      <th>Location</th>
-                      <th>View Details</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredTickets.map((ticket) => (
-                      <tr key={ticket.id}>
-                        <td className="my-tickets-code-cell">{ticket.ticketCode}</td>
-                        <td className="my-tickets-title-cell">{ticket.title}</td>
-                        <td>{ticket.category}</td>
-                        <td>
-                          <span
-                            className={`my-tickets-badge my-tickets-priority-${ticket.priority?.toLowerCase()}`}
-                          >
-                            {ticket.priority}
-                          </span>
-                        </td>
-                        <td>
-                          <span
-                            className={`my-tickets-badge my-tickets-status-${ticket.status?.toLowerCase()}`}
-                          >
-                            {ticket.status}
-                          </span>
-                        </td>
-                        <td>{ticket.location}</td>
-                        <td>
-                          <Link
-                            to={`/tickets/${ticket.id}`}
-                            className="my-tickets-view-link"
-                          >
-                            View Details
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+        {filteredTickets.length === 0 ? (
+          <p className="my-tickets-empty">No tickets found for your account.</p>
+        ) : (
+          <div className="my-tickets-table-wrapper">
+            <table className="my-tickets-table">
+              <colgroup>
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+                <col />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Ticket Code</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Location</th>
+                  <th>View Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTickets.map((ticket) => (
+                  <tr key={ticket.id}>
+                    <td className="my-tickets-code-cell">{ticket.ticketCode}</td>
+                    <td className="my-tickets-title-cell">{ticket.title}</td>
+                    <td>{ticket.category}</td>
+                    <td>
+                      <span
+                        className={`my-tickets-badge my-tickets-priority-${ticket.priority?.toLowerCase()}`}
+                      >
+                        {ticket.priority}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`my-tickets-badge my-tickets-status-${ticket.status?.toLowerCase()}`}
+                      >
+                        {ticket.status}
+                      </span>
+                    </td>
+                    <td className="my-tickets-location-cell">{ticket.location}</td>
+                    <td>
+                      <Link
+                        to={`/tickets/${ticket.id}`}
+                        className="my-tickets-view-link"
+                      >
+                        View Details
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
   );

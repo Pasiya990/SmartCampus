@@ -1,6 +1,6 @@
 .verify-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f3e8ff 0%, #ede9fe 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,7 +14,7 @@
   padding: 40px 32px;
   max-width: 420px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(114, 14, 158, 0.15);
+  box-shadow: 0 20px 60px rgba(14, 78, 158, 0.15);
 }
 
 /* Header */
@@ -26,7 +26,7 @@
 .verify-checkmark {
   width: 64px;
   height: 64px;
-  background: linear-gradient(135deg, #720e9e, #5a0a7e);
+  background: linear-gradient(135deg, #0e4e9e, #0a3a7e);
   border-radius: 50%;
   display: flex;
   align-items: center;
