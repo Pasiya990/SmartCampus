@@ -15,7 +15,7 @@ export default function TechnicianLayout({ children, activeMenu = "dashboard" })
           <div className="technician-sidebar-logo">
             <div className="technician-logo-icon">🛠️</div>
             <div>
-              <h2>Headstart</h2>
+              <h2>Resora</h2>
               <p>Technician Panel</p>
             </div>
           </div>

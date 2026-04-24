@@ -163,37 +163,7 @@ const MyTickets = () => {
             </select>
           </div>
 
-          <div className="my-tickets-summary-grid">
-            <div className="my-tickets-summary-card my-tickets-summary-total">
-              <span className="my-tickets-summary-label">Total</span>
-              <span className="my-tickets-summary-value">{totalTickets}</span>
-            </div>
-
-            <div className="my-tickets-summary-card my-tickets-summary-open">
-              <span className="my-tickets-summary-label">Open</span>
-              <span className="my-tickets-summary-value">{openCount}</span>
-            </div>
-
-            <div className="my-tickets-summary-card my-tickets-summary-progress">
-              <span className="my-tickets-summary-label">In Progress</span>
-              <span className="my-tickets-summary-value">{inProgressCount}</span>
-            </div>
-
-            <div className="my-tickets-summary-card my-tickets-summary-resolved">
-              <span className="my-tickets-summary-label">Resolved</span>
-              <span className="my-tickets-summary-value">{resolvedCount}</span>
-            </div>
-
-            <div className="my-tickets-summary-card my-tickets-summary-rejected">
-              <span className="my-tickets-summary-label">Rejected</span>
-              <span className="my-tickets-summary-value">{rejectedCount}</span>
-            </div>
-
-            <div className="my-tickets-summary-card my-tickets-summary-closed">
-              <span className="my-tickets-summary-label">Closed</span>
-              <span className="my-tickets-summary-value">{closedCount}</span>
-            </div>
-          </div>
+          
         </div>
 
         <div className="my-tickets-results-row">
