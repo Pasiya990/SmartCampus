@@ -3,6 +3,7 @@ import { resourceService } from "../services/resourceService";
 import toast from "react-hot-toast";
 import "./ResourceModal.css";
 
+
 const DEFAULT_TYPES = [
   "LECTURE_HALL",
   "LAB",
@@ -116,6 +117,9 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
   });
 
   return (
+
+    
+      
     <div
       className="modal-overlay"
       onClick={(e) => e.target === e.currentTarget && onClose()}
@@ -263,5 +267,6 @@ export default function ResourceModal({ resource, types, onClose, onSaved }) {
         </div>
       </div>
     </div>
+  
   );
 }

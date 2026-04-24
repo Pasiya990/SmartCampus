@@ -8,6 +8,10 @@ export default function Topbar() {
 
   const isActive = (path) => location.pathname.startsWith(path);
 
+  const role = localStorage.getItem("role");
+
+if (role !== "USER") return null;
+
   return (
     <header className="topbar">
 

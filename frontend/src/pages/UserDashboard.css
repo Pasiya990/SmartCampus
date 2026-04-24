@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   UserDashboard.css
+   UserDashboard.css (Premium Clean Layout)
    ═══════════════════════════════════════════ */
 
    .dashboard {
@@ -7,28 +7,112 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    background-color: #f4f6fb;
+  
+    /* 🔥 soft premium background */
+    background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
     min-height: 100vh;
   }
   
+  /* ===== GRID ===== */
   .grid {
     display: grid;
     grid-template-columns: 1fr 360px;
-    gap: 20px;
+    gap: 24px;
     align-items: start;
   }
   
+  /* ===== RIGHT SIDE PANEL ===== */
   .side {
     display: flex;
     flex-direction: column;
     gap: 20px;
+  
+    /* 🔥 make side panel feel separate */
+    position: sticky;
+    top: 90px;
   }
   
+  /* ===== CARD BASE IMPROVEMENT ===== */
+  .card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+  
+    border-radius: 16px;
+    padding: 18px;
+  
+    border: 1px solid rgba(226, 232, 240, 0.6);
+  
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.04),
+      0 2px 6px rgba(0, 0, 0, 0.02);
+  
+    transition: all 0.25s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-3px);
+  }
+  
+  /* ===== NOTIFICATIONS (TIMELINE STYLE FEEL) ===== */
+  .alert-card {
+    margin-top: 6px;
+  
+    /* subtle separation */
+    border-top: 1px solid #e2e8f0;
+    padding-top: 16px;
+  
+    /* slightly taller feel */
+    min-height: 240px;
+  }
+  
+  /* ===== SIDE SECTION GROUPING (OPTIONAL STRUCTURE) ===== */
+  .side-top {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .side-bottom {
+    margin-top: 4px;
+  }
+  
+  /* ===== SCROLL IF TOO MANY ITEMS ===== */
+  .alert-card,
+  .outage-card {
+    max-height: 280px;
+    overflow-y: auto;
+  }
+  
+  /* smooth scroll */
+  .alert-card::-webkit-scrollbar,
+  .outage-card::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .alert-card::-webkit-scrollbar-thumb,
+  .outage-card::-webkit-scrollbar-thumb {
+    background: #cbd5f5;
+    border-radius: 999px;
+  }
+  
+  /* ===== RESPONSIVE ===== */
   @media (max-width: 1024px) {
     .grid {
       grid-template-columns: 1fr;
     }
+  
     .dashboard {
       padding: 20px 16px 40px;
     }
+  
+    .side {
+      position: static;
+    }
+  }
+
+  /* LEFT COLUMN */
+.main {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }

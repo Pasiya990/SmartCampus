@@ -18,29 +18,44 @@
     padding: 18px 20px;
     text-decoration: none;
     color: #1a2233;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
     cursor: pointer;
+    transition: border-color 0.25s ease,
+                box-shadow 0.25s ease,
+                transform 0.2s ease,
+                background 0.25s ease,
+                color 0.25s ease;
   }
   
+  /* HOVER — fill with blue like the primary card */
   .action-card:hover {
-    border-color: #0F62FE;
-    box-shadow: 0 4px 18px rgba(15, 98, 254, 0.12);
-    transform: translateY(-2px);
-  }
-  
-  /* Primary card — Create Ticket */
-  .action-card.primary {
     background: linear-gradient(135deg, #0F62FE 0%, #0047c8 100%);
     border-color: transparent;
     color: #fff;
-    box-shadow: 0 4px 18px rgba(15, 98, 254, 0.3);
+    box-shadow: 0 10px 28px rgba(15, 98, 254, 0.38);
+    transform: translateY(-3px);
   }
+ 
+   /* PRIMARY — Create Ticket (always filled) */
+   .action-card.primary {
+    background: #ffffff;
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(15, 98, 254, 0.30);
+  }
+  
+  .action-card:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(15, 98, 254, 0.28);
+  }
+  
   
   .action-card.primary:hover {
-    background: linear-gradient(135deg, #1a6fff 0%, #0053e0 100%);
-    box-shadow: 0 8px 24px rgba(15, 98, 254, 0.4);
+    background: linear-gradient(135deg, #2b74ff 0%, #0053e0 100%);
+    box-shadow: 0 10px 28px rgba(15, 98, 254, 0.45);
+    transform: translateY(-3px);
   }
   
+  /* ICON */
   .action-icon {
     width: 40px;
     height: 40px;
@@ -54,7 +69,14 @@
     flex-shrink: 0;
     font-weight: 700;
     line-height: 1;
-    transition: background 0.2s;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease;
+  }
+  
+  /* icon turns white-tinted on hover */
+  .action-card:hover .action-icon {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    transform: scale(1.08);
   }
   
   .action-card.primary .action-icon {
@@ -62,19 +84,18 @@
     color: #fff;
   }
   
-  .action-card:hover .action-icon {
-    background: rgba(15, 98, 254, 0.14);
-  }
-  
   .action-card.primary:hover .action-icon {
     background: rgba(255, 255, 255, 0.28);
+    transform: scale(1.08);
   }
   
+  /* TEXT */
   .action-text h4 {
     margin: 0 0 2px;
     font-size: 0.9rem;
     font-weight: 600;
     line-height: 1.2;
+    transition: color 0.25s ease;
   }
   
   .action-text p {
@@ -82,10 +103,16 @@
     font-size: 0.76rem;
     opacity: 0.65;
     font-weight: 400;
+    transition: opacity 0.25s ease;
   }
   
-  .action-card.primary .action-text p {
-    opacity: 0.8;
+  /* text goes fully white on hover */
+  .action-card:hover .action-text h4 {
+    color: #fff;
+  }
+  
+  .action-card:hover .action-text p {
+    opacity: 0.82;
   }
   
   @media (max-width: 900px) {

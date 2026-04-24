@@ -174,6 +174,9 @@ export default function ResourceCatalogue() {
 };
 
   return (
+
+
+
     <AdminLayout activeMenu="resources">
     <div className="resource-page">
     <div className="catalogue-page">
@@ -370,5 +373,6 @@ export default function ResourceCatalogue() {
     </div>
      </div>
   </AdminLayout>
+
   );
 }

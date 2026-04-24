@@ -33,24 +33,32 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/oauth-success" element={<OAuthSuccess />} />
 
-              <Route path="/user" element={<UserLayout />}>
-        <Route index element={<UserDashboard />} />
-      </Route>
+        <Route element={<UserLayout />}>
+
+<Route path="/user" element={<UserDashboard />} />
+
+<Route path="/resources" element={<ResourceCatalogue />} />
+
+<Route path="/my-bookings" element={<MyBookingsPage />} />
+
+<Route path="/my-tickets" element={<MyTickets />} />
+
+<Route path="/tickets/new" element={<TicketCreate />} />
+
+<Route path="/tickets/:id" element={<TicketDetails />} />
+
+<Route path="/book" element={<BookingFormPage />} />
+<Route path="/booking/:id" element={<BookingFormPage />} />
+<Route path="/booking/verify/:id" element={<BookingVerifyPage />} />
+
+</Route>
 
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/technician" element={<TechnicianDashboard />} />
-        <Route path="/resources" element={<ResourceCatalogue />} />
 
-        <Route path="/book" element={<BookingFormPage />} />
-        <Route path="/booking/:id" element={<BookingFormPage />} />
-        <Route path="/my-bookings" element={<MyBookingsPage />} />
         <Route path="/admin/bookings" element={<AdminBookingsPage />} />
-        <Route path="/booking/verify/:id" element={<BookingVerifyPage />} />
 
-        <Route path="/tickets/new" element={<TicketCreate />} />
         <Route path="/tickets" element={<TicketList />} />
-        <Route path="/tickets/:id" element={<TicketDetails />} />
-        <Route path="/my-tickets" element={<MyTickets />} />
         <Route path="/technician/my-tickets" element={<TechnicianView />} />
 
       </Routes>

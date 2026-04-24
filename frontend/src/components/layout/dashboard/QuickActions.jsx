@@ -6,7 +6,7 @@ export default function QuickActions() {
     <div className="actions">
 
       {/* PRIMARY */}
-      <Link to="/tickets/new" className="action-card primary">
+      <Link to="/tickets/new" className="action-card">
         <div className="action-icon">+</div>
         <div className="action-text">
           <h4>Create Ticket</h4>

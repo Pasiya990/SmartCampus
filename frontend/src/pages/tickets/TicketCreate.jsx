@@ -4,6 +4,7 @@ import { createTicket } from "../../api/ticketApi";
 import { resourceService } from "../../services/resourceService";
 import "./TicketCreate.css";
 
+
 const getEmailFromToken = () => {
   const token = localStorage.getItem("token");
 
@@ -241,246 +242,248 @@ const TicketCreate = () => {
   );
 
   return (
-    <div className="ticket-create-page">
-      <div className="ticket-create-toast-container">
-        {successMessage && (
-          <div className="ticket-create-toast success">
-            <span>✅</span>
-            <p>{successMessage}</p>
+
+ 
+        <div className="ticket-create-page">
+          <div className="ticket-create-toast-container">
+            {successMessage && (
+              <div className="ticket-create-toast success">
+                <span>✅</span>
+                <p>{successMessage}</p>
+              </div>
+            )}
+
+            {errorMessage && (
+              <div className="ticket-create-toast error">
+                <span>⚠️</span>
+                <p>{errorMessage}</p>
+              </div>
+            )}
           </div>
-        )}
 
-        {errorMessage && (
-          <div className="ticket-create-toast error">
-            <span>⚠️</span>
-            <p>{errorMessage}</p>
+          <div className="ticket-create-header">
+            <div className="ticket-create-header-left">
+              <button
+                type="button"
+                className="ticket-create-back-btn"
+                onClick={() => navigate(-1)}
+              >
+                ←
+              </button>
+
+              <div>
+                <h2 className="ticket-create-title">Create Incident Ticket</h2>
+                <p className="ticket-create-subtitle">
+                  Submit a new issue with location, priority, and supporting details
+                </p>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
 
-      <div className="ticket-create-header">
-        <div className="ticket-create-header-left">
-          <button
-            type="button"
-            className="ticket-create-back-btn"
-            onClick={() => navigate(-1)}
-          >
-            ←
-          </button>
+          <div className="ticket-create-card">
+            <form className="ticket-create-form" onSubmit={handleSubmit}>
+              <div className="ticket-create-grid">
+                <div className="ticket-create-field ticket-create-field-wide">
+                  <label>
+                    Title <span className="ticket-create-required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder="Enter a short title for the incident"
+                    required
+                  />
+                </div>
 
-          <div>
-            <h2 className="ticket-create-title">Create Incident Ticket</h2>
-            <p className="ticket-create-subtitle">
-              Submit a new issue with location, priority, and supporting details
-            </p>
+                <div className="ticket-create-field ticket-create-field-wide">
+                  <label>
+                    Description <span className="ticket-create-required">*</span>
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Describe the issue clearly"
+                    rows="5"
+                    required
+                  />
+                </div>
+
+                <div className="ticket-create-field">
+                  <label>
+                    Category <span className="ticket-create-required">*</span>
+                  </label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    <option value="IT_EQUIPMENT">IT Equipment</option>
+                    <option value="HVAC">HVAC</option>
+                    <option value="STRUCTURAL">Structural</option>
+                    <option value="ELECTRICAL">Electrical</option>
+                    <option value="PLUMBING">Plumbing</option>
+                    <option value="SECURITY">Security</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+
+                <div className="ticket-create-field">
+                  <label>
+                    Priority <span className="ticket-create-required">*</span>
+                  </label>
+                  <select
+                    name="priority"
+                    value={formData.priority}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select Priority</option>
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                    <option value="CRITICAL">Critical</option>
+                  </select>
+                </div>
+
+                <div className="ticket-create-field">
+                  <label>
+                    Building <span className="ticket-create-required">*</span>
+                  </label>
+                  <select
+                    value={selectedBuilding}
+                    onChange={handleBuildingChange}
+                    required
+                  >
+                    <option value="">Select Building</option>
+                    {uniqueBuildings.map((building, index) => (
+                      <option key={index} value={building}>
+                        {building}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="ticket-create-field">
+                  <label>
+                    Floor <span className="ticket-create-required">*</span>
+                  </label>
+                  <select
+                    value={selectedFloor}
+                    onChange={handleFloorChange}
+                    required
+                    disabled={!selectedBuilding}
+                  >
+                    <option value="">Select Floor</option>
+                    {uniqueFloors.map((floor, index) => (
+                      <option key={index} value={floor}>
+                        {floor}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="ticket-create-field">
+                  <label>
+                    Resource Name <span className="ticket-create-required">*</span>
+                  </label>
+                  <select
+                    value={formData.resourceId}
+                    onChange={handleResourceChange}
+                    required
+                    disabled={!selectedBuilding || !selectedFloor}
+                  >
+                    <option value="">Select Resource</option>
+                    {filteredResources.map((resource) => (
+                      <option key={resource.id} value={resource.id}>
+                        {resource.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="ticket-create-field">
+                  <label>
+                    Location <span className="ticket-create-required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    placeholder="Auto-filled from selected resource"
+                    readOnly
+                    required
+                  />
+                </div>
+
+                <div className="ticket-create-field">
+                  <label>
+                    Preferred Contact{" "}
+                    <span className="ticket-create-required">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="preferredContact"
+                    value={formData.preferredContact}
+                    onChange={handleChange}
+                    placeholder="Enter Email or valid phone number"
+                    required
+                  />
+                </div>
+
+                <div className="ticket-create-field">
+                  <label>Contact Name</label>
+                  <input
+                    type="text"
+                    name="contactName"
+                    value={formData.contactName}
+                    onChange={handleChange}
+                    placeholder="Optional contact name"
+                  />
+                </div>
+
+                <div className="ticket-create-field ticket-create-field-wide">
+                  <label>Reported By</label>
+                  <input
+                    type="text"
+                    name="reportedBy"
+                    value={formData.reportedBy}
+                    placeholder="Reporter email"
+                    required
+                    readOnly
+                  />
+                </div>
+
+                <div className="ticket-create-field ticket-create-field-wide">
+                  <label>Upload Images (max 3)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                  />
+                  <span className="ticket-create-helper-text">
+                    Attach up to 3 images related to the issue
+                  </span>
+                </div>
+              </div>
+
+              <div className="ticket-create-actions">
+                <button
+                  className="ticket-create-primary-btn"
+                  type="submit"
+                  disabled={loading}
+                >
+                  {loading ? "Submitting..." : "Create Ticket"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </div>
-
-      <div className="ticket-create-card">
-        <form className="ticket-create-form" onSubmit={handleSubmit}>
-          <div className="ticket-create-grid">
-            <div className="ticket-create-field ticket-create-field-wide">
-              <label>
-                Title <span className="ticket-create-required">*</span>
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="Enter a short title for the incident"
-                required
-              />
-            </div>
-
-            <div className="ticket-create-field ticket-create-field-wide">
-              <label>
-                Description <span className="ticket-create-required">*</span>
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Describe the issue clearly"
-                rows="5"
-                required
-              />
-            </div>
-
-            <div className="ticket-create-field">
-              <label>
-                Category <span className="ticket-create-required">*</span>
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Category</option>
-                <option value="IT_EQUIPMENT">IT Equipment</option>
-                <option value="HVAC">HVAC</option>
-                <option value="STRUCTURAL">Structural</option>
-                <option value="ELECTRICAL">Electrical</option>
-                <option value="PLUMBING">Plumbing</option>
-                <option value="SECURITY">Security</option>
-                <option value="OTHER">Other</option>
-              </select>
-            </div>
-
-            <div className="ticket-create-field">
-              <label>
-                Priority <span className="ticket-create-required">*</span>
-              </label>
-              <select
-                name="priority"
-                value={formData.priority}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select Priority</option>
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-                <option value="CRITICAL">Critical</option>
-              </select>
-            </div>
-
-            <div className="ticket-create-field">
-              <label>
-                Building <span className="ticket-create-required">*</span>
-              </label>
-              <select
-                value={selectedBuilding}
-                onChange={handleBuildingChange}
-                required
-              >
-                <option value="">Select Building</option>
-                {uniqueBuildings.map((building, index) => (
-                  <option key={index} value={building}>
-                    {building}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="ticket-create-field">
-              <label>
-                Floor <span className="ticket-create-required">*</span>
-              </label>
-              <select
-                value={selectedFloor}
-                onChange={handleFloorChange}
-                required
-                disabled={!selectedBuilding}
-              >
-                <option value="">Select Floor</option>
-                {uniqueFloors.map((floor, index) => (
-                  <option key={index} value={floor}>
-                    {floor}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="ticket-create-field">
-              <label>
-                Resource Name <span className="ticket-create-required">*</span>
-              </label>
-              <select
-                value={formData.resourceId}
-                onChange={handleResourceChange}
-                required
-                disabled={!selectedBuilding || !selectedFloor}
-              >
-                <option value="">Select Resource</option>
-                {filteredResources.map((resource) => (
-                  <option key={resource.id} value={resource.id}>
-                    {resource.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="ticket-create-field">
-              <label>
-                Location <span className="ticket-create-required">*</span>
-              </label>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                placeholder="Auto-filled from selected resource"
-                readOnly
-                required
-              />
-            </div>
-
-            <div className="ticket-create-field">
-              <label>
-                Preferred Contact{" "}
-                <span className="ticket-create-required">*</span>
-              </label>
-              <input
-                type="text"
-                name="preferredContact"
-                value={formData.preferredContact}
-                onChange={handleChange}
-                placeholder="Enter Email or valid phone number"
-                required
-              />
-            </div>
-
-            <div className="ticket-create-field">
-              <label>Contact Name</label>
-              <input
-                type="text"
-                name="contactName"
-                value={formData.contactName}
-                onChange={handleChange}
-                placeholder="Optional contact name"
-              />
-            </div>
-
-            <div className="ticket-create-field ticket-create-field-wide">
-              <label>Reported By</label>
-              <input
-                type="text"
-                name="reportedBy"
-                value={formData.reportedBy}
-                placeholder="Reporter email"
-                required
-                readOnly
-              />
-            </div>
-
-            <div className="ticket-create-field ticket-create-field-wide">
-              <label>Upload Images (max 3)</label>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileChange}
-              />
-              <span className="ticket-create-helper-text">
-                Attach up to 3 images related to the issue
-              </span>
-            </div>
-          </div>
-
-          <div className="ticket-create-actions">
-            <button
-              className="ticket-create-primary-btn"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? "Submitting..." : "Create Ticket"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
   );
 };
 

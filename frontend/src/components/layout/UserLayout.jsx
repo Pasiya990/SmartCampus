@@ -4,20 +4,22 @@ import { Outlet } from "react-router-dom";
 import "./UserLayout.css";
 
 export default function UserLayout() {
+  const role = localStorage.getItem("role");
+
+  const isUser = role === "USER";
+
   return (
     <div className="layout">
 
-      <header className="layout-header">
-        <Topbar />
-      </header>
+      {/* ✅ ONLY FOR USER */}
+      {isUser && <Topbar />}
 
       <main className="layout-content">
         <Outlet />
       </main>
 
-      <footer className="layout-footer">
-        <Footer />
-      </footer>
+      {/* ✅ ONLY FOR USER */}
+      {isUser && <Footer />}
 
     </div>
   );
