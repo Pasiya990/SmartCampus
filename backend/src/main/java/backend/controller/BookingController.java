@@ -25,12 +25,12 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    // ✅ FIXED: Safe helper methods (NO MORE CRASH)
+    //  FIXED: Safe helper methods (NO MORE CRASH)
     private String getEmail(Authentication auth) {
         if (auth == null 
             || !auth.isAuthenticated() 
             || "anonymousUser".equals(auth.getPrincipal())) {
-            return null; // ✅ important for QR/public access
+            return null; //  important for QR/public access
         }
         return auth.getName();
     }
@@ -69,14 +69,14 @@ public class BookingController {
     }
 
     
-    // ✅ FIXED: Works for BOTH QR (no auth) and logged-in users
+    //  FIXED: Works for BOTH QR (no auth) and logged-in users
     @GetMapping("/{id}")
     public ResponseEntity<BookingResponse> getBooking(
             @PathVariable Long id,
             Authentication auth
     ) {
-        String email = getEmail(auth);   // can be null ✅
-        boolean admin = isAdmin(auth);   // false if not logged in ✅
+        String email = getEmail(auth);   // can be null 
+        boolean admin = isAdmin(auth);   // false if not logged in 
 
         return ResponseEntity.ok(
                 bookingService.getBookingById(id, email, admin)
