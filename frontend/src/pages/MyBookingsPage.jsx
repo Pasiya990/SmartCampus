@@ -196,7 +196,7 @@ export default function MyBookingsPage() {
               <div className="card-text">
                 {b.date} · {b.startTime} – {b.endTime}
               </div>
-            )}
+            
 
             <div className="card-actions">
 
