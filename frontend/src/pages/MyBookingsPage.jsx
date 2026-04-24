@@ -31,6 +31,17 @@ export default function MyBookingsPage() {
       .finally(() => setLoading(false));
   }, [refresh]);
 
+  useEffect(() => {
+    if (message || error) {
+      const timer = setTimeout(() => {
+        setMessage('');
+        setError('');
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message, error]);
+
   const isUpcoming = (b) => {
     const dt = new Date(`${b.date}T${b.startTime}`);
     return dt > new Date();
@@ -185,8 +196,7 @@ export default function MyBookingsPage() {
               <StatusBadge status={b.status} />
             </div>
 
-        {message && <div className="success">{message}</div>}
-        {error && <div className="error">{error}</div>}
+        
 
             <div className="card-meta">
               <span>🎯 {b.purpose}</span>
@@ -203,6 +213,23 @@ export default function MyBookingsPage() {
               {(b.status === 'PENDING' || b.status === 'APPROVED') && (
                 <button className="btn-cancel" onClick={() => handleCancel(b.id)}>
                   Cancel
+                </button>
+              )}
+              {b.status === 'PENDING' && (
+                <button 
+                  className="btn-edit"
+                  onClick={() => handleEditOpen(b)}
+                >
+                  Edit
+                </button>
+              )}
+
+              {(b.status === 'REJECTED' || b.status === 'CANCELLED') && (
+                <button
+                  className="btn-delete"
+                  onClick={() => handleDelete(b.id)}
+                >
+                  Delete
                 </button>
               )}
 
@@ -227,33 +254,65 @@ export default function MyBookingsPage() {
         <div className="modal-overlay" onClick={() => setEditingId(null)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
 
-            <h3>Edit Booking</h3>
+          <h3>Edit Booking</h3>
 
-            <input type="date" value={editForm.date}
-              onChange={e => setEditForm({ ...editForm, date: e.target.value })} />
+          <div className="form-group">
+            <label>Date</label>
+            <input
+              type="date"
+              value={editForm.date}
+              onChange={e => setEditForm({ ...editForm, date: e.target.value })}
+            />
+          </div>
 
-            <input type="time" value={editForm.startTime}
-              onChange={e => setEditForm({ ...editForm, startTime: e.target.value })} />
-
-            <input type="time" value={editForm.endTime}
-              onChange={e => setEditForm({ ...editForm, endTime: e.target.value })} />
-
-            <input type="text" value={editForm.purpose}
-              onChange={e => setEditForm({ ...editForm, purpose: e.target.value })} />
-
-            <input type="number" value={editForm.attendees}
-              onChange={e => setEditForm({ ...editForm, attendees: e.target.value })} />
-
-            <div className="modal-actions">
-              <button className="modal-btn-confirm" onClick={handleEditSubmit}>
-                Save
-              </button>
-              <button className="modal-btn-cancel" onClick={() => setEditingId(null)}>
-                Cancel
-              </button>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Start Time</label>
+              <input
+                type="time"
+                value={editForm.startTime}
+                onChange={e => setEditForm({ ...editForm, startTime: e.target.value })}
+              />
             </div>
 
+            <div className="form-group">
+              <label>End Time</label>
+              <input
+                type="time"
+                value={editForm.endTime}
+                onChange={e => setEditForm({ ...editForm, endTime: e.target.value })}
+              />
+            </div>
           </div>
+
+          <div className="form-group">
+            <label>Purpose</label>
+            <input
+              type="text"
+              value={editForm.purpose}
+              onChange={e => setEditForm({ ...editForm, purpose: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Attendees</label>
+            <input
+              type="number"
+              value={editForm.attendees}
+              onChange={e => setEditForm({ ...editForm, attendees: e.target.value })}
+            />
+          </div>
+
+          <div className="modal-actions">
+            <button className="modal-btn-confirm" onClick={handleEditSubmit}>
+              Save
+            </button>
+            <button className="modal-btn-cancel" onClick={() => setEditingId(null)}>
+              Cancel
+            </button>
+          </div>
+
+        </div>
         </div>
       )}
 

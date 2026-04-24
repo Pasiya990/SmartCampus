@@ -9,7 +9,7 @@ export default function BookingVerifyPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`http://10.21.135.110:8080/api/bookings/${id}`)
+    axios.get(`http://10.175.71.110:8080/api/bookings/${id}`)
       .then(res => setBooking(res.data))
       .finally(() => setLoading(false));
   }, [id]);

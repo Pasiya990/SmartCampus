@@ -21,6 +21,6 @@ public class QRCodeService {
     }
 
    public String buildQRContent(BookingResponse booking) {
-        return "http://10.21.135.110:3000/booking/verify/" + booking.getId();
+        return "http://10.175.71.110:3000/booking/verify/" + booking.getId();
     }
 }
