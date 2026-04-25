@@ -199,8 +199,8 @@ export default function MyBookingsPage() {
         
 
             <div className="card-meta">
-              <span>🎯 {b.purpose}</span>
-              <span>👥 {b.attendees}</span>
+              <span> {b.purpose}</span>
+              <span> {b.attendees}</span>
             </div>
 
               <div className="card-text">
