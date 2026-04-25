@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { jwtDecode } from "jwt-decode";
 import API from "../services/api";
 import { getNotifications } from "../api/notificationApi";
@@ -40,82 +40,76 @@ export default function UserDashboard() {
     } catch {}
   }
 
-  useEffect(() => {
-    fetchDashboardData();
-    fetchUser(); // 🔥 NEW
-  }, []);
 
   // ✅ FETCH USER NAME FROM BACKEND
-  const fetchUser = async () => {
-    try {
-      const res = await API.get("/user/me");
-      setName(res.data.name); // ✅ real DB name
-    } catch (err) {
-      console.error("Failed to fetch user", err);
-    }
-  };
+  // ✅ functions FIRST
+    const fetchUser = useCallback(async () => {
+      try {
+        const res = await API.get("/user/me");
+        setName(res.data.name);
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+      }
+    }, []);
 
-  const fetchDashboardData = async () => {
-    try {
-      // 🔹 tickets + bookings
-      const ticketRes = await API.get("/api/tickets/my-tickets");
-      const bookingRes = await API.get("/api/bookings");
+    const fetchDashboardData = useCallback(async () => {
+      try {
+        const ticketRes = await API.get("/api/tickets/my-tickets");
+        const bookingRes = await API.get("/api/bookings");
 
-      const ticketData = ticketRes.data || [];
-      const allBookings = bookingRes.data || [];
+        const ticketData = ticketRes.data || [];
+        const allBookings = bookingRes.data || [];
 
-      // 📅 today
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-      // ✅ filter bookings
-      const filteredBookings = allBookings
-        .filter((b) => {
-          const status = b.status?.toLowerCase();
-          const bookingDate = new Date(b.date);
+        const filteredBookings = allBookings
+          .filter((b) => {
+            const status = b.status?.toLowerCase();
+            const bookingDate = new Date(b.date);
+            return (
+              (status === "pending" || status === "approved") &&
+              bookingDate >= today
+            );
+          })
+          .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-          return (
-            (status === "pending" || status === "approved") &&
-            bookingDate >= today
-          );
-        })
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
+        const notiData = await getNotifications(email);
 
-      // 🔔 notifications
-      const notiData = await getNotifications(email);
+        const resourceRes = await resourceService.getAll();
+        const allResources = resourceRes.data || [];
 
-      // 🔹 resources (out of service)
-      const resourceRes = await resourceService.getAll();
-      const allResources = resourceRes.data || [];
+        const unavailable = allResources.filter(
+          (r) =>
+            r.status === "OUT_OF_SERVICE" ||
+            r.status === "MAINTENANCE"
+        );
 
-      const unavailable = allResources.filter(
-        (r) =>
-          r.status === "OUT_OF_SERVICE" ||
-          r.status === "MAINTENANCE"
-      );
+        setTickets(ticketData);
+        setBookings(filteredBookings);
+        setNotifications(notiData || []);
+        setOutages(unavailable);
 
-      // 🔹 set states
-      setTickets(ticketData);
-      setBookings(filteredBookings);
-      setNotifications(notiData || []);
-      setOutages(unavailable);
+        const active = ticketData.length;
+        const pending = ticketData.filter(
+          (t) => t.status?.toLowerCase() === "pending"
+        ).length;
 
-      // 📊 stats
-      const active = ticketData.length;
-      const pending = ticketData.filter(
-        (t) => t.status?.toLowerCase() === "pending"
-      ).length;
+        setStats({
+          active,
+          pending,
+          bookings: filteredBookings.length,
+        });
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+      }
+    }, [email]);
 
-      setStats({
-        active,
-        pending,
-        bookings: filteredBookings.length
-      });
-
-    } catch (err) {
-      console.error("Dashboard fetch error:", err);
-    }
-  };
+    // ✅ THEN useEffect
+    useEffect(() => {
+      fetchDashboardData();
+      fetchUser();
+    }, [fetchDashboardData, fetchUser]);
 
   return (
     <div className="dashboard">
