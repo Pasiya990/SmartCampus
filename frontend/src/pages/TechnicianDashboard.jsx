@@ -67,7 +67,6 @@ export default function TechnicianDashboard() {
     const openPercent = (open / safeTotalStatus) * 100;
     const inProgressPercent = (inProgress / safeTotalStatus) * 100;
     const resolvedPercent = (resolved / safeTotalStatus) * 100;
-    const closedPercent = (closed / safeTotalStatus) * 100;
 
     const doughnutStyle = {
       background: `conic-gradient(
