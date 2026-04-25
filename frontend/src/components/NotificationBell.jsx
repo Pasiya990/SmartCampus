@@ -1,5 +1,4 @@
-import { useEffect, useState, useRef } from "react";
-import {
+import { useEffect, useState, useRef, useCallback } from "react";import {
   getNotifications,
   markAsRead,
   deleteNotification,
@@ -26,7 +25,7 @@ export default function NotificationBell() {
     } catch {}
   }
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     if (!email || !enabled) return;
     try {
       const data = await getNotifications(email);
@@ -34,7 +33,7 @@ export default function NotificationBell() {
     } catch (err) {
       console.error("Failed to load notifications", err);
     }
-  };
+  }, [email, enabled]);
 
   useEffect(() => {
     const loadPreference = async () => {
@@ -64,7 +63,7 @@ export default function NotificationBell() {
       ]);
     });
     return () => disconnectSocket();
-  }, [email, enabled]);
+    }, [email, enabled, loadNotifications]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
