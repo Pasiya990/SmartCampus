@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <div className="footer">
       <div className="footer-left">
-        © 2026 CampusCore. All rights reserved.
+        © 2026 Resora. All rights reserved.
       </div>
 
       <div className="footer-right">
