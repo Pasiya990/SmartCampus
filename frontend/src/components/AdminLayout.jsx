@@ -125,6 +125,13 @@ export default function AdminLayout({ children, activeMenu = "dashboard" }) {
               
               <span>Resources</span>
             </button>
+
+            <button
+              className={`admin-side-btn ${activeMenu === "users" ? "active" : ""}`}
+              onClick={() => handleMenuClick("/admin/users")}
+            >
+              <span>Role Management</span>
+            </button>
           </div>
         </div>
 

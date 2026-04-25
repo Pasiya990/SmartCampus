@@ -22,6 +22,8 @@ import LandingPage from "./pages/LandingPage";
 import BookingVerifyPage from './pages/BookingVerifyPage';
 
 import UserLayout from "./components/layout/UserLayout";
+import UserManagement from "./pages/UserManagement";
+
 
 function App() {
   return (
@@ -52,6 +54,9 @@ function App() {
           <Route path="/booking/verify/:id" element={<BookingVerifyPage />} />
 
         </Route>
+
+        <Route path="/admin/users" element={<UserManagement />} />
+
 
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/technician" element={<TechnicianDashboard />} />
