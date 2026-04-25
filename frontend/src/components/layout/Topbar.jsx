@@ -47,7 +47,7 @@ export default function Topbar() {
   return (
     <header className="topbar">
 
-      <Link to="/user" className="logo">CampusCore</Link>
+      <Link to="/user" className="logo">Resora</Link>
 
       <nav className="nav-links">
         <Link to="/user" className={isActive("/user") ? "active" : ""}>Dashboard</Link>

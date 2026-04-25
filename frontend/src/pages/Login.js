@@ -39,9 +39,9 @@ export default function Login() {
       <div className="login-card">
 
         {/* LOGO MARK */}
-        <div className="login-logo">SC</div>
+        <div className="login-logo">R</div>
 
-        <h1>Smart Campus</h1>
+        <h1>Resora</h1>
         <p className="subtitle">Sign in to continue to your workspace</p>
 
         {/* PRIMARY — Google */}
