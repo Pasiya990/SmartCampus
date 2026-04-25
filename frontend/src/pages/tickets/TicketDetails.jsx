@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   getTicketById,
@@ -100,7 +100,7 @@ const TicketDetails = () => {
     }, 4000);
   };
 
-  const fetchTicketDetails = async () => {
+  const fetchTicketDetails = useCallback(async () => {
     try {
       const data = await getTicketById(id);
       setTicket(data);
@@ -108,16 +108,16 @@ const TicketDetails = () => {
       console.error("Fetch ticket details error:", error);
       setErrorMessage("Failed to load ticket details.");
     }
-  };
-
-  const fetchComments = async () => {
+  }, [id]);
+  
+  const fetchComments = useCallback(async () => {
     try {
       const data = await getCommentsByTicketId(id);
       setComments(data);
     } catch (error) {
       console.error("Fetch comments error:", error);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -126,9 +126,9 @@ const TicketDetails = () => {
       await fetchComments();
       setLoading(false);
     };
-
+  
     loadData();
-  }, [id]);
+  }, [fetchTicketDetails, fetchComments]);
 
   const handleAddComment = async (e) => {
     e.preventDefault();
